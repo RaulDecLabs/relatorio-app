@@ -1,0 +1,239 @@
+{
+  "name": "InsightOS - Coleta e Ingestão com IA",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 2 * * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger-daily-0200",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Você é o Agente IA de coleta de métricas do InsightOS. Sua tarefa diária é:\n1. Disparar a ferramenta 'Disparar Importação GA4' para importar as visitas e acessos do Google Analytics.\n2. Usar 'Get many campaigns in Google Ads' para coletar o desempenho das campanhas ativas de ontem.\n3. Usar 'Query search analytics in Search..' para extrair dados de SEO do Search Console de ontem.\n4. Salvar os resultados do Google Ads usando 'google ads relatorio' e os resultados do Search Console usando 'google search console relatorio'.\n\nExecute cada ferramenta e certifique-se de que todos os dados sejam consolidados e ingeridos com sucesso.",
+        "options": {
+          "systemMessage": "Você é um robô de integração de dados de marketing extremamente conciso e focado em execuções de API."
+        }
+      },
+      "id": "ai-agent-node",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        500,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "id": "gemini-model",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        340,
+        460
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "redis-memory",
+      "name": "Redis Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryRedis",
+      "typeVersion": 1.2,
+      "position": [
+        460,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "name": "google_search_console_relatorio",
+        "description": "Salva uma nova linha de métricas de SEO do Search Console no banco de dados."
+      },
+      "id": "supabase-gsc-tool",
+      "name": "google search console relatorio",
+      "type": "@n8n/n8n-nodes-langchain.toolSupabase",
+      "typeVersion": 1,
+      "position": [
+        240,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "name": "google_ads_relatorio",
+        "description": "Salva uma nova linha de métricas de campanhas do Google Ads no banco de dados."
+      },
+      "id": "supabase-ads-tool",
+      "name": "google ads relatorio",
+      "type": "@n8n/n8n-nodes-langchain.toolSupabase",
+      "typeVersion": 1,
+      "position": [
+        380,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "name": "Get many campaigns in Google Ads",
+        "description": "Busca dados de ontem das campanhas de Google Ads.",
+        "method": "POST",
+        "url": "https://googleads.googleapis.com/v17/customers/{{$parameter.customer_id}}/googleAds:search"
+      },
+      "id": "http-ads-tool",
+      "name": "Get many campaigns in Google Ads",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "name": "Query search analytics in Search..",
+        "description": "Busca dados de ontem do Google Search Console.",
+        "method": "POST",
+        "url": "https://www.googleapis.com/webmasters/v3/sites/{{$parameter.site_url}}/searchAnalytics/query"
+      },
+      "id": "http-gsc-tool",
+      "name": "Query search analytics in Search..",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        920,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "name": "disparar_importacao_ga4",
+        "description": "Dispara o script interno de importação do Google Analytics 4 (GA4) direto no painel do InsightOS. Retorna o status da importação.",
+        "method": "POST",
+        "url": "https://beach-bookmark-barn-sustained.trycloudflare.com/api/public/trigger-import?secret=insightOS-secret-2024&days=1",
+        "sendHeaders": false,
+        "sendBody": false
+      },
+      "id": "http-ga4-import-tool",
+      "name": "Disparar Importação GA4",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        460
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google search console relatorio": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google ads relatorio": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many campaigns in Google Ads": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query search analytics in Search..": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparar Importação GA4": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

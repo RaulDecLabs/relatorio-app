@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guia Completo: Relatório de Tráfego Multicanal & Links Compartilhados</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #1f2937;
+      --text-muted: #4b5563;
+      --bg-light: #f3f4f6;
+      --border: #e5e7eb;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      color: #111827;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #111827;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: #1f2937;
+      margin-top: 1.5rem;
+    }
+
+    code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      background-color: var(--bg-light);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background-color: var(--bg-light);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+
+    pre code {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+      font-size: 0.9em;
+    }
+
+    ul, ol {
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .alert {
+      background-color: #eff6ff;
+      border-left: 4px solid var(--primary);
+      padding: 1rem;
+      border-radius: 0.375rem;
+      margin: 1.5rem 0;
+    }
+
+    .alert-title {
+      font-weight: bold;
+      color: var(--primary-dark);
+      margin-top: 0;
+      margin-bottom: 0.25rem;
+    }
+
+    .alert p {
+      margin: 0;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .print-button-container {
+      margin-bottom: 2rem;
+      text-align: right;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        max-width: 100%;
+      }
+      .print-button-container {
+        display: none;
+      }
+      h2 {
+        page-break-before: always;
+      }
+      pre {
+        page-break-inside: avoid;
+      }
+      .alert {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-button-container">
+    <button onclick="window.print()" class="btn">Imprimir / Salvar como PDF</button>
+  </div>
+
+  <header>
+    <h1>Guia Completo: Relatório de Tráfego Multicanal & Links Compartilhados</h1>
+    <p class="subtitle">Instruções para conectar Google Ads, GA4 e Meta Ads usando n8n e links públicos no Supabase.</p>
+  </header>
+
+  <section>
+    <h2>1. Seu Novo Projeto Supabase está Pronto!</h2>
+    <p>Eu criei um novo projeto no Supabase chamado <code>insight-ai-hub</code> na região <code>sa-east-1</code> (São Paulo) e já apliquei todas as migrações necessárias.</p>
+    <p>O seu arquivo local <code>.env</code> já foi atualizado com as novas chaves para que seu aplicativo conecte automaticamente:</p>
+    <ul>
+      <li><strong>Supabase Project ID:</strong> <code>btdgetidtawjtqrvzybh</code></li>
+      <li><strong>Supabase URL:</strong> <code>https://btdgetidtawjtqrvzybh.supabase.co</code></li>
+      <li><strong>Publishable API Key (Anon Key):</strong> <code>sb_publishable_ajCs5VZ3suNt9i1DJBtW5w_UNqtw4xm</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>2. Estrutura do Banco de Dados Criada</h2>
+    <p>O banco de dados foi estruturado com as tabelas fundamentais de DW (Data Warehouse) e segurança:</p>
+    <ol>
+      <li><strong><code>clients</code>:</strong> Registra seus clientes. Adicionei a coluna <code>share_token</code> (UUID) que serve como o link secreto do cliente.</li>
+      <li><strong><code>metrics_daily</code>:</strong> Armazena os dados consolidados dia a dia de cada canal (gasto, impressões, cliques, conversões, receita).</li>
+      <li><strong><code>metrics_raw</code>:</strong> Histórico do payload bruto recebido para auditoria.</li>
+      <li><strong><code>ingest_logs</code>:</strong> Histórico de execuções e status das integrações de dados.</li>
+    </ol>
+
+    <h3>Acesso Público Seguro via Funções RPC:</h3>
+    <p>Para permitir que os clientes vejam seus relatórios de forma pública e segura (sem expor o restante do banco), criei duas funções seguras (<code>SECURITY DEFINER</code>) que filtram os dados automaticamente pelo token do cliente:</p>
+    <ul>
+      <li><code>get_shared_client_details(p_share_token)</code>: Retorna o nome, logo e cores do cliente.</li>
+      <li><code>get_shared_metrics(p_share_token)</code>: Retorna apenas as métricas de anúncios e conversões daquele token específico.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Passo a Passo do n8n (Integração Google e Meta)</h2>
+    <p>O n8n será responsável por extrair dados diariamente das APIs de anúncios e injetar no banco de dados.</p>
+    
+    <h3>Fluxo de Trabalho no n8n:</h3>
+    <ol>
+      <li><strong>Trigger Cron:</strong> Configurado para rodar diariamente (ex: às 01:00 AM).</li>
+      <li><strong>Nó Google Ads:</strong> Busca o custo (spend), cliques e conversões filtrados pela data de ontem.</li>
+      <li><strong>Nó Meta Ads (Facebook):</strong> Busca o custo, cliques e compras (compras no site/leads).</li>
+      <li><strong>Nó Google Analytics 4:</strong> Busca o total de cliques externos e eventos de rolagem (scroll) do site.</li>
+      <li><strong>Nó Code (Formatação):</strong> Formata os dados de cada plataforma no formato JSON padrão esperado pela nossa API.</li>
+      <li><strong>Nó HTTP Request (Envio):</strong> Faz um POST enviando os dados para o seu app local ou em produção.</li>
+    </ol>
+
+    <div class="alert">
+      <p class="alert-title">Importante: Assinatura de Segurança HMAC</p>
+      <p>A API do InsightOS exige que as requisições do n8n venham assinadas no cabeçalho <code>x-ingest-signature</code> usando a chave secreta HMAC definida em seu ambiente. Isso garante que nenhum invasor consiga enviar dados falsos ao seu banco.</p>
+    </div>
+
+    <h3>Estrutura de JSON Esperada pela API:</h3>
+    <pre><code>{
+  "client_id": "ID_DO_CLIENTE_NO_BANCO",
+  "source": "google_ads", // ou 'meta_ads', 'google_analytics'
+  "rows": [
+    {
+      "metric_date": "2026-06-11",
+      "scope": "account",
+      "entity_id": "id-da-conta-ou-campanha",
+      "entity_name": "Nome da Conta/Campanha",
+      "dimensions": {},
+      "metrics": {
+        "clicks": 150,
+        "spend": 45.20,
+        "conversions": 12
+      }
+    }
+  ]
+}</code></pre>
+  </section>
+
+  <section>
+    <h2>4. Rastreamento de Cliques e Rolagem (Scroll) no Site</h2>
+    <p>A melhor forma de medir cliques e rolagem de página sem precisar mexer em códigos JavaScript complexos é usando o <strong>Google Analytics 4 (GA4)</strong>.</p>
+    <p>Ele rastreia por padrão:</p>
+    <ul>
+      <li><code>scroll</code>: Sempre que o usuário chega a 90% da altura da página.</li>
+      <li><code>click</code>: Cliques em links externos.</li>
+    </ul>
+    <p>Para ativar, vá no painel do GA4 do cliente em <strong>Administrador > Fluxo de Dados > Configurações do Fluxo</strong> e ative a <strong>Medição Otimizada</strong>.</p>
+  </section>
+
+  <section>
+    <h2>5. O Link de Compartilhamento no Frontend</h2>
+    <p>Seus links de cliente terão este formato: <code>http://localhost:8080/shared/[SHARE_TOKEN]</code></p>
+    <p>No frontend, construiremos uma tela limpa, sem a barra lateral de administração, que carrega as cores e logotipo personalizados do cliente e renderiza os gráficos de evolução de cliques, conversões e ROAS comparativo.</p>
+  </section>
+
+  <section>
+    <h2>Como Salvar este Documento como PDF:</h2>
+    <p>Se você deseja salvar este guia agora mesmo:</p>
+    <ol>
+      <li>Abra o arquivo <code>guia_passo_a_passo.html</code> no seu navegador de preferência (Google Chrome, Edge, etc.).</li>
+      <li>Clique no botão <strong>"Imprimir / Salvar como PDF"</strong> no topo da página.</li>
+      <li>Escolha o destino como <strong>"Salvar como PDF"</strong> ou <strong>"Microsoft Print to PDF"</strong> e clique em Salvar!</li>
+    </ol>
+  </section>
+
+</body>
+</html>

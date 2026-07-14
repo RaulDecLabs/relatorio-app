@@ -1,0 +1,86 @@
+import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
+
+function loadEnv() {
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (!fs.existsSync(envPath)) {
+    console.error('.env file not found!');
+    process.exit(1);
+  }
+
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  envContent.split('\n').forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const match = trimmed.match(/^([^=]+)=(.*)$/);
+    if (!match) return;
+    const key = match[1].trim();
+    let val = match[2].trim();
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.substring(1, val.length - 1);
+    }
+    process.env[key] = val;
+  });
+}
+
+loadEnv();
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env");
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function clearMetrics() {
+  try {
+    console.log("Fetching reports configurations...");
+    const { data: configs, error: configError } = await supabase
+      .from('reports_config')
+      .select('id, name, table_name, ads_table_name, fb_ads_table_name, gsc_table_name');
+
+    if (configError) throw configError;
+
+    if (!configs || configs.length === 0) {
+      console.log("No reports configured.");
+      return;
+    }
+
+    console.log(`Found ${configs.length} report configs. Starting deletion process...`);
+
+    for (const config of configs) {
+      console.log(`\nProcessing client: ${config.name}`);
+      const tables = [
+        config.table_name,
+        config.ads_table_name,
+        config.fb_ads_table_name,
+        config.gsc_table_name
+      ].filter(Boolean);
+
+      for (const table of tables) {
+        console.log(`  Deleting all rows from table: ${table}...`);
+        
+        const { error: deleteError } = await supabase
+          .from(table)
+          .delete()
+          .neq('id', '00000000-0000-0000-0000-000000000000'); 
+
+        if (deleteError) {
+          console.warn(`    Warning: Could not delete from ${table}: ${deleteError.message}`);
+        } else {
+          console.log(`    Successfully cleared ${table}.`);
+        }
+      }
+    }
+    
+    console.log("\nMetrics clearing completed successfully!");
+  } catch (error) {
+    console.error("Error clearing metrics:", error);
+  }
+}
+
+clearMetrics();

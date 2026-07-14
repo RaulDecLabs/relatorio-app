@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guia de Credenciais: Google Ads, Meta Ads e Google Analytics 4</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #1f2937;
+      --text-muted: #4b5563;
+      --bg-light: #f3f4f6;
+      --border: #e5e7eb;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      color: #111827;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #111827;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: #1f2937;
+      margin-top: 1.5rem;
+    }
+
+    code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      background-color: var(--bg-light);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.9em;
+    }
+
+    ul, ol {
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .alert {
+      background-color: #fef3c7;
+      border-left: 4px solid #d97706;
+      padding: 1rem;
+      border-radius: 0.375rem;
+      margin: 1.5rem 0;
+    }
+
+    .alert-title {
+      font-weight: bold;
+      color: #b45309;
+      margin-top: 0;
+      margin-bottom: 0.25rem;
+    }
+
+    .alert p {
+      margin: 0;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .print-button-container {
+      margin-bottom: 2rem;
+      text-align: right;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        max-width: 100%;
+      }
+      .print-button-container {
+        display: none;
+      }
+      h2 {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-button-container">
+    <button onclick="window.print()" class="btn">Imprimir / Salvar como PDF</button>
+  </div>
+
+  <header>
+    <h1>Guia de Credenciais: Google Ads, Meta Ads e Google Analytics 4</h1>
+    <p class="subtitle">Como obter chaves, tokens e IDs necessários para conectar as APIs de publicidade no n8n.</p>
+  </header>
+
+  <section>
+    <h2>1. Credenciais do Google Ads & Google Analytics 4 (GA4)</h2>
+    <p>Como ambas as plataformas pertencem ao ecossistema do Google, você utilizará o <strong>Google Cloud Console</strong> para gerar um par único de <code>Client ID</code> e <code>Client Secret</code> para usar em ambas.</p>
+
+    <h3>Passo 1: Criar um Projeto no Google Cloud Console</h3>
+    <ol>
+      <li>Acesse o <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>.</li>
+      <li>No menu superior esquerdo (próximo à marca do Google Cloud), clique em <strong>Selecionar um projeto</strong> > <strong>Novo Projeto</strong>.</li>
+      <li>Dê um nome intuitivo ao projeto (ex: <code>Agencia-InsightOS-DW</code>) e clique em <strong>Criar</strong>.</li>
+    </ol>
+
+    <h3>Passo 2: Ativar as APIs Necessárias</h3>
+    <ol>
+      <li>Na barra de busca do console, procure por:
+        <ul>
+          <li><strong>Google Ads API</strong>: Clique e escolha <strong>Ativar</strong>.</li>
+          <li><strong>Google Analytics Data API</strong>: Clique e escolha <strong>Ativar</strong>.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>Passo 3: Configurar a Tela de Consentimento OAuth (OAuth Consent Screen)</h3>
+    <ol>
+      <li>No menu lateral esquerdo, navegue até <strong>APIs e Serviços > Tela de consentimento OAuth</strong>.</li>
+      <li>Selecione <strong>Externo</strong> (User Type) e clique em <strong>Criar</strong>.</li>
+      <li>Preencha os dados obrigatórios: Nome do Aplicativo, email de suporte e endereço de email do desenvolvedor. Clique em <strong>Salvar e Continuar</strong>.</li>
+      <li>Na aba <strong>Escopos (Scopes)</strong>, clique em <strong>Adicionar ou remover escopos</strong>, marque o escopo do Google Analytics <code>.../auth/analytics.readonly</code> e salve.</li>
+      <li>Na aba <strong>Usuários de Teste (Test Users)</strong>, clique em <strong>Adicionar Usuários</strong> e digite o seu email do Google que você usa para acessar a conta de anúncios dos clientes. Isso é essencial para que o login funcione durante os testes. Salve e conclua.</li>
+    </ol>
+
+    <h3>Passo 4: Criar as Credenciais OAuth 2.0</h3>
+    <ol>
+      <li>Acesse o menu lateral <strong>APIs e Serviços > Credenciais</strong>.</li>
+      <li>Clique no botão <strong>Criar Credenciais</strong> no topo e escolha <strong>ID do cliente OAuth</strong>.</li>
+      <li>Em <strong>Tipo de aplicativo</strong>, escolha <strong>Aplicativo da Web</strong>.</li>
+      <li>Em <strong>Origens JavaScript autorizadas</strong>, insira a URL do seu n8n.</li>
+      <li>Em <strong>URIs de redirecionamento autorizados</strong>, insira a URL de callback fornecida pelo n8n ao criar a credencial (geralmente segue o padrão <code>https://&lt;seu-n8n&gt;/rest/oauth2-credential/callback</code>).</li>
+      <li>Clique em <strong>Criar</strong>. Uma janela com o seu <code>Client ID</code> e <code>Client Secret</code> será aberta. Copie e guarde em um bloco de notas.</li>
+    </ol>
+
+    <h3>Passo 5: Obter o Developer Token do Google Ads</h3>
+    <ol>
+      <li>Acesse a sua <strong>Conta de Administrador do Google Ads (MCC)</strong>. *(Você precisa de uma conta tipo "Manager" no Google Ads).*</li>
+      <li>Clique em <strong>Ferramentas e Configurações > Configurações da Conta de Administrador > Central de APIs</strong>.</li>
+      <li>Preencha a solicitação básica de desenvolvedor. O Google gerará um <code>Developer Token</code> instantaneamente em nível de "Acesso de teste" (suficiente para ler dados das contas vinculadas).</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>2. Credenciais do Meta Ads (Facebook Ads)</h2>
+    <p>Para o Facebook Ads, precisaremos de um aplicativo configurado na plataforma de desenvolvedores da Meta.</p>
+
+    <h3>Passo 1: Criar um Aplicativo no Meta para Desenvolvedores</h3>
+    <ol>
+      <li>Acesse o portal <a href="https://developers.facebook.com/" target="_blank">Meta for Developers</a>.</li>
+      <li>Clique em <strong>Meus Aplicativos > Criar aplicativo</strong>.</li>
+      <li>Escolha a opção <strong>Outro > Empresa (Business)</strong> e avance.</li>
+      <li>Nomeie o app (ex: <code>InsightOS-Integracao</code>), selecione a sua conta do Gerenciador de Negócios (Business Manager) e clique em <strong>Criar aplicativo</strong>.</li>
+    </ol>
+
+    <h3>Passo 2: Configurar o Produto "Marketing API"</h3>
+    <ol>
+      <li>No painel do app criado, role até a lista de produtos, procure por <strong>Marketing API</strong> e clique em <strong>Configurar</strong>.</li>
+      <li>No menu lateral sob Marketing API, acesse <strong>Configurações</strong>.</li>
+      <li>Em <strong>URIs de redirecionamento do OAuth autorizados</strong>, insira a URI fornecida pelo n8n ao configurar credenciais do Facebook. Salve as alterações.</li>
+    </ol>
+
+    <h3>Passo 3: Gerar um Token de Acesso de Longa Duração (System User Token)</h3>
+    <p>Para garantir que o fluxo funcione de forma contínua sem deslogar a cada 60 dias, use um token de Usuário do Sistema:</p>
+    <ol>
+      <li>Abra o <a href="https://business.facebook.com/settings" target="_blank">Meta Business Settings</a>.</li>
+      <li>Acesse o menu lateral <strong>Usuários > Usuários do Sistema</strong>.</li>
+      <li>Adicione um novo Usuário do Sistema com cargo de <strong>Administrador</strong>.</li>
+      <li>Selecione o usuário criado e clique em <strong>Gerar Novo Token</strong>.</li>
+      <li>Marque o aplicativo correspondente e selecione as seguintes permissões:
+        <ul>
+          <li><code>ads_read</code></li>
+          <li><code>ads_management</code></li>
+          <li><code>read_insights</code></li>
+        </ul>
+      </li>
+      <li>Clique em <strong>Gerar Token</strong>. Copie o token exibido. Ele é vitalício e servirá como a sua chave permanente de acesso.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>3. Como Localizar os IDs das Contas de Cada Cliente</h2>
+    <p>Com as chaves de desenvolvedor prontas, você precisará apontar o n8n para as contas de anúncios de cada cliente individualmente. Pegue estes IDs com seus clientes:</p>
+    <ul>
+      <li><strong>Google Ads Customer ID:</strong> Número de 10 dígitos (formato <code>123-456-7890</code>) exibido no topo direito da tela do Google Ads do cliente.</li>
+      <li><strong>Facebook Ad Account ID:</strong> ID numérico que identifica a conta de anúncios no Gerenciador de Negócios (formato <code>act_XXXXXXXXXXXX</code>).</li>
+      <li><strong>GA4 Property ID:</strong> No Analytics do cliente, clique na engrenagem no canto inferior esquerdo e vá em <strong>Configurações da propriedade</strong>. Copie o número de 9 dígitos exibido no canto superior direito.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Como Salvar este Documento como PDF:</h2>
+    <p>Para gerar o PDF de forma rápida:</p>
+    <ol>
+      <li>Abra este arquivo <code>guia_credenciais.html</code> em qualquer navegador.</li>
+      <li>Clique no botão azul <strong>"Imprimir / Salvar como PDF"</strong> no topo da página.</li>
+      <li>Escolha a impressora como <strong>"Salvar como PDF"</strong> e clique em Salvar!</li>
+    </ol>
+  </section>
+
+</body>
+</html>
