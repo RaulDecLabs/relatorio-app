@@ -1,4 +1,5 @@
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import { OAuth2Client } from 'google-auth-library';
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
@@ -54,9 +55,19 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   },
 });
 
-// Initialize GA4 Client
-// It automatically picks up GOOGLE_APPLICATION_CREDENTIALS from process.env
-const analyticsDataClient = new BetaAnalyticsDataClient();
+// Initialize GA4 Client using OAuth2 or fallback to Application Default Credentials
+let analyticsDataClient;
+const CLIENT_ID = cleanEnv(process.env.GOOGLE_CLIENT_ID);
+const CLIENT_SECRET = cleanEnv(process.env.GOOGLE_CLIENT_SECRET);
+const REFRESH_TOKEN = cleanEnv(process.env.GOOGLE_REFRESH_TOKEN);
+
+if (CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN) {
+  const auth = new OAuth2Client(CLIENT_ID, CLIENT_SECRET);
+  auth.setCredentials({ refresh_token: REFRESH_TOKEN });
+  analyticsDataClient = new BetaAnalyticsDataClient({ authClient: auth });
+} else {
+  analyticsDataClient = new BetaAnalyticsDataClient();
+}
 
 // Get date range from arguments
 let days = 7;
