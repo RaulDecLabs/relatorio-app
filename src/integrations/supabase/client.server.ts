@@ -5,12 +5,30 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+function cleanUrl(val: any): string | undefined {
+  if (!val || typeof val !== 'string') return undefined;
+  const cleaned = val.trim().replace(/^['"]|['"]$/g, '');
+  return (cleaned.startsWith('http://') || cleaned.startsWith('https://')) ? cleaned : undefined;
+}
+
+function cleanKey(val: any): string | undefined {
+  if (!val || typeof val !== 'string') return undefined;
+  return val.trim().replace(/^['"]|['"]$/g, '');
+}
+
 function createSupabaseAdminClient() {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_SERVICE_ROLE_KEY = 
+  const SUPABASE_URL = cleanUrl(
+    process.env.SUPABASE_URL || 
+    process.env.VITE_SUPABASE_URL || 
+    (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_SUPABASE_URL : undefined)
+  );
+  const SUPABASE_SERVICE_ROLE_KEY = cleanKey(
     process.env.SUPABASE_SERVICE_ROLE_KEY || 
     process.env.SUPABASE_PUBLISHABLE_KEY || 
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY : undefined)
+  );
+
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     const missing = [
