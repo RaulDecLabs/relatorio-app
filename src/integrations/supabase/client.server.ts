@@ -17,17 +17,20 @@ function cleanKey(val: any): string | undefined {
 }
 
 function createSupabaseAdminClient() {
+  const defaultUrl = "https://btdgetidtawjtqrvzybh.supabase.co";
+  const defaultKey = "sb_publishable_ajCs5VZ3suNt9i1DJBtW5w_UNqtw4xm";
+
   const SUPABASE_URL = cleanUrl(
     process.env.SUPABASE_URL || 
     process.env.VITE_SUPABASE_URL || 
     (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_SUPABASE_URL : undefined)
-  );
+  ) || defaultUrl;
   const SUPABASE_SERVICE_ROLE_KEY = cleanKey(
     process.env.SUPABASE_SERVICE_ROLE_KEY || 
     process.env.SUPABASE_PUBLISHABLE_KEY || 
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
     (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY : undefined)
-  );
+  ) || defaultKey;
 
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
