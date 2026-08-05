@@ -15,7 +15,4 @@ export default defineConfig({
       allowedHosts: ['.lhr.life', '.loca.lt', '.ngrok-free.app', '.trycloudflare.com', 'localhost'],
     },
   },
-  nitro: {
-    preset: 'vercel'
-  }
 });

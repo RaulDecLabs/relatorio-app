@@ -70,8 +70,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "InsightOS — Marketing Intelligence" },
-      { name: "description", content: "Centro de inteligência em marketing digital com IA especializada." },
+      { title: "InsightOS — Growth & Performance Intelligence" },
+      { name: "description", content: "Centro de gestão e análise avançada para campanhas de Growth Marketing." },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

@@ -23,6 +23,10 @@ import { Route as AuthenticatedCostsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAutomationsRouteImport } from './routes/_authenticated/automations'
 import { Route as AuthenticatedAiInsightsRouteImport } from './routes/_authenticated/ai-insights'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
+import { Route as ApiPublicTriggerMockTestRouteImport } from './routes/api/public/trigger-mock-test'
+import { Route as ApiPublicTriggerImportSeoRouteImport } from './routes/api/public/trigger-import-seo'
+import { Route as ApiPublicTriggerImportMetaRouteImport } from './routes/api/public/trigger-import-meta'
+import { Route as ApiPublicTriggerImportGoogleAdsRouteImport } from './routes/api/public/trigger-import-google-ads'
 import { Route as ApiPublicTriggerImportRouteImport } from './routes/api/public/trigger-import'
 import { Route as ApiPublicSheetsAuditRouteImport } from './routes/api/public/sheets-audit'
 import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
@@ -102,6 +106,30 @@ const AuthenticatedClientsIndexRoute =
     path: '/clients/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ApiPublicTriggerMockTestRoute =
+  ApiPublicTriggerMockTestRouteImport.update({
+    id: '/api/public/trigger-mock-test',
+    path: '/api/public/trigger-mock-test',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTriggerImportSeoRoute =
+  ApiPublicTriggerImportSeoRouteImport.update({
+    id: '/api/public/trigger-import-seo',
+    path: '/api/public/trigger-import-seo',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTriggerImportMetaRoute =
+  ApiPublicTriggerImportMetaRouteImport.update({
+    id: '/api/public/trigger-import-meta',
+    path: '/api/public/trigger-import-meta',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTriggerImportGoogleAdsRoute =
+  ApiPublicTriggerImportGoogleAdsRouteImport.update({
+    id: '/api/public/trigger-import-google-ads',
+    path: '/api/public/trigger-import-google-ads',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTriggerImportRoute = ApiPublicTriggerImportRouteImport.update({
   id: '/api/public/trigger-import',
   path: '/api/public/trigger-import',
@@ -152,6 +180,10 @@ export interface FileRoutesByFullPath {
   '/api/public/ingest': typeof ApiPublicIngestRoute
   '/api/public/sheets-audit': typeof ApiPublicSheetsAuditRoute
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
+  '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
+  '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
+  '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -173,6 +205,10 @@ export interface FileRoutesByTo {
   '/api/public/ingest': typeof ApiPublicIngestRoute
   '/api/public/sheets-audit': typeof ApiPublicSheetsAuditRoute
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
+  '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
+  '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
+  '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
 }
 export interface FileRoutesById {
@@ -196,6 +232,10 @@ export interface FileRoutesById {
   '/api/public/ingest': typeof ApiPublicIngestRoute
   '/api/public/sheets-audit': typeof ApiPublicSheetsAuditRoute
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
+  '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
+  '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
+  '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
 }
 export interface FileRouteTypes {
@@ -219,6 +259,10 @@ export interface FileRouteTypes {
     | '/api/public/ingest'
     | '/api/public/sheets-audit'
     | '/api/public/trigger-import'
+    | '/api/public/trigger-import-google-ads'
+    | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-seo'
+    | '/api/public/trigger-mock-test'
     | '/clients/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -240,6 +284,10 @@ export interface FileRouteTypes {
     | '/api/public/ingest'
     | '/api/public/sheets-audit'
     | '/api/public/trigger-import'
+    | '/api/public/trigger-import-google-ads'
+    | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-seo'
+    | '/api/public/trigger-mock-test'
     | '/clients'
   id:
     | '__root__'
@@ -262,6 +310,10 @@ export interface FileRouteTypes {
     | '/api/public/ingest'
     | '/api/public/sheets-audit'
     | '/api/public/trigger-import'
+    | '/api/public/trigger-import-google-ads'
+    | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-seo'
+    | '/api/public/trigger-mock-test'
     | '/_authenticated/clients/'
   fileRoutesById: FileRoutesById
 }
@@ -274,6 +326,10 @@ export interface RootRouteChildren {
   ApiPublicIngestRoute: typeof ApiPublicIngestRoute
   ApiPublicSheetsAuditRoute: typeof ApiPublicSheetsAuditRoute
   ApiPublicTriggerImportRoute: typeof ApiPublicTriggerImportRoute
+  ApiPublicTriggerImportGoogleAdsRoute: typeof ApiPublicTriggerImportGoogleAdsRoute
+  ApiPublicTriggerImportMetaRoute: typeof ApiPublicTriggerImportMetaRoute
+  ApiPublicTriggerImportSeoRoute: typeof ApiPublicTriggerImportSeoRoute
+  ApiPublicTriggerMockTestRoute: typeof ApiPublicTriggerMockTestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -376,6 +432,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/trigger-mock-test': {
+      id: '/api/public/trigger-mock-test'
+      path: '/api/public/trigger-mock-test'
+      fullPath: '/api/public/trigger-mock-test'
+      preLoaderRoute: typeof ApiPublicTriggerMockTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/trigger-import-seo': {
+      id: '/api/public/trigger-import-seo'
+      path: '/api/public/trigger-import-seo'
+      fullPath: '/api/public/trigger-import-seo'
+      preLoaderRoute: typeof ApiPublicTriggerImportSeoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/trigger-import-meta': {
+      id: '/api/public/trigger-import-meta'
+      path: '/api/public/trigger-import-meta'
+      fullPath: '/api/public/trigger-import-meta'
+      preLoaderRoute: typeof ApiPublicTriggerImportMetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/trigger-import-google-ads': {
+      id: '/api/public/trigger-import-google-ads'
+      path: '/api/public/trigger-import-google-ads'
+      fullPath: '/api/public/trigger-import-google-ads'
+      preLoaderRoute: typeof ApiPublicTriggerImportGoogleAdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/trigger-import': {
       id: '/api/public/trigger-import'
       path: '/api/public/trigger-import'
@@ -464,6 +548,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicIngestRoute: ApiPublicIngestRoute,
   ApiPublicSheetsAuditRoute: ApiPublicSheetsAuditRoute,
   ApiPublicTriggerImportRoute: ApiPublicTriggerImportRoute,
+  ApiPublicTriggerImportGoogleAdsRoute: ApiPublicTriggerImportGoogleAdsRoute,
+  ApiPublicTriggerImportMetaRoute: ApiPublicTriggerImportMetaRoute,
+  ApiPublicTriggerImportSeoRoute: ApiPublicTriggerImportSeoRoute,
+  ApiPublicTriggerMockTestRoute: ApiPublicTriggerMockTestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

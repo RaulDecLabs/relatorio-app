@@ -360,7 +360,11 @@ export type Database = {
         Row: {
           ads_table_name: string | null
           created_at: string
+          fb_ads_table_name: string | null
           ga4_property_id: string | null
+          google_ads_id: string | null
+          meta_ads_id: string | null
+          gsc_url: string | null
           gsc_table_name: string | null
           id: string
           name: string
@@ -369,7 +373,11 @@ export type Database = {
         Insert: {
           ads_table_name?: string | null
           created_at?: string
+          fb_ads_table_name?: string | null
           ga4_property_id?: string | null
+          google_ads_id?: string | null
+          meta_ads_id?: string | null
+          gsc_url?: string | null
           gsc_table_name?: string | null
           id?: string
           name: string
@@ -378,7 +386,11 @@ export type Database = {
         Update: {
           ads_table_name?: string | null
           created_at?: string
+          fb_ads_table_name?: string | null
           ga4_property_id?: string | null
+          google_ads_id?: string | null
+          meta_ads_id?: string | null
+          gsc_url?: string | null
           gsc_table_name?: string | null
           id?: string
           name?: string
@@ -418,12 +430,238 @@ export type Database = {
           },
         ]
       }
+      ai_insights: {
+        Row: {
+          analysis_period: string | null
+          created_at: string
+          id: string
+          insight_text: string
+          report_id: string
+        }
+        Insert: {
+          analysis_period?: string | null
+          created_at?: string
+          id?: string
+          insight_text: string
+          report_id: string
+        }
+        Update: {
+          analysis_period?: string | null
+          created_at?: string
+          id?: string
+          insight_text?: string
+          report_id?: string
+        }
+        Relationships: []
+      }
+      ingest_logs: {
+        Row: {
+          client_id: string
+          completed_at: string | null
+          error: string | null
+          id: string
+          rows_received: number
+          rows_upserted: number
+          source: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          client_id: string
+          completed_at?: string | null
+          error?: string | null
+          id?: string
+          rows_received?: number
+          rows_upserted?: number
+          source: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          client_id?: string
+          completed_at?: string | null
+          error?: string | null
+          id?: string
+          rows_received?: number
+          rows_upserted?: number
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      integrations: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          last_sync_at: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          source: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      clients: {
+        Row: {
+          company_name: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          plan: string | null
+          segment: string | null
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan?: string | null
+          segment?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan?: string | null
+          segment?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      roadmap_items: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          item_order: number
+          phase: string
+          phase_order: number
+          status: "todo" | "doing" | "done"
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          item_order?: number
+          phase: string
+          phase_order?: number
+          status?: "todo" | "doing" | "done"
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          item_order?: number
+          phase?: string
+          phase_order?: number
+          status?: "todo" | "doing" | "done"
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       create_dynamic_ads_table: {
+        Args: { p_table_name: string }
+        Returns: undefined
+      }
+      create_dynamic_fb_ads_table: {
         Args: { p_table_name: string }
         Returns: undefined
       }

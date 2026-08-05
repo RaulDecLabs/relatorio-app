@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Users, TrendingUp, DollarSign, Target, Sparkles, AlertCircle } from "lucide-react";
+import { Users, TrendingUp, DollarSign, Target, BarChart3, AlertCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { KpiCard } from "@/components/kpi-card";
@@ -27,7 +27,7 @@ function DashboardPage() {
       <PageHeader
         title="Visão geral"
         description="Performance consolidada de todos os clientes da agência."
-        actions={<Button size="sm"><Sparkles className="mr-2 h-4 w-4" />Gerar análise IA</Button>}
+        actions={<Button size="sm"><BarChart3 className="mr-2 h-4 w-4" />Ver parecer executivo</Button>}
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -51,11 +51,11 @@ function DashboardPage() {
 
         <Card className="border-border/70 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Insights da IA</CardTitle>
-            <Badge variant="secondary" className="gap-1"><Sparkles className="h-3 w-3" />Beta</Badge>
+            <CardTitle className="text-base">Resumo Executivo de Performance</CardTitle>
+            <Badge variant="secondary" className="gap-1"><BarChart3 className="h-3 w-3" />Ativo</Badge>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <InsightRow severity="info" text="Nenhum relatório com dados configurado ainda. Conecte fontes do Google Analytics no menu Relatórios para receber análises da IA." />
+            <InsightRow severity="info" text="Nenhum relatório com dados configurado ainda. Conecte fontes e campanhas para receber leituras estratégicas consolidadas da sua operação." />
           </CardContent>
         </Card>
       </div>

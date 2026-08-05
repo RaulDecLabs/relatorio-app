@@ -12,9 +12,12 @@ dist
 dist-ssr
 .output
 .vinxi
-.tanstack/**
+.tanstack
+.lovable
+.vite
 .nitro
 *.local
+tmp
 
 # Wrangler / Cloudflare
 .wrangler/
@@ -27,6 +30,9 @@ dist-ssr
 .DS_Store
 *.suo
 *.ntvs*
-*.njsproj
 *.sln
 *.sw?
+.env
+.env.*
+*.env
+

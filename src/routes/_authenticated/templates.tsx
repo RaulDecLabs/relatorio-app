@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 import { 
-  LayoutTemplate, Sparkles, TrendingUp, DollarSign, 
+  LayoutTemplate, Award, CheckCircle2, TrendingUp, DollarSign, 
   MousePointer, Globe, BarChart2, Calendar, Target,
-  Zap, Search, Facebook, Activity, Eye, Clock, Table2, History
+  Zap, Search, Facebook, Activity, Eye, Clock, Table2, History, Key, Loader2, RefreshCw
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
@@ -13,9 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/hooks/use-auth";
+import { useRoles } from "@/hooks/use-role";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { 
@@ -35,6 +40,9 @@ interface ReportConfig {
   fb_ads_table_name?: string | null;
   gsc_table_name?: string | null;
   ga4_property_id?: string | null;
+  google_ads_id?: string | null;
+  meta_ads_id?: string | null;
+  gsc_url?: string | null;
 }
 
 function SectionTitle({ title, description, icon: Icon, color = "blue" }: any) {
@@ -119,8 +127,27 @@ const CustomChartTooltip = ({ active, payload, label }: any) => {
 };
 
 function TemplatesPage() {
+  const { user } = useAuth();
+  const { isClient } = useRoles();
+  const queryClient = useQueryClient();
   const [selectedReportId, setSelectedReportId] = useState<string>("");
   const [dateRange, setDateRange] = useState<string>("7");
+  const [isGeneratingAi, setIsGeneratingAi] = useState<boolean>(false);
+  const [autoAiEnabled, setAutoAiEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem("ai_auto_generation_enabled");
+    return saved !== null ? saved === "true" : true;
+  });
+
+  const toggleAutoAi = () => {
+    const newVal = !autoAiEnabled;
+    setAutoAiEnabled(newVal);
+    localStorage.setItem("ai_auto_generation_enabled", String(newVal));
+    if (newVal) {
+      toast.success("⚡ Atualização Automática Ativada! Ao receber novas métricas pelo webhook ou atualizar o banco, o parecer executivo consolidado será emitido instantaneamente.");
+    } else {
+      toast.info("🔕 Atualização Automática de Leitura Pausada.");
+    }
+  };
 
   const getDatesForRange = (range: string) => {
     const end = new Date();
@@ -157,12 +184,20 @@ function TemplatesPage() {
 
   // Queries
   const { data: reports = [] } = useQuery<ReportConfig[]>({
-    queryKey: ["reports-configs"],
+    queryKey: ["reports-configs", user?.id, isClient],
     queryFn: async () => {
       const { data, error } = await supabase.from("reports_config").select("*").order("created_at", { ascending: true });
       if (error) throw error;
-      return data || [];
-    }
+      const list = data || [];
+      if (isClient && user?.user_metadata?.assigned_report_id) {
+        return list.filter((r) => r.id === user.user_metadata.assigned_report_id);
+      }
+      if (isClient && !user?.user_metadata?.assigned_report_id) {
+        return [];
+      }
+      return list;
+    },
+    enabled: !!user || !isClient,
   });
 
   useEffect(() => {
@@ -179,7 +214,7 @@ function TemplatesPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from(activeReport!.table_name as any).select("*").gte("metric_date", startDateStr).lte("metric_date", endDateStr).order("metric_date", { ascending: true });
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     }
   });
 
@@ -189,7 +224,7 @@ function TemplatesPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from(activeReport!.ads_table_name as any).select("*").gte("metric_date", startDateStr).lte("metric_date", endDateStr).order("metric_date", { ascending: true });
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     }
   });
 
@@ -199,7 +234,7 @@ function TemplatesPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from(activeReport!.fb_ads_table_name as any).select("*").gte("metric_date", startDateStr).lte("metric_date", endDateStr).order("metric_date", { ascending: true });
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     }
   });
 
@@ -209,7 +244,7 @@ function TemplatesPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from(activeReport!.gsc_table_name as any).select("*").gte("metric_date", startDateStr).lte("metric_date", endDateStr).order("metric_date", { ascending: true });
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     }
   });
 
@@ -223,11 +258,11 @@ function TemplatesPage() {
         .eq("report_id", activeReport!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     }
   });
   
-  const aiInsight = aiInsightsList.length > 0 ? aiInsightsList[0] : null;
+  const aiInsight = (aiInsightsList.length > 0 ? aiInsightsList[0] : null) as any;
 
   const isLoading = loadGa || loadAds || loadFbAds || loadGsc || loadAi;
 
@@ -317,40 +352,165 @@ function TemplatesPage() {
     return arr;
   }, [adsMetrics, fbAdsMetrics]);
 
+  const generateAiInsights = async (customKey?: string) => {
+    const keyToUse = customKey || import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.OPENAI_API_KEY || localStorage.getItem("openai_api_key");
+    if (!keyToUse || typeof keyToUse !== "string" || keyToUse.trim() === "") {
+      console.warn("Chave da API OpenAI não encontrada no arquivo .env (VITE_OPENAI_API_KEY). Geração IA ignorada.");
+      return;
+    }
+    if (!activeReport) return;
+
+    setIsGeneratingAi(true);
+
+    try {
+      const promptData = {
+        cliente: activeReport.name || "Cliente",
+        periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
+        google_ads: {
+          investimento: adsCost,
+          cliques: adsClicks,
+          conversoes: adsConversions,
+          cpa: adsCpa,
+          top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
+        },
+        meta_ads_facebook: {
+          investimento: fbCost,
+          cliques: fbClicks,
+          conversoes: fbConversions,
+          cpa: fbCpa
+        },
+        consolidado_trafego_pago: {
+          investimento_total: totalCost,
+          conversoes_totais: totalConversions,
+          cpa_blended_geral: blendedCpa
+        },
+        ga4: {
+          sessoes: gaSessions,
+          usuarios: gaUsers,
+          pageviews: gaPageViews,
+          tempo_medio_sessao_segundos: gaAvgSessionDuration
+        },
+        seo_search_console: {
+          cliques_organicos: gscClicks,
+          impressoes: gscImpressions
+        }
+      };
+
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${keyToUse.trim()}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          temperature: 0.7,
+          messages: [
+            {
+              role: "system",
+              content: `Você é um Diretor Senior de Growth Marketing e Estrategista de alta performance de uma agência de publicidade de elite. Seu papel é analisar os dados de tráfego pago (Google Ads e Meta Ads), SEO (Search Console) e tráfego web (GA4) de uma empresa e gerar um Parecer Executivo e Estratégico extremamente profissional, claro, motivador e analítico.
+Use formatação Markdown limpa e elegante (negrito nos KPIs de destaque e bullet points claros), seguindo OBRIGATORIAMENTE ESTA ESTRUTURA EXATA:
+# 📊 Parecer Executivo de Growth & Performance
+## 1. 📈 Resumo Executivo (O Cenário Geral)
+## 2. 🎯 Pontos de Força & Alavanca (O que está acelerando resultados)
+## 3. ⚠️ Oportunidades de Correção (Onde otimizar o investimento)
+## 4. 🚀 Plano de Ação Estratégico (Recomendações Práticas)
+
+Diretrizes de Especialista:
+- IMPORTANTE E OBRIGATÓRIO: Nunca mencione que você é uma IA, inteligência artificial, robô, sistema automatizado ou modelo do OpenAI. Assuma 100% a postura de uma diretoria humana experiente assinando este documento estratégico para a liderança da empresa.
+- Seja ultra-preciso nas análises financeiras, destacando o ROAS/CPA e a qualidade da conversão.
+- Entregue recomendações acionáveis (ex: sugestão para testar novos criativos no Meta Ads, realocar verbas para campanhas campeãs de Google Ads ou explorar landing pages para as palavras-chave do Search Console).
+- Nunca invente números fora do JSON entregue, mas demonstre domínio comercial profundo interpretando o peso de cada canal no resultado final.`
+            },
+            {
+              role: "user",
+              content: `Aqui estão os dados consolidados do período para a empresa ${activeReport.name}:\n\n${JSON.stringify(promptData, null, 2)}\n\nPor favor, gere a leitura executiva estratégica de Growth em português agora.`
+            }
+          ]
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error?.message || `Erro de comunicação ao processar parecer (Status: ${res.status})`);
+      }
+
+      const content = json.choices?.[0]?.message?.content;
+      if (!content) {
+        throw new Error("O processamento retornou uma resposta vazia.");
+      }
+
+      const { error: dbErr } = await supabase.from("ai_insights").insert({
+        report_id: activeReport.id,
+        insight_text: content,
+        analysis_period: `Período: ${startDateStr} a ${endDateStr} (${dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias`})`
+      });
+
+      if (dbErr) throw dbErr;
+
+      await queryClient.invalidateQueries({ queryKey: ["ai-insight", activeReport.id] });
+      toast.success("📊 Parecer executivo consolidado com sucesso com base nas últimas métricas!");
+    } catch (err: any) {
+      console.error("Erro na geração IA automática:", err);
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
+
+  // Gatilho reativo inteligente: dispara análise IA sozinho se a opção automática estiver ligada, houver dados e não houver análise para o período
+  useEffect(() => {
+    if (autoAiEnabled && activeReport && !isLoading && !aiInsight && !isGeneratingAi) {
+      const temDados = adsCost > 0 || fbCost > 0 || gscClicks > 0 || gaSessions > 0;
+      if (temDados) {
+        const timer = setTimeout(() => {
+          generateAiInsights();
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [autoAiEnabled, activeReport, isLoading, aiInsight, adsCost, fbCost, gscClicks, gaSessions]);
+
   return (
     <AppShell>
       <PageHeader
         title="Relatório Executivo"
-        description="Central de inteligência comercial: campanhas, métricas vitais e análise estratégica consolidada."
-      >
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <Select value={selectedReportId} onValueChange={setSelectedReportId}>
-            <SelectTrigger className="w-[180px] bg-card/50 backdrop-blur-sm border-border/50">
-              <SelectValue placeholder="Selecione o Cliente" />
-            </SelectTrigger>
-            <SelectContent>
-              {reports.map((r) => (
-                <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        description="Central de performance operacional: campanhas, métricas vitais e parecer estratégico consolidado."
+        actions={
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            {isClient ? (
+              <div className="flex items-center h-10 px-4 rounded-md bg-muted/50 border border-border/60 text-xs font-semibold text-foreground backdrop-blur-sm">
+                🏢 {activeReport?.name || "Empresa Vinculada"}
+              </div>
+            ) : (
+              <Select value={selectedReportId} onValueChange={setSelectedReportId}>
+                <SelectTrigger className="w-[180px] bg-card/50 backdrop-blur-sm border-border/50">
+                  <SelectValue placeholder="Selecione o Cliente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {reports.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
 
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[180px] bg-card/50 backdrop-blur-sm border-border/50">
-              <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="yesterday">Ontem</SelectItem>
-              <SelectItem value="7">Últimos 7 dias</SelectItem>
-              <SelectItem value="30">Últimos 30 dias</SelectItem>
-              <SelectItem value="90">Últimos 90 dias</SelectItem>
-              <SelectItem value="this_month">Mês Atual</SelectItem>
-              <SelectItem value="last_month">Mês Anterior</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </PageHeader>
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-[180px] bg-card/50 backdrop-blur-sm border-border/50">
+                <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yesterday">Ontem</SelectItem>
+                <SelectItem value="7">Últimos 7 dias</SelectItem>
+                <SelectItem value="30">Últimos 30 dias</SelectItem>
+                <SelectItem value="90">Últimos 90 dias</SelectItem>
+                <SelectItem value="this_month">Mês Atual</SelectItem>
+                <SelectItem value="last_month">Mês Anterior</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        }
+      />
 
       <main className="flex-1 p-6 lg:p-10 space-y-12 max-w-7xl mx-auto w-full relative">
         
@@ -361,7 +521,7 @@ function TemplatesPage() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-            <p className="text-muted-foreground animate-pulse font-medium">Buscando inteligência de dados...</p>
+            <p className="text-muted-foreground animate-pulse font-medium">Consolidando métricas e parecer executivo...</p>
           </div>
         ) : !activeReport ? (
           <div className="text-center py-20 text-muted-foreground bg-card/30 backdrop-blur-sm rounded-2xl border border-border/50 shadow-sm">
@@ -370,37 +530,61 @@ function TemplatesPage() {
         ) : (
           <div className="space-y-16">
 
-            {/* SEÇÃO 1: INSIGHTS DA IA */}
+            {/* SEÇÃO 1: PARECER EXECUTIVO CONSOLIDADO */}
             <section className="relative">
-              <SectionTitle title="Insights Estratégicos (IA)" description="Leituras consolidadas da operação para acelerar tomada de decisão." icon={Sparkles} color="purple" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <SectionTitle title="Parecer Executivo (Growth & Performance)" description="Diagnóstico operacional completo e plano de ação comercial gerados a partir da consolidação dos dados." icon={Award} color="purple" />
+                
+                {!isClient && (
+                  <div className="flex items-center gap-2 self-start sm:self-center mt-2 sm:mt-8">
+                    <Button
+                      onClick={toggleAutoAi}
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "h-9 text-xs font-medium px-4 transition-all duration-200",
+                        autoAiEnabled 
+                          ? "bg-purple-500/10 text-purple-400 border-purple-500/40 hover:bg-purple-500/20 shadow-sm shadow-purple-500/10" 
+                          : "bg-card text-muted-foreground border-border/50 hover:bg-muted"
+                      )}
+                    >
+                      <Zap className={cn("w-3.5 h-3.5 mr-2", autoAiEnabled && "text-purple-400 animate-pulse")} />
+                      {autoAiEnabled ? "Relatório Automático: Ativado" : "Relatório Automático: Pausado"}
+                    </Button>
+                  </div>
+                )}
+              </div>
               
               {aiInsight ? (
-                <Card className="border-purple-500/40 shadow-lg shadow-purple-500/10 overflow-hidden relative">
+                <Card className="border-purple-500/40 shadow-lg shadow-purple-500/10 overflow-hidden relative mt-2">
                   <div className="absolute top-0 right-0 p-4 flex gap-2">
                     {aiInsightsList.length > 1 && (
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm" className="h-6 text-xs bg-card hover:bg-muted border-purple-500/20 text-purple-600 dark:text-purple-400">
                             <History className="w-3 h-3 mr-1" />
-                            Histórico
+                            Histórico ({aiInsightsList.length})
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
                               <History className="w-5 h-5" /> 
-                              Histórico de Análises (IA)
+                              Histórico do Parecer Executivo - {activeReport?.name}
                             </DialogTitle>
                           </DialogHeader>
                           <ScrollArea className="flex-1 pr-4 mt-4">
                             <div className="space-y-8">
                               {aiInsightsList.map((insight: any, i: number) => (
                                 <div key={insight.id} className="pb-8 border-b border-border/40 last:border-0 last:pb-0">
-                                  <div className="flex items-center gap-2 mb-4">
-                                    <Badge variant="outline" className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20">
-                                      {new Date(insight.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                    </Badge>
-                                    {i === 0 && <Badge className="bg-purple-500 hover:bg-purple-600 text-white border-none">Atual</Badge>}
+                                  <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant="outline" className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20">
+                                        {new Date(insight.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                      </Badge>
+                                      {i === 0 && <Badge className="bg-purple-500 hover:bg-purple-600 text-white border-none">Atual</Badge>}
+                                    </div>
+                                    <span className="text-[11px] text-muted-foreground font-mono">{insight.analysis_period || "Período personalizado"}</span>
                                   </div>
                                   <div className="prose prose-purple dark:prose-invert max-w-none text-sm prose-p:leading-relaxed prose-headings:text-purple-600 dark:prose-headings:text-purple-400">
                                     <ReactMarkdown>{insight.insight_text}</ReactMarkdown>
@@ -412,32 +596,47 @@ function TemplatesPage() {
                         </DialogContent>
                       </Dialog>
                     )}
-                    <Badge className="bg-purple-500 hover:bg-purple-600 text-white border-none shadow-sm flex items-center h-6">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Análise IA Ativa
+                    <Badge className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-none shadow-sm flex items-center h-6">
+                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                      Parecer Consolidado
                     </Badge>
                   </div>
-                  <CardContent className="p-8">
+                  <CardContent className="p-8 pt-12 sm:pt-8">
                     <div className="prose prose-purple dark:prose-invert max-w-none prose-p:leading-relaxed prose-headings:text-purple-600 dark:prose-headings:text-purple-400">
                       <ReactMarkdown>{aiInsight.insight_text}</ReactMarkdown>
                     </div>
-                    {aiInsight.analysis_period && (
-                      <p className="text-xs text-muted-foreground mt-6 pt-4 border-t border-border/50">
-                        Período analisado: {aiInsight.analysis_period}
-                      </p>
-                    )}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-muted-foreground mt-8 pt-4 border-t border-border/50 gap-2">
+                      <span>Período do Relatório: <strong className="text-foreground">{aiInsight.analysis_period || `Últimos ${dateRange} dias`}</strong></span>
+                      <span>Atualizado em: {new Date(aiInsight.created_at).toLocaleString("pt-BR")}</span>
+                    </div>
                   </CardContent>
                 </Card>
               ) : (
-                <Card className="border-purple-500/30 bg-purple-500/5 backdrop-blur-md overflow-hidden relative">
+                <Card className="border-purple-500/30 bg-gradient-to-b from-purple-500/5 to-indigo-500/5 backdrop-blur-md overflow-hidden relative mt-2">
                   <div className="absolute top-0 right-0 p-4">
-                    <Badge variant="outline" className="bg-purple-500/20 text-purple-400 border-purple-500/30">Aguardando IA</Badge>
+                    <Badge variant="outline" className={autoAiEnabled ? "bg-purple-500/20 text-purple-300 border-purple-500/30" : "bg-muted text-muted-foreground border-border"}>
+                      {autoAiEnabled ? "⚡ Modo Automático Ativo" : "⏸️ Automação Pausada"}
+                    </Badge>
                   </div>
-                  <CardContent className="p-8 flex flex-col items-center justify-center text-center min-h-[200px]">
-                    <Sparkles className="w-12 h-12 text-purple-500/40 mb-4" />
-                    <h3 className="text-xl font-bold text-foreground mb-2">Análise Inteligente via n8n</h3>
-                    <p className="text-muted-foreground max-w-xl mb-4">
-                      Configure o fluxo no n8n para salvar a análise no Supabase (tabela <code className="bg-muted px-1 py-0.5 rounded">ai_insights</code>). Assim que os dados chegarem, o texto formatado aparecerá aqui automaticamente!
+                  <CardContent className="p-8 flex flex-col items-center justify-center text-center min-h-[220px]">
+                    <div className="h-14 w-14 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4 text-purple-500">
+                      {isGeneratingAi ? <Loader2 className="w-7 h-7 animate-spin text-purple-400" /> : <Award className="w-7 h-7 text-purple-400" />}
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">
+                      {isGeneratingAi ? "Processando Parecer Executivo..." : "Relatório Executivo Consolidado"}
+                    </h3>
+                    <p className="text-muted-foreground max-w-xl text-sm mb-2 leading-relaxed">
+                      {isGeneratingAi ? (
+                        "O sistema está sintetizando neste momento as métricas consolidadas de todas as campanhas para elaborar a leitura estratégica..."
+                      ) : autoAiEnabled ? (
+                        <span>
+                          O modo automático está <strong>ativado</strong>. Assim que o webhook do n8n entregar novas métricas ou houver atualização nos dados das campanhas, o parecer executivo será atualizado espontaneamente com as informações mais recentes.
+                        </span>
+                      ) : (
+                        <span>
+                          A atualização automática está atualmente <strong>pausada</strong>. Clique no botão de controle ao lado do título para permitir a elaboração de pareceres ao receber novos dados do webhook.
+                        </span>
+                      )}
                     </p>
                   </CardContent>
                 </Card>

@@ -39,7 +39,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const CLIENT_ID = '28819554-149b-4d54-9198-60455dbada07';
 const ADS_TABLE = 'Dec_google_ads_metrics';
 const GSC_TABLE = 'Dec_google_search_console_metrics';
-const GA4_TABLE = 'Dec_google_analytics_metrics';
 
 async function seedData() {
   console.log("Iniciando geração de dados simulados (Ads e Search Console)...");
@@ -48,11 +47,9 @@ async function seedData() {
   console.log("Limpando dados existentes...");
   await supabase.from(ADS_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000');
   await supabase.from(GSC_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  await supabase.from(GA4_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
   const adsRows = [];
   const gscRows = [];
-  const ga4Rows = [];
 
   const today = new Date();
   
@@ -62,13 +59,11 @@ async function seedData() {
     currentDate.setDate(today.getDate() - i);
     const dateStr = currentDate.toISOString().split('T')[0];
 
-    // --- GOOGLE ADS & FACEBOOK ADS DATA ---
+    // --- GOOGLE ADS DATA ---
     const campaigns = [
-      { id: 'c1', name: 'Google PMax - Conversão Principal' },
-      { id: 'c2', name: 'Google Search - Marca Dec' },
-      { id: 'c3', name: 'Google Display - Remarketing Dinâmico' },
-      { id: 'fb1', name: 'Meta Ads - Captação Instagram' },
-      { id: 'fb2', name: 'Meta Ads - Retargeting Facebook' }
+      { id: 'c1', name: 'PMax - Conversão Principal' },
+      { id: 'c2', name: 'Search - Marca Dec' },
+      { id: 'c3', name: 'Display - Remarketing Dinâmico' }
     ];
 
     campaigns.forEach((camp) => {
@@ -167,57 +162,6 @@ async function seedData() {
         position
       });
     });
-
-    // --- GA4 DATA ---
-    const ga4Sources = [
-      { source: 'google', medium: 'organic' },
-      { source: 'google', medium: 'cpc' },
-      { source: 'facebook', medium: 'paid' },
-      { source: 'direct', medium: '(none)' }
-    ];
-
-    ga4Sources.forEach((src) => {
-      let baseUsers, baseSessions, basePageViews;
-      if (src.source === 'google' && src.medium === 'organic') {
-        baseUsers = 150; baseSessions = 180; basePageViews = 350;
-      } else if (src.source === 'google' && src.medium === 'cpc') {
-        baseUsers = 80; baseSessions = 90; basePageViews = 150;
-      } else if (src.source === 'facebook') {
-        baseUsers = 200; baseSessions = 250; basePageViews = 400;
-      } else {
-        baseUsers = 50; baseSessions = 60; basePageViews = 100;
-      }
-
-      const randomFactor = 0.7 + Math.random() * 0.6;
-      const users = Math.round(baseUsers * randomFactor);
-      const sessions = Math.round(baseSessions * randomFactor);
-      const pageViews = Math.round(basePageViews * randomFactor);
-      const engagedSessions = Math.round(sessions * 0.6);
-
-      ga4Rows.push({
-        client_id: CLIENT_ID,
-        metric_date: dateStr,
-        page_path: '/',
-        session_manual_source_medium: `${src.source} / ${src.medium}`,
-        session_source: src.source,
-        session_medium: src.medium,
-        city: 'São Paulo',
-        device_category: 'mobile',
-        browser: 'Chrome',
-        sessions: sessions,
-        total_users: users,
-        active_users: users,
-        bounce_rate: 40.5,
-        page_views: pageViews,
-        engagement_rate: 60.0,
-        average_session_duration: 120.5,
-        engaged_sessions: engagedSessions,
-        events: pageViews * 2,
-        total_ad_revenue: 0,
-        transactions: 0,
-        session_duration: sessions * 120.5
-      });
-    });
   }
 
   // Enviar para o banco em blocos
@@ -236,14 +180,6 @@ async function seedData() {
     console.error("Erro ao inserir GSC:", gscErr.message);
   } else {
     console.log("Search Console inserido com sucesso!");
-  }
-
-  console.log(`Enviando ${ga4Rows.length} linhas para o GA4...`);
-  const { error: ga4Err } = await supabase.from(GA4_TABLE).insert(ga4Rows);
-  if (ga4Err) {
-    console.error("Erro ao inserir GA4:", ga4Err.message);
-  } else {
-    console.log("GA4 inserido com sucesso!");
   }
 
   console.log("Finalizado!");

@@ -85,11 +85,11 @@ function AuthPage() {
         </div>
         <div className="space-y-4">
           <h2 className="text-3xl font-semibold leading-tight">
-            O centro de inteligência da sua agência.
+            O centro de gestão e performance da sua agência.
           </h2>
           <p className="max-w-md text-sm text-white/80">
-            Consolide dados de Google Ads, Meta, Analytics, CRM e mais.
-            Receba análises e planos de ação gerados por IA especializada em marketing.
+            Consolide dados de Google Ads, Meta Ads, Search Console e GA4.
+            Tenha em mãos leituras executivas precisas e planos de ação estratégicos para acelerar seus resultados.
           </p>
         </div>
         <div className="text-xs text-white/60">© {new Date().getFullYear()} InsightOS</div>
