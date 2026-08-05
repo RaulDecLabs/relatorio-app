@@ -7,13 +7,20 @@ import type { Database } from './types';
 
 function cleanUrl(val: any): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
-  const cleaned = val.trim().replace(/^['"]|['"]$/g, '');
-  return (cleaned.startsWith('http://') || cleaned.startsWith('https://')) ? cleaned : undefined;
+  let cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
+  try {
+    const url = new URL(cleaned);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined;
+    return url.origin;
+  } catch (e) {
+    return undefined;
+  }
 }
 
 function cleanKey(val: any): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
-  return val.trim().replace(/^['"]|['"]$/g, '');
+  const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
+  return cleaned.length > 10 ? cleaned : undefined;
 }
 
 function createSupabaseAdminClient() {
