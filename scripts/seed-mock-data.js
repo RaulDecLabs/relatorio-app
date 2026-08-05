@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
+import ws from 'ws';
+
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = ws;
+}
 
 function loadEnv() {
   const envPath = path.resolve(process.cwd(), '.env');
@@ -35,7 +40,10 @@ if (!supabaseUrl || !supabaseKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false },
+  realtime: { transport: ws }
+});
 
 const CLIENT_ID = '28819554-149b-4d54-9198-60455dbada07';
 const ADS_TABLE = 'Dec_google_ads_metrics';

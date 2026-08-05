@@ -2,6 +2,11 @@ import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
+import ws from 'ws';
+
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = ws;
+}
 
 // Helper to load and parse .env file
 function loadEnv() {
@@ -43,6 +48,9 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: {
     persistSession: false,
+  },
+  realtime: {
+    transport: ws,
   },
 });
 

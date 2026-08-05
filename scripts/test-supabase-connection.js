@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
+import ws from 'ws';
+
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = ws;
+}
 
 function loadEnv() {
   const envPath = path.resolve(process.cwd(), '.env');
@@ -36,7 +41,10 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { persistSession: false }
+  auth: { persistSession: false },
+  realtime: {
+    transport: ws,
+  },
 });
 
 async function testSupabase() {

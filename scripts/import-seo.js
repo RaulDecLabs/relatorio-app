@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
+import ws from 'ws';
+
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = ws;
+}
 
 // Helper para ler .env
 function loadEnv() {
@@ -46,7 +51,8 @@ if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { persistSession: false }
+  auth: { persistSession: false },
+  realtime: { transport: ws }
 });
 
 async function getAccessToken() {

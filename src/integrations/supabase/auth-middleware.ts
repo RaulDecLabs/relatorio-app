@@ -3,6 +3,11 @@ import { createMiddleware } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './types'
+import ws from 'ws'
+
+if (typeof globalThis.WebSocket === 'undefined' && typeof window === 'undefined') {
+  (globalThis as any).WebSocket = ws;
+}
 
 
 
@@ -76,6 +81,9 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
           storage: undefined,
           persistSession: false,
           autoRefreshToken: false,
+        },
+        realtime: {
+          transport: ws as any,
         },
       }
     );

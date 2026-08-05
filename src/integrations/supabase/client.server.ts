@@ -4,6 +4,11 @@
 // For user-authenticated queries (with RLS), use the auth middleware instead.
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import ws from 'ws';
+
+if (typeof globalThis.WebSocket === 'undefined' && typeof window === 'undefined') {
+  (globalThis as any).WebSocket = ws;
+}
 
 function cleanUrl(val: any): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
@@ -59,6 +64,9 @@ function createSupabaseAdminClient() {
       storage: undefined,
       persistSession: false,
       autoRefreshToken: false,
+    },
+    realtime: {
+      transport: ws as any,
     }
   });
 }
