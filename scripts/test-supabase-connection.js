@@ -4,10 +4,7 @@ import path from 'path';
 
 function loadEnv() {
   const envPath = path.resolve(process.cwd(), '.env');
-  if (!fs.existsSync(envPath)) {
-    console.error('.env file not found!');
-    process.exit(1);
-  }
+  if (!fs.existsSync(envPath)) return;
 
   const envContent = fs.readFileSync(envPath, 'utf-8');
   envContent.split('\n').forEach((line) => {
@@ -16,21 +13,25 @@ function loadEnv() {
     const match = trimmed.match(/^([^=]+)=(.*)$/);
     if (!match) return;
     const key = match[1].trim();
-    let val = match[2].trim();
-    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-      val = val.substring(1, val.length - 1);
-    }
+    let val = match[2].trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
     process.env[key] = val;
   });
 }
 
 loadEnv();
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+function cleanEnv(val, fallback = undefined) {
+  if (!val || typeof val !== 'string') return fallback;
+  const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
+  return cleaned || fallback;
+}
+
+const defaultUrl = 'https://btdgetidtawjtqrvzybh.supabase.co';
+const SUPABASE_URL = cleanEnv(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, defaultUrl);
+const SUPABASE_SERVICE_ROLE_KEY = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não definidos no arquivo .env.');
+  console.error('ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não definidos em memória ou arquivo .env.');
   process.exit(1);
 }
 

@@ -4,10 +4,7 @@ import path from 'path';
 
 function loadEnv() {
   const envPath = path.resolve(process.cwd(), '.env');
-  if (!fs.existsSync(envPath)) {
-    console.error('.env file not found!');
-    process.exit(1);
-  }
+  if (!fs.existsSync(envPath)) return;
 
   const envContent = fs.readFileSync(envPath, 'utf-8');
   envContent.split('\n').forEach((line) => {
@@ -16,21 +13,25 @@ function loadEnv() {
     const match = trimmed.match(/^([^=]+)=(.*)$/);
     if (!match) return;
     const key = match[1].trim();
-    let val = match[2].trim();
-    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-      val = val.substring(1, val.length - 1);
-    }
+    let val = match[2].trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
     process.env[key] = val;
   });
 }
 
 loadEnv();
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+function cleanEnv(val, fallback = undefined) {
+  if (!val || typeof val !== 'string') return fallback;
+  const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
+  return cleaned || fallback;
+}
+
+const defaultUrl = 'https://btdgetidtawjtqrvzybh.supabase.co';
+const supabaseUrl = cleanEnv(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL, defaultUrl);
+const supabaseKey = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env");
+  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment");
   process.exit(1);
 }
 
