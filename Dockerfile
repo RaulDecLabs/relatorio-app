@@ -17,8 +17,8 @@ COPY . .
 # Usamos sed para substituir o preset: 'vercel' (se existir)
 RUN sed -i "s/preset: 'vercel'/preset: 'node-server'/g" vite.config.ts
 
-# Fazer o build do projeto (TanStack Start/Nitro)
-RUN npm run build
+# Fazer o build do projeto com Nitro forçado para node-server sem usar cache antigo
+RUN NITRO_PRESET=node-server npm run build && ls -la .output && ls -la .output/server
 
 # Expor a porta 3000
 EXPOSE 3000
