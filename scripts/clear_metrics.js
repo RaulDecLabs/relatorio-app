@@ -77,10 +77,19 @@ async function clearMetrics() {
       }
     }
     
-    console.log("\nMetrics clearing completed successfully!");
+    console.log("\nClearing ai_insights table (Parecer Executivo)...");
+    const { error: aiErr } = await supabase.from('ai_insights').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (aiErr) {
+      console.warn(`  Warning: Could not delete from ai_insights: ${aiErr.message}`);
+    } else {
+      console.log("  Successfully cleared ai_insights.");
+    }
+
+    console.log("\nAll metrics and insights clearing completed successfully!");
   } catch (error) {
     console.error("Error clearing metrics:", error);
   }
 }
+
 
 clearMetrics();
