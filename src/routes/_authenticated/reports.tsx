@@ -29,6 +29,7 @@ import { GoogleAdsTab } from "@/components/reports/google-ads-tab";
 import { MetaAdsTab } from "@/components/reports/meta-ads-tab";
 import { GscTab } from "@/components/reports/gsc-tab";
 import { SheetsTab } from "@/components/reports/sheets-tab";
+import { RdMarketingTab } from "@/components/reports/rd-marketing-tab";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
@@ -46,12 +47,14 @@ function ReportsPage() {
   const [newGscUrl, setNewGscUrl] = useState("");
   const [newGoogleSheetsUrl, setNewGoogleSheetsUrl] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "sheets">("traffic");
+  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "rd" | "sheets">("traffic");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [ga4PropertyId, setGa4PropertyId] = useState("");
   const [googleAdsId, setGoogleAdsId] = useState("");
   const [metaAdsId, setMetaAdsId] = useState("");
   const [gscUrl, setGscUrl] = useState("");
+  const [rdPublicToken, setRdPublicToken] = useState("");
+  const [rdPrivateToken, setRdPrivateToken] = useState("");
   const [googleSheetsUrl, setGoogleSheetsUrl] = useState("");
 
   const [dateRange, setDateRange] = useState<string>("7");
@@ -158,6 +161,8 @@ function ReportsPage() {
       setGoogleAdsId(activeReport.google_ads_id || "");
       setMetaAdsId(activeReport.meta_ads_id || "");
       setGscUrl(activeReport.gsc_url || "");
+      setRdPublicToken(activeReport.rd_public_token || "");
+      setRdPrivateToken(activeReport.rd_private_token || "");
       // Carregar link da planilha associada se houver
       supabase
         .from("reports_sheets_config")
@@ -171,7 +176,7 @@ function ReportsPage() {
   }, [activeReport, isSettingsOpen]);
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; googleSheetsUrl: string }) => {
+    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, rdPublicToken, rdPrivateToken, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; rdPublicToken: string; rdPrivateToken: string; googleSheetsUrl: string }) => {
       const { data, error } = await supabase
         .from("reports_config")
         .update({ 
@@ -179,6 +184,8 @@ function ReportsPage() {
           google_ads_id: googleAdsId || null,
           meta_ads_id: metaAdsId || null,
           gsc_url: gscUrl || null,
+          rd_public_token: rdPublicToken || null,
+          rd_private_token: rdPrivateToken || null,
         })
         .eq("id", id)
         .select()
@@ -222,6 +229,8 @@ function ReportsPage() {
       googleAdsId: googleAdsId.trim(),
       metaAdsId: metaAdsId.trim(),
       gscUrl: gscUrl.trim(),
+      rdPublicToken: rdPublicToken.trim(),
+      rdPrivateToken: rdPrivateToken.trim(),
       googleSheetsUrl: googleSheetsUrl.trim(),
     });
   };
@@ -541,6 +550,33 @@ function ReportsPage() {
                           </div>
                         </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+                          <div className="grid gap-1.5">
+                            <Label htmlFor="rdPublicToken" className="text-xs font-semibold text-orange-600 dark:text-orange-400">RD Marketing (Token Público)</Label>
+                            <Input
+                              id="rdPublicToken"
+                              placeholder="Ex: d7a8f9e0-..."
+                              value={rdPublicToken}
+                              onChange={(e) => setRdPublicToken(e.target.value)}
+                              className="h-9 text-sm font-mono"
+                            />
+                            <p className="text-[10px] text-muted-foreground">Token Público (Public API Token) do RD Station.</p>
+                          </div>
+                          
+                          <div className="grid gap-1.5">
+                            <Label htmlFor="rdPrivateToken" className="text-xs font-semibold text-orange-600 dark:text-orange-400">RD Marketing (Token Privado)</Label>
+                            <Input
+                              id="rdPrivateToken"
+                              type="password"
+                              placeholder="Ex: 8c1b2d3e-..."
+                              value={rdPrivateToken}
+                              onChange={(e) => setRdPrivateToken(e.target.value)}
+                              className="h-9 text-sm font-mono"
+                            />
+                            <p className="text-[10px] text-muted-foreground">Token Privado (Private API Token) da conta RD.</p>
+                          </div>
+                        </div>
+
                         <div className="grid gap-1.5 pt-2 border-t border-border/60">
                           <Label htmlFor="googleSheetsUrl" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Planilha Personalizada (Google Sheets Link)</Label>
                           <Input
@@ -814,6 +850,19 @@ function ReportsPage() {
             <Button
               variant="ghost"
               className={cn(
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap flex items-center gap-1.5",
+                activeTab === "rd" 
+                  ? "border-orange-500 text-orange-500 bg-orange-500/5" 
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:text-orange-500"
+              )}
+              onClick={() => setActiveTab("rd")}
+            >
+              RD Marketing
+              <span className="inline-block w-2 h-2 rounded-full bg-orange-500 animate-pulse" title="Inbound & Leads" />
+            </Button>
+            <Button
+              variant="ghost"
+              className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "sheets" 
                   ? "border-primary text-primary bg-primary/5" 
@@ -839,6 +888,10 @@ function ReportsPage() {
 
           {activeTab === "gsc" && (
             <GscTab gscMetrics={gscMetrics} activeReport={activeReport} />
+          )}
+
+          {activeTab === "rd" && (
+            <RdMarketingTab activeReport={activeReport} />
           )}
 
           {activeTab === "sheets" && (

@@ -9,10 +9,13 @@ export interface ReportConfig {
   ads_table_name?: string | null;
   fb_ads_table_name?: string | null;
   gsc_table_name?: string | null;
+  rd_table_name?: string | null;
   ga4_property_id?: string | null;
   google_ads_id?: string | null;
   meta_ads_id?: string | null;
   gsc_url?: string | null;
+  rd_public_token?: string | null;
+  rd_private_token?: string | null;
   created_at: string;
 }
 
@@ -25,7 +28,7 @@ export function SectionTitle({
   title: string; 
   description: string; 
   icon: any; 
-  color?: "blue" | "green" | "amber" | "indigo" | "purple" 
+  color?: "blue" | "green" | "amber" | "indigo" | "purple" | "orange" | "teal" | "cyan" | "rose"
 }) {
   const colorMap = {
     blue: "text-blue-500 bg-blue-500/10 border-blue-500/20",
@@ -33,6 +36,10 @@ export function SectionTitle({
     amber: "text-amber-500 bg-amber-500/10 border-amber-500/20",
     indigo: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
     purple: "text-purple-500 bg-purple-500/10 border-purple-500/20",
+    orange: "text-orange-500 bg-orange-500/10 border-orange-500/20",
+    teal: "text-teal-500 bg-teal-500/10 border-teal-500/20",
+    cyan: "text-cyan-500 bg-cyan-500/10 border-cyan-500/20",
+    rose: "text-rose-500 bg-rose-500/10 border-rose-500/20",
   };
   const design = colorMap[color] || colorMap.blue;
   return (

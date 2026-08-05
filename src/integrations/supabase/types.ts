@@ -366,6 +366,9 @@ export type Database = {
           meta_ads_id: string | null
           gsc_url: string | null
           gsc_table_name: string | null
+          rd_table_name: string | null
+          rd_public_token: string | null
+          rd_private_token: string | null
           id: string
           name: string
           table_name: string
@@ -379,6 +382,9 @@ export type Database = {
           meta_ads_id?: string | null
           gsc_url?: string | null
           gsc_table_name?: string | null
+          rd_table_name?: string | null
+          rd_public_token?: string | null
+          rd_private_token?: string | null
           id?: string
           name: string
           table_name: string
@@ -392,6 +398,9 @@ export type Database = {
           meta_ads_id?: string | null
           gsc_url?: string | null
           gsc_table_name?: string | null
+          rd_table_name?: string | null
+          rd_public_token?: string | null
+          rd_private_token?: string | null
           id?: string
           name?: string
           table_name?: string
