@@ -13,21 +13,25 @@ export const Route = createFileRoute('/api/auth/callback/rd-marketing')({
           return new Response('Code ou State (report_id) ausente', { status: 400 })
         }
         
-        const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://btdgetidtawjtqrvzybh.supabase.co'
-        const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || ''
-        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-        
-        const { data: config } = await supabase.from('reports_config').select('rd_client_id, rd_client_secret').eq('id', state).single()
-        
-        const clientId = config?.rd_client_id || process.env.RD_CLIENT_ID
-        const clientSecret = config?.rd_client_secret || process.env.RD_CLIENT_SECRET
-        const redirectUri = `${url.origin}/api/auth/callback/rd-marketing`
-        
-        if (!clientId || !clientSecret) {
-          return new Response('Client ID ou Secret não encontrados. Configure para este cliente ou como variável global (.env).', { status: 400 })
-        }
-        
         try {
+          const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://btdgetidtawjtqrvzybh.supabase.co'
+          const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || ''
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+          
+          const { data: config, error } = await supabase.from('reports_config').select('rd_client_id, rd_client_secret').eq('id', state).maybeSingle()
+          
+          if (error) {
+            return new Response('Erro ao consultar banco no callback: ' + error.message, { status: 500 })
+          }
+
+          const clientId = config?.rd_client_id || process.env.RD_CLIENT_ID
+          const clientSecret = config?.rd_client_secret || process.env.RD_CLIENT_SECRET
+          const redirectUri = `${url.origin}/api/auth/callback/rd-marketing`
+          
+          if (!clientId || !clientSecret) {
+            return new Response('Client ID ou Secret não encontrados. Configure para este cliente ou como variável global (.env).', { status: 400 })
+          }
+          
           const res = await fetch('https://api.rd.services/auth/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -61,7 +65,7 @@ export const Route = createFileRoute('/api/auth/callback/rd-marketing')({
           
         } catch (err: any) {
           console.error(err)
-          return new Response('Erro interno no callback do RD Station: ' + err.message, { status: 500 })
+          return new Response('Erro interno no callback do RD Station: ' + err.message + '\n' + err.stack, { status: 500 })
         }
       }
     }
