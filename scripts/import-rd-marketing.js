@@ -123,8 +123,8 @@ async function runImport() {
         continue;
       }
 
-      const clientId = config.rd_client_id || process.env.RD_CLIENT_ID;
-      const clientSecret = config.rd_client_secret || process.env.RD_CLIENT_SECRET;
+      const clientId = config.rd_client_id || cleanEnv(process.env.RD_CLIENT_ID);
+      const clientSecret = config.rd_client_secret || cleanEnv(process.env.RD_CLIENT_SECRET);
       const refreshToken = config.rd_refresh_token;
 
       console.log(`\n------------------------------------------------------`);

@@ -25,8 +25,8 @@ export const Route = createFileRoute('/api/auth/callback/rd-marketing')({
             return new Response('Erro ao consultar banco no callback: ' + error.message, { status: 500 })
           }
 
-          const clientId = config?.rd_client_id || process.env.RD_CLIENT_ID
-          const clientSecret = config?.rd_client_secret || process.env.RD_CLIENT_SECRET
+          const clientId = config?.rd_client_id || cleanStr(process.env.RD_CLIENT_ID)
+          const clientSecret = config?.rd_client_secret || cleanStr(process.env.RD_CLIENT_SECRET)
           const redirectUri = `${url.origin}/api/auth/callback/rd-marketing`
           
           if (!clientId || !clientSecret) {

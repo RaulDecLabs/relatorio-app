@@ -23,7 +23,7 @@ export const Route = createFileRoute('/api/auth/login/rd-marketing')({
             return new Response('Erro ao consultar banco de dados: ' + error.message, { status: 500 })
           }
           
-          const clientId = config?.rd_client_id || process.env.RD_CLIENT_ID
+          const clientId = config?.rd_client_id || cleanStr(process.env.RD_CLIENT_ID)
           if (!clientId) {
             return new Response('Client ID do RD Station não configurado no banco de dados para este cliente e nem como global no .env do servidor.', { status: 400 })
           }
