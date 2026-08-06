@@ -15,98 +15,80 @@ import {
 } from "@/components/reports/report-ui";
 
 interface RdMarketingTabProps {
-  rdMetrics?: any[];
+  rdEvents?: any[];
   activeReport?: ReportConfig;
 }
 
 const COLORS = ["#f97316", "#14b8a6", "#3b82f6", "#8b5cf6", "#10b981"];
 
-export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabProps) {
+export function RdMarketingTab({ rdEvents = [], activeReport }: RdMarketingTabProps) {
   // Exibição estritamente dos dados reais oriundos da tabela do RD Marketing no banco do Supabase
-  const safeMetrics = Array.isArray(rdMetrics) ? rdMetrics : [];
+  const safeMetrics = Array.isArray(rdEvents) ? rdEvents : [];
   const hasData = Boolean(safeMetrics && safeMetrics.length > 0);
   
   const data = useMemo(() => {
-    if (hasData && safeMetrics.length > 0) {
-      const totalLeads = safeMetrics.reduce((sum, item) => sum + (Number(item?.total_leads) || 0), 0);
-      const totalMqls = safeMetrics.reduce((sum, item) => sum + (Number(item?.leads_mql) || 0), 0);
-      const totalOportunidades = safeMetrics.reduce((sum, item) => sum + (Number(item?.oportunidades) || 0), 0);
-      const totalVisits = safeMetrics.reduce((sum, item) => sum + (Number(item?.visits) || 0), 0);
+    if (hasData) {
+      const totalLeads = safeMetrics.filter(e => e.event_type === 'CONVERSION').length;
+      const totalOportunidades = safeMetrics.filter(e => e.event_type === 'OPPORTUNITY').length;
+      
       const taxaConversao = totalLeads > 0 ? ((totalOportunidades / totalLeads) * 100).toFixed(2) : "0.00";
-      const taxaMql = totalLeads > 0 ? Math.round((totalMqls / totalLeads) * 100) : 0;
-      const taxaOportunidade = totalMqls > 0 ? Math.round((totalOportunidades / totalMqls) * 100) : 0;
-      const taxaVisitaLead = totalVisits > 0 ? ((totalLeads / totalVisits) * 100).toFixed(1) : "0.0";
       
-      // Mapeamento real por canais de origem salvos no banco de dados
-      const googleAds = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_google_ads) || 0), 0);
-      const metaAds = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_meta_ads) || 0), 0);
-      const organic = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_organic) || 0), 0);
-      const direct = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_direct) || 0), 0);
+      // Canais
+      const channelCounts: Record<string, number> = {};
+      const allLps: Record<string, { visits: number, leads: number }> = {};
+      const evolutionMap: Record<string, { data: string, Leads: number, Oportunidades: number }> = {};
       
-      const rawChannels = [
-        { name: "Google Ads", value: googleAds },
-        { name: "Meta Ads (Instagram/FB)", value: metaAds },
-        { name: "Busca Orgânica (SEO)", value: organic },
-        { name: "Tráfego Direto / Outros", value: direct },
-      ].filter(c => c.value > 0);
-      
-      // Agregação real das Landing Pages e Pontos de Conversão vindos na coluna top_lps
-      const allLps: Record<string, { visits: number; leads: number }> = {};
-      safeMetrics.forEach(m => {
-        if (m?.top_lps && Array.isArray(m.top_lps)) {
-          m.top_lps.forEach((lp: any) => {
-            const name = lp?.name || "Landing Page / Formulário";
-            if (!allLps[name]) allLps[name] = { visits: 0, leads: 0 };
-            allLps[name].visits += (Number(lp?.visits) || 0);
-            allLps[name].leads += (Number(lp?.leads) || 0);
-          });
+      safeMetrics.forEach(ev => {
+        // Data group
+        const dateObj = new Date(ev.created_at);
+        const day = dateObj.getDate().toString().padStart(2, '0') + '/' + (dateObj.getMonth() + 1).toString().padStart(2, '0');
+        if (!evolutionMap[day]) evolutionMap[day] = { data: day, Leads: 0, Oportunidades: 0 };
+        
+        if (ev.event_type === 'CONVERSION') {
+           evolutionMap[day].Leads++;
+           
+           // Origem
+           const origem = ev.payload?.custom_fields?.Origem || ev.payload?.custom_fields?.Origem_RD || ev.payload?.custom_fields?.['Origem RD1'] || ev.payload?.last_conversion?.source || 'Desconhecido';
+           channelCounts[origem] = (channelCounts[origem] || 0) + 1;
+           
+           // Identificador (LP)
+           const lp = ev.payload?.last_conversion?.content?.identificador || ev.payload?.first_conversion?.content?.identificador || 'Geral';
+           if (!allLps[lp]) allLps[lp] = { visits: 0, leads: 0 };
+           allLps[lp].leads++;
+        } else if (ev.event_type === 'OPPORTUNITY') {
+           evolutionMap[day].Oportunidades++;
         }
       });
       
-      const topLps = Object.entries(allLps).map(([name, val]) => ({
+      const rawChannels = Object.entries(channelCounts).map(([name, value]) => ({ name, value: value as number })).sort((a,b) => b.value - a.value);
+      const topLps = Object.entries(allLps).map(([name, val]: [string, any]) => ({
         name,
         visits: val.visits,
         leads: val.leads,
-        conv: val.visits > 0 ? (val.leads / val.visits) * 100 : 0
+        conv: 0
       })).sort((a, b) => b.leads - a.leads);
 
-      // Últimas métricas de e-mail marketing e fluxos capturados
-      const lastRow = safeMetrics[safeMetrics.length - 1] || {};
-      const emailOpenRate = lastRow?.email_open_rate || 0;
-      const emailCtr = lastRow?.email_ctr || 0;
-      const workflowsActive = lastRow?.workflows_active || 0;
+      const evolutionData = Object.values(evolutionMap).reverse(); // Reverse to have chronological if fetched descending
 
       return {
         totalLeads,
-        totalMqls,
+        totalMqls: 0, // Ignorando MQL no painel
         totalOportunidades,
-        totalVisits,
+        totalVisits: 0,
         taxaConversao,
-        taxaMql,
-        taxaOportunidade,
-        taxaVisitaLead,
-        evolutionData: safeMetrics.map(m => {
-          let dia = "Dia";
-          if (m?.metric_date && typeof m.metric_date === 'string') {
-            const parts = m.metric_date.split('-');
-            if (parts.length === 3) dia = `${parts[2]}/${parts[1]}`;
-          }
-          return {
-            data: dia,
-            Leads: Number(m?.total_leads) || 0,
-            MQLs: Number(m?.leads_mql) || 0,
-            Oportunidades: Number(m?.oportunidades) || 0,
-          };
-        }),
-        channelsData: rawChannels.length > 0 ? rawChannels : [],
+        taxaMql: 0,
+        taxaOportunidade: 0,
+        taxaVisitaLead: "0.0",
+        evolutionData,
+        channelsData: rawChannels,
         topLps,
-        emailOpenRate: Number(emailOpenRate).toFixed(1),
-        emailCtr: Number(emailCtr).toFixed(2),
-        workflowsActive: Number(workflowsActive) || 0
+        emailOpenRate: "0.0",
+        emailCtr: "0.0",
+        workflowsActive: 0,
+        latestLeads: safeMetrics.filter(e => e.event_type === 'CONVERSION').slice(0, 15) // Ultimos 15 leads
       };
     }
 
-    // Sem dados demonstrativos nem simulações: Retorno real zerado se o banco ainda não possuir sincronização do período
     return {
       totalLeads: 0,
       totalMqls: 0,
@@ -121,7 +103,8 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
       topLps: [],
       emailOpenRate: "0.0",
       emailCtr: "0.00",
-      workflowsActive: 0
+      workflowsActive: 0,
+      latestLeads: []
     };
   }, [safeMetrics, hasData]);
 
@@ -181,7 +164,7 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
             Não existem métricas gravadas no banco de dados para este período de 7 dias. Certifique-se de preencher o Token Privado no botão "Configurar" e execute a rotina de importação:
           </p>
           <div className="mt-4 bg-background/80 border rounded-xl p-3 inline-block font-mono text-xs text-orange-600 dark:text-orange-400 font-semibold shadow-inner">
-            node scripts/import-rd-marketing.js --days=7
+            Webhooks pendentes ou aguardando primeiro Lead entrar!
           </div>
         </Card>
       )}
@@ -478,6 +461,48 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
           </div>
         </Card>
       </div>
+    
+      {/* Últimos Leads Captados (Tempo Real) */}
+      <Card className="border-border/60 bg-card/60 backdrop-blur-md shadow-sm overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between bg-muted/20 border-b pb-4">
+          <div>
+            <CardTitle className="text-base font-semibold">Últimos Leads (Tempo Real)</CardTitle>
+            <CardDescription>Visualização instantânea dos dados brutos processados via Webhook.</CardDescription>
+          </div>
+          <Users className="h-5 w-5 text-muted-foreground/50" />
+        </CardHeader>
+        <CardContent className="p-0">
+          {data.latestLeads && data.latestLeads.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="font-semibold text-xs pl-6">E-mail</TableHead>
+                    <TableHead className="font-semibold text-xs">Identificador</TableHead>
+                    <TableHead className="font-semibold text-xs">Data/Hora</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.latestLeads.map((lead, idx) => {
+                    const ident = lead.payload?.last_conversion?.content?.identificador || 'N/A';
+                    return (
+                    <TableRow key={idx} className="hover:bg-muted/30 transition-colors">
+                      <TableCell className="font-medium text-sm pl-6">{lead.lead_email}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{ident}</TableCell>
+                      <TableCell className="text-sm font-mono text-muted-foreground">{new Date(lead.created_at).toLocaleString('pt-BR')}</TableCell>
+                    </TableRow>
+                  )})}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+             <div className="p-8 text-center text-muted-foreground text-sm flex flex-col items-center justify-center">
+              <span>Nenhum lead processado em tempo real ainda.</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

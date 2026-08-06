@@ -334,20 +334,23 @@ function ReportsPage() {
     },
   });
 
-  // 3.9. Query RD Marketing metrics from the dynamically selected rd_table_name
-  const { data: rdMetrics = [], isLoading: isLoadingRdMetrics } = useQuery({
-    queryKey: ["rd-marketing-metrics", activeReport?.rd_table_name, startDateStr, endDateStr],
-    enabled: !!activeReport?.rd_table_name,
+  // 3.9. Query RD Marketing metrics from the REAL-TIME Webhook events table
+  const { data: rdEvents = [], isLoading: isLoadingRdEvents } = useQuery({
+    queryKey: ["rd-marketing-events", activeReport?.id, startDateStr, endDateStr],
+    enabled: !!activeReport?.id,
     queryFn: async () => {
+      // Ajustando a endDate para o final do dia para incluir os webhooks de hoje
+      const endDateTime = `${endDateStr}T23:59:59.999Z`;
       const { data, error } = await supabase
-        .from(activeReport.rd_table_name as any)
+        .from("rd_events" as any)
         .select("*")
-        .gte("metric_date", startDateStr)
-        .lte("metric_date", endDateStr)
-        .order("metric_date", { ascending: true });
+        .eq("report_id", activeReport.id)
+        .gte("created_at", `${startDateStr}T00:00:00.000Z`)
+        .lte("created_at", endDateTime)
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.warn(`Aviso ao carregar RD Marketing (${activeReport.rd_table_name}):`, error.message);
+        console.warn(`Aviso ao carregar Webhooks da RD Station:`, error.message);
         return [];
       }
       return (data || []) as any[];
@@ -489,7 +492,7 @@ function ReportsPage() {
     });
   };
 
-  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics;
+  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics || isLoadingRdEvents;
 
   return (
     <AppShell title="Relatórios">
@@ -970,7 +973,7 @@ function ReportsPage() {
           )}
 
           {activeTab === "rd" && (
-            <RdMarketingTab rdMetrics={rdMetrics} activeReport={activeReport} />
+            <RdMarketingTab rdEvents={rdEvents} activeReport={activeReport} />
           )}
 
           {activeTab === "sheets" && (
