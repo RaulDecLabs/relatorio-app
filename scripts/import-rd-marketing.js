@@ -65,20 +65,15 @@ console.log(`=== IMPORTAÇÃO DE DADOS REAIS - RD STATION MARKETING ===`);
 console.log(`======================================================`);
 console.log(`Período de Extração: ${startDateStr} até ${endDateStr} (${days} dias)\n`);
 
-async function fetchRdContacts(token) {
+async function fetchRdContacts(accessToken) {
   const url = `https://api.rd.services/platform/contacts`;
-  const headers = { 'Content-Type': 'application/json' };
-  
-  // Suporte a token privado (Bearer ou via api_key na query string)
-  let fetchUrl = url;
-  if (token.startsWith('ey') || token.length > 30) {
-    headers['Authorization'] = `Bearer ${token}`;
-  } else {
-    fetchUrl += `?api_key=${token}`;
-  }
+  const headers = { 
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${accessToken}`
+  };
 
   try {
-    const response = await fetch(fetchUrl, { method: 'GET', headers });
+    const response = await fetch(url, { method: 'GET', headers });
     if (!response.ok) {
       const txt = await response.text();
       console.warn(` [Aviso API RD] Resposta HTTP ${response.status} ao consultar contatos: ${txt}`);
@@ -90,6 +85,23 @@ async function fetchRdContacts(token) {
     console.error(` [Erro de Rede API RD]:`, err.message);
     return [];
   }
+}
+
+async function refreshRdToken(clientId, clientSecret, refreshToken) {
+  const res = await fetch('https://api.rd.services/auth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken
+    })
+  });
+  const data = await res.json();
+  if (!res.ok || data.errors) {
+    throw new Error(`Falha ao revalidar token OAuth da RD Station: ${JSON.stringify(data)}`);
+  }
+  return data;
 }
 
 async function runImport() {
@@ -111,19 +123,37 @@ async function runImport() {
         continue;
       }
 
-      const token = config.rd_private_token || config.rd_public_token || process.env.RD_PRIVATE_TOKEN || process.env.RD_ACCESS_TOKEN || process.env.RD_PUBLIC_TOKEN;
+      const clientId = config.rd_client_id || process.env.RD_CLIENT_ID;
+      const clientSecret = config.rd_client_secret || process.env.RD_CLIENT_SECRET;
+      const refreshToken = config.rd_refresh_token;
 
       console.log(`\n------------------------------------------------------`);
       console.log(`Processando Cliente: ${config.name}`);
       console.log(`Tabela Destino no Banco: ${tableName}`);
       
-      if (!token) {
-        console.error(` [Erro] Token Privado/Público da RD Marketing não configurado para ${config.name}. Preencha no modal de Configuração ou no arquivo .env.`);
+      if (!refreshToken || !clientId || !clientSecret) {
+        console.error(` [Erro] Faltam credenciais OAuth (Refresh Token, Client ID ou Secret) para ${config.name}. Conecte o RD Station na tela de Configuração.`);
+        continue;
+      }
+
+      let accessToken = config.rd_access_token;
+      console.log(` - Revalidando token de acesso da RD Station para garantir conexão...`);
+      try {
+        const newTokens = await refreshRdToken(clientId, clientSecret, refreshToken);
+        accessToken = newTokens.access_token;
+        
+        // Atualiza no banco para uso futuro imediato
+        await supabase.from('reports_config').update({ 
+          rd_access_token: newTokens.access_token,
+          rd_refresh_token: newTokens.refresh_token || refreshToken
+        }).eq('id', config.id);
+      } catch (e) {
+        console.error(` [Erro de Autenticação]`, e.message);
         continue;
       }
 
       console.log(` - Conectando na API do RD Station para buscar base de contatos dos últimos ${days} dias...`);
-      const contacts = await fetchRdContacts(token);
+      const contacts = await fetchRdContacts(accessToken);
       console.log(` - Total de registros brutos retornados pela API: ${contacts.length}`);
 
       // Agregador de dados por dia

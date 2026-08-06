@@ -55,6 +55,8 @@ function ReportsPage() {
   const [gscUrl, setGscUrl] = useState("");
   const [rdPublicToken, setRdPublicToken] = useState("");
   const [rdPrivateToken, setRdPrivateToken] = useState("");
+  const [rdClientId, setRdClientId] = useState("");
+  const [rdClientSecret, setRdClientSecret] = useState("");
   const [googleSheetsUrl, setGoogleSheetsUrl] = useState("");
 
   const [dateRange, setDateRange] = useState<string>("7");
@@ -163,6 +165,8 @@ function ReportsPage() {
       setGscUrl(activeReport.gsc_url || "");
       setRdPublicToken(activeReport.rd_public_token || "");
       setRdPrivateToken(activeReport.rd_private_token || "");
+      setRdClientId(activeReport.rd_client_id || "");
+      setRdClientSecret(activeReport.rd_client_secret || "");
       // Carregar link da planilha associada se houver
       supabase
         .from("reports_sheets_config")
@@ -176,7 +180,7 @@ function ReportsPage() {
   }, [activeReport, isSettingsOpen]);
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, rdPublicToken, rdPrivateToken, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; rdPublicToken: string; rdPrivateToken: string; googleSheetsUrl: string }) => {
+    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, rdPublicToken, rdPrivateToken, rdClientId, rdClientSecret, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; rdPublicToken: string; rdPrivateToken: string; rdClientId: string; rdClientSecret: string; googleSheetsUrl: string }) => {
       const { data, error } = await supabase
         .from("reports_config")
         .update({ 
@@ -186,6 +190,8 @@ function ReportsPage() {
           gsc_url: gscUrl || null,
           rd_public_token: rdPublicToken || null,
           rd_private_token: rdPrivateToken || null,
+          rd_client_id: rdClientId || null,
+          rd_client_secret: rdClientSecret || null,
         })
         .eq("id", id)
         .select()
@@ -231,6 +237,8 @@ function ReportsPage() {
       gscUrl: gscUrl.trim(),
       rdPublicToken: rdPublicToken.trim(),
       rdPrivateToken: rdPrivateToken.trim(),
+      rdClientId: rdClientId.trim(),
+      rdClientSecret: rdClientSecret.trim(),
       googleSheetsUrl: googleSheetsUrl.trim(),
     });
   };
@@ -570,9 +578,60 @@ function ReportsPage() {
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+                        <div className="grid gap-4 pt-2 border-t border-border/60">
+                          <div className="flex flex-col gap-2">
+                            <Label className="text-sm font-bold text-orange-600 dark:text-orange-400">Integração RD Station (OAuth 2.0)</Label>
+                            <p className="text-xs text-muted-foreground">O Client ID e Secret podem ser cadastrados por cliente abaixo. Se deixados em branco, o sistema tentará usar as chaves globais da sua agência no servidor (.env).</p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid gap-1.5">
+                              <Label htmlFor="rdClientId" className="text-xs font-semibold">Client ID do App (Opcional)</Label>
+                              <Input
+                                id="rdClientId"
+                                placeholder="Client ID específico deste cliente..."
+                                value={rdClientId}
+                                onChange={(e) => setRdClientId(e.target.value)}
+                                className="h-9 text-sm font-mono"
+                              />
+                            </div>
+                            
+                            <div className="grid gap-1.5">
+                              <Label htmlFor="rdClientSecret" className="text-xs font-semibold">Client Secret do App (Opcional)</Label>
+                              <Input
+                                id="rdClientSecret"
+                                type="password"
+                                placeholder="Client Secret específico..."
+                                value={rdClientSecret}
+                                onChange={(e) => setRdClientSecret(e.target.value)}
+                                className="h-9 text-sm font-mono"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between p-3 border rounded-md bg-orange-50/50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30">
+                            <div>
+                              <h4 className="text-sm font-semibold text-orange-700 dark:text-orange-300">Conexão Oficial RD Station</h4>
+                              <p className="text-xs text-orange-600/80 dark:text-orange-400/80">
+                                {activeReport.rd_refresh_token 
+                                  ? "✅ Token de acesso OAuth conectado. A extração de histórico está ativa." 
+                                  : "❌ Não conectado. É necessário fazer o Login com RD Station para puxar os leads do período."}
+                              </p>
+                            </div>
+                            <Button 
+                              type="button"
+                              onClick={() => {
+                                window.location.href = `/api/auth/login/rd-marketing?report_id=${activeReport.id}`;
+                              }}
+                              className="bg-[#f06924] hover:bg-[#d65d20] text-white whitespace-nowrap"
+                            >
+                              Conectar RD Station
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60 opacity-60">
                           <div className="grid gap-1.5">
-                            <Label htmlFor="rdPublicToken" className="text-xs font-semibold text-orange-600 dark:text-orange-400">RD Marketing (Token Público)</Label>
+                            <Label htmlFor="rdPublicToken" className="text-xs font-semibold">Token Público (Antigo / Legado)</Label>
                             <Input
                               id="rdPublicToken"
                               placeholder="Ex: d7a8f9e0-..."
@@ -580,11 +639,11 @@ function ReportsPage() {
                               onChange={(e) => setRdPublicToken(e.target.value)}
                               className="h-9 text-sm font-mono"
                             />
-                            <p className="text-[10px] text-muted-foreground">Token Público (Public API Token) do RD Station.</p>
+                            <p className="text-[10px] text-muted-foreground">Obsoleto. Não puxe histórico com ele.</p>
                           </div>
                           
                           <div className="grid gap-1.5">
-                            <Label htmlFor="rdPrivateToken" className="text-xs font-semibold text-orange-600 dark:text-orange-400">RD Marketing (Token Privado)</Label>
+                            <Label htmlFor="rdPrivateToken" className="text-xs font-semibold">Token Privado (Antigo / Legado)</Label>
                             <Input
                               id="rdPrivateToken"
                               type="password"
@@ -593,7 +652,7 @@ function ReportsPage() {
                               onChange={(e) => setRdPrivateToken(e.target.value)}
                               className="h-9 text-sm font-mono"
                             />
-                            <p className="text-[10px] text-muted-foreground">Token Privado (Private API Token) da conta RD.</p>
+                            <p className="text-[10px] text-muted-foreground">Obsoleto. Apenas para Webhooks pontuais.</p>
                           </div>
                         </div>
 

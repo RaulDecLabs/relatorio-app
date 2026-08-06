@@ -25,10 +25,12 @@ import { Route as AuthenticatedAiInsightsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
 import { Route as ApiPublicTriggerMockTestRouteImport } from './routes/api/public/trigger-mock-test'
 import { Route as ApiPublicTriggerImportSeoRouteImport } from './routes/api/public/trigger-import-seo'
+import { Route as ApiPublicTriggerImportRdMarketingRouteImport } from './routes/api/public/trigger-import-rd-marketing'
 import { Route as ApiPublicTriggerImportMetaRouteImport } from './routes/api/public/trigger-import-meta'
 import { Route as ApiPublicTriggerImportGoogleAdsRouteImport } from './routes/api/public/trigger-import-google-ads'
 import { Route as ApiPublicTriggerImportRouteImport } from './routes/api/public/trigger-import'
 import { Route as ApiPublicSheetsAuditRouteImport } from './routes/api/public/sheets-audit'
+import { Route as ApiPublicRdIngestRouteImport } from './routes/api/public/rd-ingest'
 import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
 import { Route as ApiPublicGscIngestRouteImport } from './routes/api/public/gsc-ingest'
 import { Route as ApiPublicAdsIngestRouteImport } from './routes/api/public/ads-ingest'
@@ -118,6 +120,12 @@ const ApiPublicTriggerImportSeoRoute =
     path: '/api/public/trigger-import-seo',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTriggerImportRdMarketingRoute =
+  ApiPublicTriggerImportRdMarketingRouteImport.update({
+    id: '/api/public/trigger-import-rd-marketing',
+    path: '/api/public/trigger-import-rd-marketing',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTriggerImportMetaRoute =
   ApiPublicTriggerImportMetaRouteImport.update({
     id: '/api/public/trigger-import-meta',
@@ -138,6 +146,11 @@ const ApiPublicTriggerImportRoute = ApiPublicTriggerImportRouteImport.update({
 const ApiPublicSheetsAuditRoute = ApiPublicSheetsAuditRouteImport.update({
   id: '/api/public/sheets-audit',
   path: '/api/public/sheets-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRdIngestRoute = ApiPublicRdIngestRouteImport.update({
+  id: '/api/public/rd-ingest',
+  path: '/api/public/rd-ingest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicIngestRoute = ApiPublicIngestRouteImport.update({
@@ -178,10 +191,12 @@ export interface FileRoutesByFullPath {
   '/api/public/ads-ingest': typeof ApiPublicAdsIngestRoute
   '/api/public/gsc-ingest': typeof ApiPublicGscIngestRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
+  '/api/public/rd-ingest': typeof ApiPublicRdIngestRoute
   '/api/public/sheets-audit': typeof ApiPublicSheetsAuditRoute
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
   '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
   '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
@@ -203,10 +218,12 @@ export interface FileRoutesByTo {
   '/api/public/ads-ingest': typeof ApiPublicAdsIngestRoute
   '/api/public/gsc-ingest': typeof ApiPublicGscIngestRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
+  '/api/public/rd-ingest': typeof ApiPublicRdIngestRoute
   '/api/public/sheets-audit': typeof ApiPublicSheetsAuditRoute
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
   '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
   '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
@@ -230,10 +247,12 @@ export interface FileRoutesById {
   '/api/public/ads-ingest': typeof ApiPublicAdsIngestRoute
   '/api/public/gsc-ingest': typeof ApiPublicGscIngestRoute
   '/api/public/ingest': typeof ApiPublicIngestRoute
+  '/api/public/rd-ingest': typeof ApiPublicRdIngestRoute
   '/api/public/sheets-audit': typeof ApiPublicSheetsAuditRoute
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
   '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
   '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
@@ -257,10 +276,12 @@ export interface FileRouteTypes {
     | '/api/public/ads-ingest'
     | '/api/public/gsc-ingest'
     | '/api/public/ingest'
+    | '/api/public/rd-ingest'
     | '/api/public/sheets-audit'
     | '/api/public/trigger-import'
     | '/api/public/trigger-import-google-ads'
     | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
     | '/clients/'
@@ -282,10 +303,12 @@ export interface FileRouteTypes {
     | '/api/public/ads-ingest'
     | '/api/public/gsc-ingest'
     | '/api/public/ingest'
+    | '/api/public/rd-ingest'
     | '/api/public/sheets-audit'
     | '/api/public/trigger-import'
     | '/api/public/trigger-import-google-ads'
     | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
     | '/clients'
@@ -308,10 +331,12 @@ export interface FileRouteTypes {
     | '/api/public/ads-ingest'
     | '/api/public/gsc-ingest'
     | '/api/public/ingest'
+    | '/api/public/rd-ingest'
     | '/api/public/sheets-audit'
     | '/api/public/trigger-import'
     | '/api/public/trigger-import-google-ads'
     | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
     | '/_authenticated/clients/'
@@ -324,10 +349,12 @@ export interface RootRouteChildren {
   ApiPublicAdsIngestRoute: typeof ApiPublicAdsIngestRoute
   ApiPublicGscIngestRoute: typeof ApiPublicGscIngestRoute
   ApiPublicIngestRoute: typeof ApiPublicIngestRoute
+  ApiPublicRdIngestRoute: typeof ApiPublicRdIngestRoute
   ApiPublicSheetsAuditRoute: typeof ApiPublicSheetsAuditRoute
   ApiPublicTriggerImportRoute: typeof ApiPublicTriggerImportRoute
   ApiPublicTriggerImportGoogleAdsRoute: typeof ApiPublicTriggerImportGoogleAdsRoute
   ApiPublicTriggerImportMetaRoute: typeof ApiPublicTriggerImportMetaRoute
+  ApiPublicTriggerImportRdMarketingRoute: typeof ApiPublicTriggerImportRdMarketingRoute
   ApiPublicTriggerImportSeoRoute: typeof ApiPublicTriggerImportSeoRoute
   ApiPublicTriggerMockTestRoute: typeof ApiPublicTriggerMockTestRoute
 }
@@ -446,6 +473,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTriggerImportSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/trigger-import-rd-marketing': {
+      id: '/api/public/trigger-import-rd-marketing'
+      path: '/api/public/trigger-import-rd-marketing'
+      fullPath: '/api/public/trigger-import-rd-marketing'
+      preLoaderRoute: typeof ApiPublicTriggerImportRdMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/trigger-import-meta': {
       id: '/api/public/trigger-import-meta'
       path: '/api/public/trigger-import-meta'
@@ -472,6 +506,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/sheets-audit'
       fullPath: '/api/public/sheets-audit'
       preLoaderRoute: typeof ApiPublicSheetsAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/rd-ingest': {
+      id: '/api/public/rd-ingest'
+      path: '/api/public/rd-ingest'
+      fullPath: '/api/public/rd-ingest'
+      preLoaderRoute: typeof ApiPublicRdIngestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/ingest': {
@@ -546,10 +587,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAdsIngestRoute: ApiPublicAdsIngestRoute,
   ApiPublicGscIngestRoute: ApiPublicGscIngestRoute,
   ApiPublicIngestRoute: ApiPublicIngestRoute,
+  ApiPublicRdIngestRoute: ApiPublicRdIngestRoute,
   ApiPublicSheetsAuditRoute: ApiPublicSheetsAuditRoute,
   ApiPublicTriggerImportRoute: ApiPublicTriggerImportRoute,
   ApiPublicTriggerImportGoogleAdsRoute: ApiPublicTriggerImportGoogleAdsRoute,
   ApiPublicTriggerImportMetaRoute: ApiPublicTriggerImportMetaRoute,
+  ApiPublicTriggerImportRdMarketingRoute:
+    ApiPublicTriggerImportRdMarketingRoute,
   ApiPublicTriggerImportSeoRoute: ApiPublicTriggerImportSeoRoute,
   ApiPublicTriggerMockTestRoute: ApiPublicTriggerMockTestRoute,
 }
