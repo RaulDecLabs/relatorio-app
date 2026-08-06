@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { 
   Users, Target, Rocket, Mail, TrendingUp, ArrowRight, 
-  Award, CheckCircle2, ShieldAlert, Filter, Globe, MousePointer, AlertCircle
+  Award, CheckCircle2, ShieldAlert, Filter, Globe, MousePointer, AlertCircle, BarChart3
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -16,31 +16,32 @@ import {
 
 interface RdMarketingTabProps {
   rdMetrics?: any[];
-  activeReport: ReportConfig;
+  activeReport?: ReportConfig;
 }
 
 const COLORS = ["#f97316", "#14b8a6", "#3b82f6", "#8b5cf6", "#10b981"];
 
 export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabProps) {
   // Exibição estritamente dos dados reais oriundos da tabela do RD Marketing no banco do Supabase
-  const hasData = Boolean(rdMetrics && rdMetrics.length > 0);
+  const safeMetrics = Array.isArray(rdMetrics) ? rdMetrics : [];
+  const hasData = Boolean(safeMetrics && safeMetrics.length > 0);
   
   const data = useMemo(() => {
-    if (hasData && rdMetrics) {
-      const totalLeads = rdMetrics.reduce((sum, item) => sum + (Number(item.total_leads) || 0), 0);
-      const totalMqls = rdMetrics.reduce((sum, item) => sum + (Number(item.leads_mql) || 0), 0);
-      const totalOportunidades = rdMetrics.reduce((sum, item) => sum + (Number(item.oportunidades) || 0), 0);
-      const totalVisits = rdMetrics.reduce((sum, item) => sum + (Number(item.visits) || 0), 0);
+    if (hasData && safeMetrics.length > 0) {
+      const totalLeads = safeMetrics.reduce((sum, item) => sum + (Number(item?.total_leads) || 0), 0);
+      const totalMqls = safeMetrics.reduce((sum, item) => sum + (Number(item?.leads_mql) || 0), 0);
+      const totalOportunidades = safeMetrics.reduce((sum, item) => sum + (Number(item?.oportunidades) || 0), 0);
+      const totalVisits = safeMetrics.reduce((sum, item) => sum + (Number(item?.visits) || 0), 0);
       const taxaConversao = totalLeads > 0 ? ((totalOportunidades / totalLeads) * 100).toFixed(2) : "0.00";
       const taxaMql = totalLeads > 0 ? Math.round((totalMqls / totalLeads) * 100) : 0;
       const taxaOportunidade = totalMqls > 0 ? Math.round((totalOportunidades / totalMqls) * 100) : 0;
       const taxaVisitaLead = totalVisits > 0 ? ((totalLeads / totalVisits) * 100).toFixed(1) : "0.0";
       
       // Mapeamento real por canais de origem salvos no banco de dados
-      const googleAds = rdMetrics.reduce((sum, item) => sum + (Number(item.channel_google_ads) || 0), 0);
-      const metaAds = rdMetrics.reduce((sum, item) => sum + (Number(item.channel_meta_ads) || 0), 0);
-      const organic = rdMetrics.reduce((sum, item) => sum + (Number(item.channel_organic) || 0), 0);
-      const direct = rdMetrics.reduce((sum, item) => sum + (Number(item.channel_direct) || 0), 0);
+      const googleAds = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_google_ads) || 0), 0);
+      const metaAds = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_meta_ads) || 0), 0);
+      const organic = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_organic) || 0), 0);
+      const direct = safeMetrics.reduce((sum, item) => sum + (Number(item?.channel_direct) || 0), 0);
       
       const rawChannels = [
         { name: "Google Ads", value: googleAds },
@@ -51,13 +52,13 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
       
       // Agregação real das Landing Pages e Pontos de Conversão vindos na coluna top_lps
       const allLps: Record<string, { visits: number; leads: number }> = {};
-      rdMetrics.forEach(m => {
-        if (m.top_lps && Array.isArray(m.top_lps)) {
+      safeMetrics.forEach(m => {
+        if (m?.top_lps && Array.isArray(m.top_lps)) {
           m.top_lps.forEach((lp: any) => {
-            const name = lp.name || "Landing Page / Formulário";
+            const name = lp?.name || "Landing Page / Formulário";
             if (!allLps[name]) allLps[name] = { visits: 0, leads: 0 };
-            allLps[name].visits += (Number(lp.visits) || 0);
-            allLps[name].leads += (Number(lp.leads) || 0);
+            allLps[name].visits += (Number(lp?.visits) || 0);
+            allLps[name].leads += (Number(lp?.leads) || 0);
           });
         }
       });
@@ -70,7 +71,7 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
       })).sort((a, b) => b.leads - a.leads);
 
       // Últimas métricas de e-mail marketing e fluxos capturados
-      const lastRow = rdMetrics[rdMetrics.length - 1];
+      const lastRow = safeMetrics[safeMetrics.length - 1] || {};
       const emailOpenRate = lastRow?.email_open_rate || 0;
       const emailCtr = lastRow?.email_ctr || 0;
       const workflowsActive = lastRow?.workflows_active || 0;
@@ -84,17 +85,17 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
         taxaMql,
         taxaOportunidade,
         taxaVisitaLead,
-        evolutionData: rdMetrics.map(m => {
+        evolutionData: safeMetrics.map(m => {
           let dia = "Dia";
-          if (m.metric_date && typeof m.metric_date === 'string') {
+          if (m?.metric_date && typeof m.metric_date === 'string') {
             const parts = m.metric_date.split('-');
             if (parts.length === 3) dia = `${parts[2]}/${parts[1]}`;
           }
           return {
             data: dia,
-            Leads: Number(m.total_leads) || 0,
-            MQLs: Number(m.leads_mql) || 0,
-            Oportunidades: Number(m.oportunidades) || 0,
+            Leads: Number(m?.total_leads) || 0,
+            MQLs: Number(m?.leads_mql) || 0,
+            Oportunidades: Number(m?.oportunidades) || 0,
           };
         }),
         channelsData: rawChannels.length > 0 ? rawChannels : [],
@@ -122,9 +123,10 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
       emailCtr: "0.00",
       workflowsActive: 0
     };
-  }, [rdMetrics, hasData]);
+  }, [safeMetrics, hasData]);
 
-  const hasTokens = Boolean(activeReport.rd_public_token || activeReport.rd_private_token);
+  const hasTokens = Boolean(activeReport?.rd_public_token || activeReport?.rd_private_token);
+  const companyName = activeReport?.name || "Empresa";
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -149,7 +151,7 @@ export function RdMarketingTab({ rdMetrics = [], activeReport }: RdMarketingTabP
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Empresa conectada: <span className="font-semibold text-foreground">{activeReport.name}</span> • Exibindo exclusivamente informações oficiais importadas da API RD Station.
+                Empresa conectada: <span className="font-semibold text-foreground">{companyName}</span> • Exibindo exclusivamente informações oficiais importadas da API RD Station.
               </p>
             </div>
           </div>
