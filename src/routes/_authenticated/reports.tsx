@@ -326,6 +326,26 @@ function ReportsPage() {
     },
   });
 
+  // 3.9. Query RD Marketing metrics from the dynamically selected rd_table_name
+  const { data: rdMetrics = [], isLoading: isLoadingRdMetrics } = useQuery({
+    queryKey: ["rd-marketing-metrics", activeReport?.rd_table_name, startDateStr, endDateStr],
+    enabled: !!activeReport?.rd_table_name,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from(activeReport.rd_table_name as any)
+        .select("*")
+        .gte("metric_date", startDateStr)
+        .lte("metric_date", endDateStr)
+        .order("metric_date", { ascending: true });
+
+      if (error) {
+        console.warn(`Aviso ao carregar RD Marketing (${activeReport.rd_table_name}):`, error.message);
+        return [];
+      }
+      return (data || []) as any[];
+    },
+  });
+
   // 3.8. Query Google Sheets Audit count
   const { data: sheetsAudit, isLoading: isLoadingSheetsAudit, refetch: refetchSheetsAudit } = useQuery({
     queryKey: ["sheets-audit", activeReport?.id, startDateStr, endDateStr],
@@ -891,7 +911,7 @@ function ReportsPage() {
           )}
 
           {activeTab === "rd" && (
-            <RdMarketingTab activeReport={activeReport} />
+            <RdMarketingTab rdMetrics={rdMetrics} activeReport={activeReport} />
           )}
 
           {activeTab === "sheets" && (
