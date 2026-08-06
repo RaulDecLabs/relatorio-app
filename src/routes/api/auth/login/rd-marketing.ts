@@ -12,9 +12,10 @@ export const Route = createFileRoute('/api/auth/login/rd-marketing')({
           return new Response('report_id is required', { status: 400 })
         }
         try {
-          const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://btdgetidtawjtqrvzybh.supabase.co'
-          const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || ''
-          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+          const cleanStr = (val: any) => typeof val === 'string' ? val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '') : undefined;
+          const SUPABASE_URL = cleanStr(process.env.SUPABASE_URL) || cleanStr(process.env.VITE_SUPABASE_URL) || 'https://btdgetidtawjtqrvzybh.supabase.co';
+          const SUPABASE_SERVICE_ROLE_KEY = cleanStr(process.env.SUPABASE_SERVICE_ROLE_KEY) || cleanStr(process.env.VITE_SUPABASE_PUBLISHABLE_KEY) || '';
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
           
           const { data: config, error } = await supabase.from('reports_config').select('rd_client_id').eq('id', reportId).maybeSingle()
           
