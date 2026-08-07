@@ -530,13 +530,13 @@ Diretrizes de Especialista:
           </div>
         ) : (
           <div className="space-y-16">
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-            </section>
-
+            <ExecutiveSummaryTab 
+              activeReport={activeReport} 
+              startDateStr={startDateStr} 
+              endDateStr={endDateStr} 
+              isClient={isClient}
+              days={dateRange}
+            />
           </div>
         )}
       </main>
