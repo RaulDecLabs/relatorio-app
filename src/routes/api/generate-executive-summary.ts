@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
-import OpenAI from 'openai'
 
 export const Route = createFileRoute('/api/generate-executive-summary')({
   server: {
@@ -102,6 +101,7 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
             return new Response('OpenAI API Key not found', { status: 500 })
           }
 
+          const { default: OpenAI } = await import('openai')
           const openai = new OpenAI({ apiKey: openaiApiKey })
 
           const prompt = `Você é um analista sênior de growth e performance.
