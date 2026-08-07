@@ -384,8 +384,6 @@ function ReportsPage() {
         .from("nectar_deals")
         .select("*")
         .eq("report_id", activeReport.id)
-        .gte("created_at", `${startDateStr}T00:00:00.000Z`)
-        .lte("created_at", `${endDateStr}T23:59:59.999Z`)
         .order("created_at", { ascending: false });
 
       if (error) {
