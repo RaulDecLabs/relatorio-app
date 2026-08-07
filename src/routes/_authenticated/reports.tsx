@@ -375,6 +375,27 @@ function ReportsPage() {
     }
   });
 
+  // 3.9 Query Nectar CRM Deals
+  const { data: nectarDeals = [], isLoading: isLoadingNectarDeals } = useQuery({
+    queryKey: ["nectar-deals", activeReport?.id, startDateStr, endDateStr],
+    enabled: !!activeReport?.id && !!activeReport?.nectar_api_token,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("nectar_deals")
+        .select("*")
+        .eq("report_id", activeReport.id)
+        .gte("created_at", `${startDateStr}T00:00:00.000Z`)
+        .lte("created_at", `${endDateStr}T23:59:59.999Z`)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.warn(`Erro ao carregar Deals do Nectar CRM:`, error.message);
+        return [];
+      }
+      return data || [];
+    },
+  });
+
   // 4. Mutation to create report config mapping & dynamic tables (GA4, Ads, FB Ads, and GSC)
   const createReportMutation = useMutation({
     mutationFn: async ({ 
@@ -497,7 +518,7 @@ function ReportsPage() {
     });
   };
 
-  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics || isLoadingRdEvents;
+  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics || isLoadingRdEvents || isLoadingNectarDeals;
 
   return (
     <AppShell title="Relatórios">
@@ -1024,6 +1045,7 @@ function ReportsPage() {
                 activeReport={activeReport} 
                 startDateStr={startDateStr} 
                 endDateStr={endDateStr} 
+                deals={nectarDeals}
               />
             </div>
           )}
