@@ -1,6 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 
+function cleanUrl(val: any): string | undefined {
+  if (!val || typeof val !== 'string') return undefined;
+  let cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
+  try {
+    const url = new URL(cleaned);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined;
+    return url.origin;
+  } catch (e) {
+    return undefined;
+  }
+}
+
+function cleanKey(val: any): string | undefined {
+  if (!val || typeof val !== 'string') return undefined;
+  const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
+  return cleaned.length > 10 ? cleaned : undefined;
+}
+
 export const Route = createFileRoute('/api/generate-executive-summary')({
   server: {
     handlers: {
@@ -13,12 +31,11 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
             return new Response('Missing reportId', { status: 400 })
           }
 
-          const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || ''
-          const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || ''
-          
-          if (!SUPABASE_URL || !SUPABASE_KEY) {
-            return new Response('Missing Supabase credentials', { status: 500 })
-          }
+          const defaultUrl = "https://btdgetidtawjtqrvzybh.supabase.co";
+          const defaultKey = "sb_publishable_ajCs5VZ3suNt9i1DJBtW5w_UNqtw4xm";
+
+          const SUPABASE_URL = cleanUrl(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL) || defaultUrl;
+          const SUPABASE_KEY = cleanKey(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY) || defaultKey;
 
           const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
             auth: { persistSession: false }
