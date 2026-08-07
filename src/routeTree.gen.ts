@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiGenerateExecutiveSummaryRouteImport } from './routes/api/generate-executive-summary'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -27,6 +28,7 @@ import { Route as ApiWebhooksRdStationRouteImport } from './routes/api/webhooks/
 import { Route as ApiPublicTriggerMockTestRouteImport } from './routes/api/public/trigger-mock-test'
 import { Route as ApiPublicTriggerImportSeoRouteImport } from './routes/api/public/trigger-import-seo'
 import { Route as ApiPublicTriggerImportRdMarketingRouteImport } from './routes/api/public/trigger-import-rd-marketing'
+import { Route as ApiPublicTriggerImportNectarCrmRouteImport } from './routes/api/public/trigger-import-nectar-crm'
 import { Route as ApiPublicTriggerImportMetaRouteImport } from './routes/api/public/trigger-import-meta'
 import { Route as ApiPublicTriggerImportGoogleAdsRouteImport } from './routes/api/public/trigger-import-google-ads'
 import { Route as ApiPublicTriggerImportRouteImport } from './routes/api/public/trigger-import'
@@ -53,6 +55,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiGenerateExecutiveSummaryRoute =
+  ApiGenerateExecutiveSummaryRouteImport.update({
+    id: '/api/generate-executive-summary',
+    path: '/api/generate-executive-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -134,6 +142,12 @@ const ApiPublicTriggerImportRdMarketingRoute =
     path: '/api/public/trigger-import-rd-marketing',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTriggerImportNectarCrmRoute =
+  ApiPublicTriggerImportNectarCrmRouteImport.update({
+    id: '/api/public/trigger-import-nectar-crm',
+    path: '/api/public/trigger-import-nectar-crm',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTriggerImportMetaRoute =
   ApiPublicTriggerImportMetaRouteImport.update({
     id: '/api/public/trigger-import-meta',
@@ -206,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/api/generate-executive-summary': typeof ApiGenerateExecutiveSummaryRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/api/public/ads-ingest': typeof ApiPublicAdsIngestRoute
   '/api/public/gsc-ingest': typeof ApiPublicGscIngestRoute
@@ -215,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
   '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
   '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-nectar-crm': typeof ApiPublicTriggerImportNectarCrmRoute
   '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
@@ -236,6 +252,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/api/generate-executive-summary': typeof ApiGenerateExecutiveSummaryRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/api/public/ads-ingest': typeof ApiPublicAdsIngestRoute
   '/api/public/gsc-ingest': typeof ApiPublicGscIngestRoute
@@ -245,6 +262,7 @@ export interface FileRoutesByTo {
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
   '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
   '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-nectar-crm': typeof ApiPublicTriggerImportNectarCrmRoute
   '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
@@ -268,6 +286,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
+  '/api/generate-executive-summary': typeof ApiGenerateExecutiveSummaryRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
   '/api/public/ads-ingest': typeof ApiPublicAdsIngestRoute
   '/api/public/gsc-ingest': typeof ApiPublicGscIngestRoute
@@ -277,6 +296,7 @@ export interface FileRoutesById {
   '/api/public/trigger-import': typeof ApiPublicTriggerImportRoute
   '/api/public/trigger-import-google-ads': typeof ApiPublicTriggerImportGoogleAdsRoute
   '/api/public/trigger-import-meta': typeof ApiPublicTriggerImportMetaRoute
+  '/api/public/trigger-import-nectar-crm': typeof ApiPublicTriggerImportNectarCrmRoute
   '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
@@ -300,6 +320,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/templates'
     | '/users'
+    | '/api/generate-executive-summary'
     | '/clients/$id'
     | '/api/public/ads-ingest'
     | '/api/public/gsc-ingest'
@@ -309,6 +330,7 @@ export interface FileRouteTypes {
     | '/api/public/trigger-import'
     | '/api/public/trigger-import-google-ads'
     | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-nectar-crm'
     | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
@@ -330,6 +352,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/templates'
     | '/users'
+    | '/api/generate-executive-summary'
     | '/clients/$id'
     | '/api/public/ads-ingest'
     | '/api/public/gsc-ingest'
@@ -339,6 +362,7 @@ export interface FileRouteTypes {
     | '/api/public/trigger-import'
     | '/api/public/trigger-import-google-ads'
     | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-nectar-crm'
     | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
@@ -361,6 +385,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/templates'
     | '/_authenticated/users'
+    | '/api/generate-executive-summary'
     | '/_authenticated/clients/$id'
     | '/api/public/ads-ingest'
     | '/api/public/gsc-ingest'
@@ -370,6 +395,7 @@ export interface FileRouteTypes {
     | '/api/public/trigger-import'
     | '/api/public/trigger-import-google-ads'
     | '/api/public/trigger-import-meta'
+    | '/api/public/trigger-import-nectar-crm'
     | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
@@ -383,6 +409,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiGenerateExecutiveSummaryRoute: typeof ApiGenerateExecutiveSummaryRoute
   ApiPublicAdsIngestRoute: typeof ApiPublicAdsIngestRoute
   ApiPublicGscIngestRoute: typeof ApiPublicGscIngestRoute
   ApiPublicIngestRoute: typeof ApiPublicIngestRoute
@@ -391,6 +418,7 @@ export interface RootRouteChildren {
   ApiPublicTriggerImportRoute: typeof ApiPublicTriggerImportRoute
   ApiPublicTriggerImportGoogleAdsRoute: typeof ApiPublicTriggerImportGoogleAdsRoute
   ApiPublicTriggerImportMetaRoute: typeof ApiPublicTriggerImportMetaRoute
+  ApiPublicTriggerImportNectarCrmRoute: typeof ApiPublicTriggerImportNectarCrmRoute
   ApiPublicTriggerImportRdMarketingRoute: typeof ApiPublicTriggerImportRdMarketingRoute
   ApiPublicTriggerImportSeoRoute: typeof ApiPublicTriggerImportSeoRoute
   ApiPublicTriggerMockTestRoute: typeof ApiPublicTriggerMockTestRoute
@@ -420,6 +448,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/generate-executive-summary': {
+      id: '/api/generate-executive-summary'
+      path: '/api/generate-executive-summary'
+      fullPath: '/api/generate-executive-summary'
+      preLoaderRoute: typeof ApiGenerateExecutiveSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/users': {
@@ -525,6 +560,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/trigger-import-rd-marketing'
       fullPath: '/api/public/trigger-import-rd-marketing'
       preLoaderRoute: typeof ApiPublicTriggerImportRdMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/trigger-import-nectar-crm': {
+      id: '/api/public/trigger-import-nectar-crm'
+      path: '/api/public/trigger-import-nectar-crm'
+      fullPath: '/api/public/trigger-import-nectar-crm'
+      preLoaderRoute: typeof ApiPublicTriggerImportNectarCrmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/trigger-import-meta': {
@@ -645,6 +687,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiGenerateExecutiveSummaryRoute: ApiGenerateExecutiveSummaryRoute,
   ApiPublicAdsIngestRoute: ApiPublicAdsIngestRoute,
   ApiPublicGscIngestRoute: ApiPublicGscIngestRoute,
   ApiPublicIngestRoute: ApiPublicIngestRoute,
@@ -653,6 +696,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTriggerImportRoute: ApiPublicTriggerImportRoute,
   ApiPublicTriggerImportGoogleAdsRoute: ApiPublicTriggerImportGoogleAdsRoute,
   ApiPublicTriggerImportMetaRoute: ApiPublicTriggerImportMetaRoute,
+  ApiPublicTriggerImportNectarCrmRoute: ApiPublicTriggerImportNectarCrmRoute,
   ApiPublicTriggerImportRdMarketingRoute:
     ApiPublicTriggerImportRdMarketingRoute,
   ApiPublicTriggerImportSeoRoute: ApiPublicTriggerImportSeoRoute,
