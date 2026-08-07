@@ -20,8 +20,15 @@ function loadEnv() {
 
 loadEnv();
 
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+function cleanEnv(val, fallback = undefined) {
+  if (!val || typeof val !== 'string') return fallback;
+  const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
+  return cleaned || fallback;
+}
+
+const defaultUrl = 'https://btdgetidtawjtqrvzybh.supabase.co';
+const SUPABASE_URL = cleanEnv(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, defaultUrl);
+const SUPABASE_SERVICE_ROLE_KEY = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error("ERRO: Variáveis do Supabase não encontradas. (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)");
