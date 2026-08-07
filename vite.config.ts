@@ -14,6 +14,11 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    build: {
+      rollupOptions: {
+        external: ['ws'],
+      },
+    },
     server: {
       allowedHosts: ['.lhr.life', '.loca.lt', '.ngrok-free.app', '.trycloudflare.com', 'localhost'],
     },

@@ -1,9 +1,11 @@
-import { createAPIFileRoute } from '@tanstack/react-start/api'
+import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 
-export const Route = createAPIFileRoute('/api/generate-executive-summary')({
-  POST: async ({ request }) => {
+export const Route = createFileRoute('/api/generate-executive-summary')({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
         try {
           const body = await request.json()
           const { reportId, days = 7 } = body
@@ -177,4 +179,6 @@ Responda APENAS com o JSON, sem nenhuma formatação Markdown ao redor (\`\`\`js
           return Response.json({ success: false, error: error.message }, { status: 500 })
         }
       }
+    }
+  }
 })
