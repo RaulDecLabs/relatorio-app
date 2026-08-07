@@ -29,7 +29,6 @@ import { GoogleAdsTab } from "@/components/reports/google-ads-tab";
 import { MetaAdsTab } from "@/components/reports/meta-ads-tab";
 import { GscTab } from "@/components/reports/gsc-tab";
 import { SheetsTab } from "@/components/reports/sheets-tab";
-import { RdMarketingTab } from "@/components/reports/rd-marketing-tab";
 import { NectarCrmTab } from "@/components/reports/nectar-crm-tab";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -48,16 +47,12 @@ function ReportsPage() {
   const [newGscUrl, setNewGscUrl] = useState("");
   const [newGoogleSheetsUrl, setNewGoogleSheetsUrl] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "rd" | "nectar" | "sheets">("traffic");
+  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "nectar" | "sheets">("traffic");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [ga4PropertyId, setGa4PropertyId] = useState("");
   const [googleAdsId, setGoogleAdsId] = useState("");
   const [metaAdsId, setMetaAdsId] = useState("");
   const [gscUrl, setGscUrl] = useState("");
-  const [rdPublicToken, setRdPublicToken] = useState("");
-  const [rdPrivateToken, setRdPrivateToken] = useState("");
-  const [rdClientId, setRdClientId] = useState("");
-  const [rdClientSecret, setRdClientSecret] = useState("");
   const [nectarApiToken, setNectarApiToken] = useState("");
   const [googleSheetsUrl, setGoogleSheetsUrl] = useState("");
 
@@ -165,10 +160,6 @@ function ReportsPage() {
       setGoogleAdsId(activeReport.google_ads_id || "");
       setMetaAdsId(activeReport.meta_ads_id || "");
       setGscUrl(activeReport.gsc_url || "");
-      setRdPublicToken(activeReport.rd_public_token || "");
-      setRdPrivateToken(activeReport.rd_private_token || "");
-      setRdClientId(activeReport.rd_client_id || "");
-      setRdClientSecret(activeReport.rd_client_secret || "");
       setNectarApiToken(activeReport.nectar_api_token || "");
       // Carregar link da planilha associada se houver
       supabase
@@ -183,7 +174,7 @@ function ReportsPage() {
   }, [activeReport, isSettingsOpen]);
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, rdPublicToken, rdPrivateToken, rdClientId, rdClientSecret, nectarApiToken, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; rdPublicToken: string; rdPrivateToken: string; rdClientId: string; rdClientSecret: string; nectarApiToken: string; googleSheetsUrl: string }) => {
+    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, nectarApiToken, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; nectarApiToken: string; googleSheetsUrl: string }) => {
       const { data, error } = await supabase
         .from("reports_config")
         .update({ 
@@ -191,10 +182,6 @@ function ReportsPage() {
           google_ads_id: googleAdsId || null,
           meta_ads_id: metaAdsId || null,
           gsc_url: gscUrl || null,
-          rd_public_token: rdPublicToken || null,
-          rd_private_token: rdPrivateToken || null,
-          rd_client_id: rdClientId || null,
-          rd_client_secret: rdClientSecret || null,
           nectar_api_token: nectarApiToken || null,
         })
         .eq("id", id)
@@ -239,10 +226,6 @@ function ReportsPage() {
       googleAdsId: googleAdsId.trim(),
       metaAdsId: metaAdsId.trim(),
       gscUrl: gscUrl.trim(),
-      rdPublicToken: rdPublicToken.trim(),
-      rdPrivateToken: rdPrivateToken.trim(),
-      rdClientId: rdClientId.trim(),
-      rdClientSecret: rdClientSecret.trim(),
       nectarApiToken: nectarApiToken.trim(),
       googleSheetsUrl: googleSheetsUrl.trim(),
     });
@@ -339,30 +322,7 @@ function ReportsPage() {
     },
   });
 
-  // 3.9. Query RD Marketing metrics from the REAL-TIME Webhook events table
-  const { data: rdEvents = [], isLoading: isLoadingRdEvents } = useQuery({
-    queryKey: ["rd-marketing-events", activeReport?.id, startDateStr, endDateStr],
-    enabled: !!activeReport?.id,
-    queryFn: async () => {
-      // Ajustando a endDate para o final do dia para incluir os webhooks de hoje
-      const endDateTime = `${endDateStr}T23:59:59.999Z`;
-      const { data, error } = await supabase
-        .from("rd_events" as any)
-        .select("*")
-        .eq("report_id", activeReport.id)
-        .gte("created_at", `${startDateStr}T00:00:00.000Z`)
-        .lte("created_at", endDateTime)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.warn(`Aviso ao carregar Webhooks da RD Station:`, error.message);
-        return [];
-      }
-      return (data || []) as any[];
-    },
-  });
-
-  // 3.8. Query Google Sheets Audit count
+  // 3.6 Query Sheets Audit
   const { data: sheetsAudit, isLoading: isLoadingSheetsAudit, refetch: refetchSheetsAudit } = useQuery({
     queryKey: ["sheets-audit", activeReport?.id, startDateStr, endDateStr],
     enabled: !!activeReport?.id,
@@ -516,7 +476,7 @@ function ReportsPage() {
     });
   };
 
-  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics || isLoadingRdEvents || isLoadingNectarDeals;
+  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics || isLoadingNectarDeals;
 
   return (
     <AppShell title="Relatórios">
@@ -607,57 +567,6 @@ function ReportsPage() {
 
                         <div className="grid gap-4 pt-2 border-t border-border/60">
                           <div className="flex flex-col gap-2">
-                            <Label className="text-sm font-bold text-orange-600 dark:text-orange-400">Integração RD Station (OAuth 2.0)</Label>
-                            <p className="text-xs text-muted-foreground">O Client ID e Secret podem ser cadastrados por cliente abaixo. Se deixados em branco, o sistema tentará usar as chaves globais da sua agência no servidor (.env).</p>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="grid gap-1.5">
-                              <Label htmlFor="rdClientId" className="text-xs font-semibold">Client ID do App (Opcional)</Label>
-                              <Input
-                                id="rdClientId"
-                                placeholder="Client ID específico deste cliente..."
-                                value={rdClientId}
-                                onChange={(e) => setRdClientId(e.target.value)}
-                                className="h-9 text-sm font-mono"
-                              />
-                            </div>
-                            
-                            <div className="grid gap-1.5">
-                              <Label htmlFor="rdClientSecret" className="text-xs font-semibold">Client Secret do App (Opcional)</Label>
-                              <Input
-                                id="rdClientSecret"
-                                type="password"
-                                placeholder="Client Secret específico..."
-                                value={rdClientSecret}
-                                onChange={(e) => setRdClientSecret(e.target.value)}
-                                className="h-9 text-sm font-mono"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-between p-3 border rounded-md bg-orange-50/50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30">
-                            <div>
-                              <h4 className="text-sm font-semibold text-orange-700 dark:text-orange-300">Conexão Oficial RD Station</h4>
-                              <p className="text-xs text-orange-600/80 dark:text-orange-400/80">
-                                {activeReport.rd_refresh_token 
-                                  ? "✅ Token de acesso OAuth conectado. A extração de histórico está ativa." 
-                                  : "❌ Não conectado. É necessário fazer o Login com RD Station para puxar os leads do período."}
-                              </p>
-                            </div>
-                            <Button 
-                              type="button"
-                              onClick={() => {
-                                window.location.href = `/api/auth/login/rd-marketing?report_id=${activeReport.id}`;
-                              }}
-                              className="bg-[#f06924] hover:bg-[#d65d20] text-white whitespace-nowrap"
-                            >
-                              Conectar RD Station
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="grid gap-4 pt-2 border-t border-border/60">
-                          <div className="flex flex-col gap-2">
                             <Label className="text-sm font-bold text-blue-600 dark:text-blue-400">Integração Nectar CRM</Label>
                             <p className="text-xs text-muted-foreground">Insira o Token de API do Nectar CRM para sincronizar os dados de vendas (Negócios e Funil).</p>
                           </div>
@@ -671,33 +580,6 @@ function ReportsPage() {
                               onChange={(e) => setNectarApiToken(e.target.value)}
                               className="h-9 text-sm font-mono"
                             />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60 opacity-60">
-                          <div className="grid gap-1.5">
-                            <Label htmlFor="rdPublicToken" className="text-xs font-semibold">Token Público (Antigo / Legado)</Label>
-                            <Input
-                              id="rdPublicToken"
-                              placeholder="Ex: d7a8f9e0-..."
-                              value={rdPublicToken}
-                              onChange={(e) => setRdPublicToken(e.target.value)}
-                              className="h-9 text-sm font-mono"
-                            />
-                            <p className="text-[10px] text-muted-foreground">Obsoleto. Não puxe histórico com ele.</p>
-                          </div>
-                          
-                          <div className="grid gap-1.5">
-                            <Label htmlFor="rdPrivateToken" className="text-xs font-semibold">Token Privado (Antigo / Legado)</Label>
-                            <Input
-                              id="rdPrivateToken"
-                              type="password"
-                              placeholder="Ex: 8c1b2d3e-..."
-                              value={rdPrivateToken}
-                              onChange={(e) => setRdPrivateToken(e.target.value)}
-                              className="h-9 text-sm font-mono"
-                            />
-                            <p className="text-[10px] text-muted-foreground">Obsoleto. Apenas para Webhooks pontuais.</p>
                           </div>
                         </div>
 
@@ -974,19 +856,6 @@ function ReportsPage() {
             <Button
               variant="ghost"
               className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap flex items-center gap-1.5",
-                activeTab === "rd" 
-                  ? "border-orange-500 text-orange-500 bg-orange-500/5" 
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:text-orange-500"
-              )}
-              onClick={() => setActiveTab("rd")}
-            >
-              RD Marketing
-              <span className="inline-block w-2 h-2 rounded-full bg-orange-500 animate-pulse" title="Inbound & Leads" />
-            </Button>
-            <Button
-              variant="ghost"
-              className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "nectar" 
                   ? "border-primary text-primary bg-primary/5" 
@@ -1024,17 +893,6 @@ function ReportsPage() {
 
           {activeTab === "gsc" && (
             <GscTab gscMetrics={gscMetrics} activeReport={activeReport} />
-          )}
-
-          {activeTab === "rd" && (
-            <div className="mt-6 animate-in fade-in duration-500">
-              <RdMarketingTab 
-                activeReport={activeReport} 
-                startDateStr={startDateStr} 
-                endDateStr={endDateStr} 
-                rdEvents={rdEvents} 
-              />
-            </div>
           )}
 
           {activeTab === "nectar" && (
