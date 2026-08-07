@@ -1,13 +1,3 @@
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-
-// Load .env
-const envPath = path.resolve(process.cwd(), '.env');
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-}
-
 async function testNectarCRM(apiToken) {
   if (!apiToken) {
     console.error("ERRO: Informe o Token do Nectar CRM!");
@@ -20,9 +10,9 @@ async function testNectarCRM(apiToken) {
   try {
     // 1. Tentar buscar as etapas de funil (Pipeline)
     console.log("\nBuscando Funis de Vendas...");
-    const funisRes = await fetch("https://app.nectarcrm.com.br/crm/api/1/funis", {
+    const funisRes = await fetch(`https://app.nectarcrm.com.br/crm/api/1/funis/?api_token=${apiToken}`, {
       headers: {
-        "Api-Token": apiToken
+        "Access-Token": apiToken
       }
     });
     
@@ -40,9 +30,9 @@ async function testNectarCRM(apiToken) {
     date.setDate(date.getDate() - 7);
     const dataFiltro = date.toISOString().split('T')[0]; // YYYY-MM-DD
     
-    const dealsRes = await fetch(`https://app.nectarcrm.com.br/crm/api/1/oportunidades?dataCriacaoInicio=${dataFiltro}`, {
+    const dealsRes = await fetch(`https://app.nectarcrm.com.br/crm/api/1/oportunidades?dataCriacaoInicio=${dataFiltro}&api_token=${apiToken}`, {
       headers: {
-        "Api-Token": apiToken
+        "Access-Token": apiToken
       }
     });
 

@@ -18,11 +18,15 @@ export const Route = createFileRoute('/api/public/trigger-import-nectar-crm')({
           return new Response('Unauthorized', { status: 401 });
         }
 
-        console.log(`[API Import] Disparando importação do Nectar CRM em child process: node scripts/import-nectar-crm.js`)
+        // 2. Parse dias para importar
+        const daysParam = url.searchParams.get('days')
+        const days = daysParam ? parseInt(daysParam, 10) : 7
+
+        console.log(`[API Import] Disparando importação do Nectar CRM em child process: node scripts/import-nectar-crm.js --days=${days}`)
 
         try {
           // Executar script do Nectar CRM
-          const { stdout, stderr } = await execPromise(`node scripts/import-nectar-crm.js`)
+          const { stdout, stderr } = await execPromise(`node scripts/import-nectar-crm.js --days=${days}`)
           
           console.log('[API Import Nectar CRM] Sucesso:', stdout)
           if (stderr) {
