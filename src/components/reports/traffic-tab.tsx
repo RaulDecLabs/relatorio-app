@@ -73,7 +73,9 @@ export function TrafficTab({ metrics, activeReport }: TrafficTabProps) {
     // Group by Session Source
     const sourceMap: { [source: string]: { source: string; sessions: number; users: number; transactions: number } } = {};
     metrics.forEach(item => {
-      const s = item.session_source || "(not set)";
+      let s = item.session_source || "(not set)";
+      if (s === "(not set)") s = "Desconhecido";
+      
       if (!sourceMap[s]) {
         sourceMap[s] = { source: s, sessions: 0, users: 0, transactions: 0 };
       }
@@ -86,7 +88,9 @@ export function TrafficTab({ metrics, activeReport }: TrafficTabProps) {
     // Group by City
     const cityMap: { [city: string]: { city: string; sessions: number } } = {};
     metrics.forEach(item => {
-      const c = item.city || "(not set)";
+      let c = item.city || "(not set)";
+      if (c === "(not set)") c = "Desconhecido";
+      
       if (!cityMap[c]) {
         cityMap[c] = { city: c, sessions: 0 };
       }
@@ -109,7 +113,9 @@ export function TrafficTab({ metrics, activeReport }: TrafficTabProps) {
     // Group by Browser
     const browserMap: { [browser: string]: { browser: string; sessions: number } } = {};
     metrics.forEach(item => {
-      const b = item.browser || "(not set)";
+      let b = item.browser || "(not set)";
+      if (b === "(not set)") b = "Desconhecido";
+      
       if (!browserMap[b]) {
         browserMap[b] = { browser: b, sessions: 0 };
       }

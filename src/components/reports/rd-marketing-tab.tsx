@@ -113,41 +113,9 @@ export function RdMarketingTab({ rdEvents = [], activeReport }: RdMarketingTabPr
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Status da Integração no Topo */}
-      <Card className="border-orange-500/30 bg-gradient-to-r from-orange-500/10 via-card/80 to-teal-500/10 shadow-sm backdrop-blur-md">
-        <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/20 text-orange-500 border border-orange-500/30 shadow-inner">
-              <Rocket className="h-5 w-5 animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-foreground sm:text-base">Integração RD Station Marketing (Dados Reais)</h4>
-                {hasTokens ? (
-                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/30 text-[11px]">
-                    <CheckCircle2 className="w-3 h-3 mr-1" /> Tokens Conectados
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/30 text-[11px]">
-                    <ShieldAlert className="w-3 h-3 mr-1" /> Tokens Pendentes no botão "Configurar"
-                  </Badge>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Empresa conectada: <span className="font-semibold text-foreground">{companyName}</span> • Exibindo exclusivamente informações oficiais importadas da API RD Station.
-              </p>
-            </div>
-          </div>
-          {!hasData && (
-            <Badge variant="outline" className="px-3 py-1 bg-amber-500/10 text-amber-600 border-amber-500/30 shadow-sm text-xs font-semibold whitespace-nowrap">
-              ⚠️ Nenhum registro processado nos últimos 7 dias
-            </Badge>
-          )}
-        </CardContent>
-      </Card>
 
       <SectionTitle 
-        title="RD Marketing (Inbound & Leads Reais)" 
+        title="RD Marketing" 
         description="Acompanhamento oficial de Captação, Qualificação de MQLs e Eficiência das suas Landing Pages." 
         icon={Users} 
         color="orange" 
@@ -159,7 +127,7 @@ export function RdMarketingTab({ rdEvents = [], activeReport }: RdMarketingTabPr
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 mb-3">
             <AlertCircle className="h-6 w-6 animate-pulse" />
           </div>
-          <h4 className="text-base font-bold text-foreground">Aguardando Importação de Dados Reais do RD Station</h4>
+          <h4 className="text-base font-bold text-foreground">Aguardando Importação do RD Station</h4>
           <p className="text-sm text-muted-foreground max-w-lg mx-auto mt-1">
             Não existem métricas gravadas no banco de dados para este período de 7 dias. Certifique-se de preencher o Token Privado no botão "Configurar" e execute a rotina de importação:
           </p>
@@ -206,7 +174,7 @@ export function RdMarketingTab({ rdEvents = [], activeReport }: RdMarketingTabPr
         <CardHeader className="bg-muted/30 border-b pb-4">
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5 text-orange-500" />
-            <CardTitle className="text-base font-semibold">Funil de Inbound Marketing (Métricas Reais)</CardTitle>
+            <CardTitle className="text-base font-semibold">Funil de Inbound Marketing</CardTitle>
           </div>
           <CardDescription>Visualização oficial da progressão dos seus leads nos estágios de qualificação.</CardDescription>
         </CardHeader>
@@ -322,7 +290,7 @@ export function RdMarketingTab({ rdEvents = [], activeReport }: RdMarketingTabPr
         {/* Canais de Origem de Leads (4 Colunas) */}
         <Card className="md:col-span-5 lg:col-span-4 border-border/60 bg-card/60 backdrop-blur-md shadow-sm flex flex-col justify-between">
           <CardHeader>
-            <CardTitle className="text-base font-semibold">Canais de Origem Reais</CardTitle>
+            <CardTitle className="text-base font-semibold">Canais de Origem</CardTitle>
             <CardDescription>Distribuição de onde vieram seus novos leads.</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col items-center justify-center">
@@ -374,7 +342,7 @@ export function RdMarketingTab({ rdEvents = [], activeReport }: RdMarketingTabPr
       <Card className="border-border/60 bg-card/60 backdrop-blur-md shadow-sm overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between bg-muted/20 border-b pb-4">
           <div>
-            <CardTitle className="text-base font-semibold">Eficiência Oficial das Landing Pages & Formulários</CardTitle>
+            <CardTitle className="text-base font-semibold">Eficiência das Landing Pages & Formulários</CardTitle>
             <CardDescription>Desempenho real das páginas onde houve conversão de contatos na API RD Marketing.</CardDescription>
           </div>
           <MousePointer className="h-5 w-5 text-muted-foreground/50" />
@@ -466,7 +434,7 @@ export function RdMarketingTab({ rdEvents = [], activeReport }: RdMarketingTabPr
       <Card className="border-border/60 bg-card/60 backdrop-blur-md shadow-sm overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between bg-muted/20 border-b pb-4">
           <div>
-            <CardTitle className="text-base font-semibold">Últimos Leads (Tempo Real)</CardTitle>
+            <CardTitle className="text-base font-semibold">Últimos Leads Captados</CardTitle>
             <CardDescription>Visualização instantânea dos dados brutos processados via Webhook.</CardDescription>
           </div>
           <Users className="h-5 w-5 text-muted-foreground/50" />

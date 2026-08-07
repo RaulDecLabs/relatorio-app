@@ -23,6 +23,7 @@ import { Route as AuthenticatedCostsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAutomationsRouteImport } from './routes/_authenticated/automations'
 import { Route as AuthenticatedAiInsightsRouteImport } from './routes/_authenticated/ai-insights'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
+import { Route as ApiWebhooksRdStationRouteImport } from './routes/api/webhooks/rd-station'
 import { Route as ApiPublicTriggerMockTestRouteImport } from './routes/api/public/trigger-mock-test'
 import { Route as ApiPublicTriggerImportSeoRouteImport } from './routes/api/public/trigger-import-seo'
 import { Route as ApiPublicTriggerImportRdMarketingRouteImport } from './routes/api/public/trigger-import-rd-marketing'
@@ -35,6 +36,8 @@ import { Route as ApiPublicIngestRouteImport } from './routes/api/public/ingest'
 import { Route as ApiPublicGscIngestRouteImport } from './routes/api/public/gsc-ingest'
 import { Route as ApiPublicAdsIngestRouteImport } from './routes/api/public/ads-ingest'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients.$id'
+import { Route as ApiAuthLoginRdMarketingRouteImport } from './routes/api/auth/login/rd-marketing'
+import { Route as ApiAuthCallbackRdMarketingRouteImport } from './routes/api/auth/callback/rd-marketing'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -108,6 +111,11 @@ const AuthenticatedClientsIndexRoute =
     path: '/clients/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ApiWebhooksRdStationRoute = ApiWebhooksRdStationRouteImport.update({
+  id: '/api/webhooks/rd-station',
+  path: '/api/webhooks/rd-station',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTriggerMockTestRoute =
   ApiPublicTriggerMockTestRouteImport.update({
     id: '/api/public/trigger-mock-test',
@@ -173,6 +181,17 @@ const AuthenticatedClientsIdRoute = AuthenticatedClientsIdRouteImport.update({
   path: '/clients/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiAuthLoginRdMarketingRoute = ApiAuthLoginRdMarketingRouteImport.update({
+  id: '/api/auth/login/rd-marketing',
+  path: '/api/auth/login/rd-marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthCallbackRdMarketingRoute =
+  ApiAuthCallbackRdMarketingRouteImport.update({
+    id: '/api/auth/callback/rd-marketing',
+    path: '/api/auth/callback/rd-marketing',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -199,7 +218,10 @@ export interface FileRoutesByFullPath {
   '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
+  '/api/webhooks/rd-station': typeof ApiWebhooksRdStationRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
+  '/api/auth/callback/rd-marketing': typeof ApiAuthCallbackRdMarketingRoute
+  '/api/auth/login/rd-marketing': typeof ApiAuthLoginRdMarketingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -226,7 +248,10 @@ export interface FileRoutesByTo {
   '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
+  '/api/webhooks/rd-station': typeof ApiWebhooksRdStationRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
+  '/api/auth/callback/rd-marketing': typeof ApiAuthCallbackRdMarketingRoute
+  '/api/auth/login/rd-marketing': typeof ApiAuthLoginRdMarketingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -255,7 +280,10 @@ export interface FileRoutesById {
   '/api/public/trigger-import-rd-marketing': typeof ApiPublicTriggerImportRdMarketingRoute
   '/api/public/trigger-import-seo': typeof ApiPublicTriggerImportSeoRoute
   '/api/public/trigger-mock-test': typeof ApiPublicTriggerMockTestRoute
+  '/api/webhooks/rd-station': typeof ApiWebhooksRdStationRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
+  '/api/auth/callback/rd-marketing': typeof ApiAuthCallbackRdMarketingRoute
+  '/api/auth/login/rd-marketing': typeof ApiAuthLoginRdMarketingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -284,7 +312,10 @@ export interface FileRouteTypes {
     | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
+    | '/api/webhooks/rd-station'
     | '/clients/'
+    | '/api/auth/callback/rd-marketing'
+    | '/api/auth/login/rd-marketing'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -311,7 +342,10 @@ export interface FileRouteTypes {
     | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
+    | '/api/webhooks/rd-station'
     | '/clients'
+    | '/api/auth/callback/rd-marketing'
+    | '/api/auth/login/rd-marketing'
   id:
     | '__root__'
     | '/'
@@ -339,7 +373,10 @@ export interface FileRouteTypes {
     | '/api/public/trigger-import-rd-marketing'
     | '/api/public/trigger-import-seo'
     | '/api/public/trigger-mock-test'
+    | '/api/webhooks/rd-station'
     | '/_authenticated/clients/'
+    | '/api/auth/callback/rd-marketing'
+    | '/api/auth/login/rd-marketing'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -357,6 +394,9 @@ export interface RootRouteChildren {
   ApiPublicTriggerImportRdMarketingRoute: typeof ApiPublicTriggerImportRdMarketingRoute
   ApiPublicTriggerImportSeoRoute: typeof ApiPublicTriggerImportSeoRoute
   ApiPublicTriggerMockTestRoute: typeof ApiPublicTriggerMockTestRoute
+  ApiWebhooksRdStationRoute: typeof ApiWebhooksRdStationRoute
+  ApiAuthCallbackRdMarketingRoute: typeof ApiAuthCallbackRdMarketingRoute
+  ApiAuthLoginRdMarketingRoute: typeof ApiAuthLoginRdMarketingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -459,6 +499,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/webhooks/rd-station': {
+      id: '/api/webhooks/rd-station'
+      path: '/api/webhooks/rd-station'
+      fullPath: '/api/webhooks/rd-station'
+      preLoaderRoute: typeof ApiWebhooksRdStationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/trigger-mock-test': {
       id: '/api/public/trigger-mock-test'
       path: '/api/public/trigger-mock-test'
@@ -543,6 +590,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/auth/login/rd-marketing': {
+      id: '/api/auth/login/rd-marketing'
+      path: '/api/auth/login/rd-marketing'
+      fullPath: '/api/auth/login/rd-marketing'
+      preLoaderRoute: typeof ApiAuthLoginRdMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback/rd-marketing': {
+      id: '/api/auth/callback/rd-marketing'
+      path: '/api/auth/callback/rd-marketing'
+      fullPath: '/api/auth/callback/rd-marketing'
+      preLoaderRoute: typeof ApiAuthCallbackRdMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -596,6 +657,9 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicTriggerImportRdMarketingRoute,
   ApiPublicTriggerImportSeoRoute: ApiPublicTriggerImportSeoRoute,
   ApiPublicTriggerMockTestRoute: ApiPublicTriggerMockTestRoute,
+  ApiWebhooksRdStationRoute: ApiWebhooksRdStationRoute,
+  ApiAuthCallbackRdMarketingRoute: ApiAuthCallbackRdMarketingRoute,
+  ApiAuthLoginRdMarketingRoute: ApiAuthLoginRdMarketingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

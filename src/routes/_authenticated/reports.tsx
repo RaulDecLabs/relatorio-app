@@ -30,6 +30,7 @@ import { MetaAdsTab } from "@/components/reports/meta-ads-tab";
 import { GscTab } from "@/components/reports/gsc-tab";
 import { SheetsTab } from "@/components/reports/sheets-tab";
 import { RdMarketingTab } from "@/components/reports/rd-marketing-tab";
+import { NectarCrmTab } from "@/components/reports/nectar-crm-tab";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
@@ -47,7 +48,7 @@ function ReportsPage() {
   const [newGscUrl, setNewGscUrl] = useState("");
   const [newGoogleSheetsUrl, setNewGoogleSheetsUrl] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "rd" | "sheets">("traffic");
+  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "rd" | "nectar" | "sheets">("traffic");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [ga4PropertyId, setGa4PropertyId] = useState("");
   const [googleAdsId, setGoogleAdsId] = useState("");
@@ -57,6 +58,7 @@ function ReportsPage() {
   const [rdPrivateToken, setRdPrivateToken] = useState("");
   const [rdClientId, setRdClientId] = useState("");
   const [rdClientSecret, setRdClientSecret] = useState("");
+  const [nectarApiToken, setNectarApiToken] = useState("");
   const [googleSheetsUrl, setGoogleSheetsUrl] = useState("");
 
   const [dateRange, setDateRange] = useState<string>("7");
@@ -167,6 +169,7 @@ function ReportsPage() {
       setRdPrivateToken(activeReport.rd_private_token || "");
       setRdClientId(activeReport.rd_client_id || "");
       setRdClientSecret(activeReport.rd_client_secret || "");
+      setNectarApiToken(activeReport.nectar_api_token || "");
       // Carregar link da planilha associada se houver
       supabase
         .from("reports_sheets_config")
@@ -180,7 +183,7 @@ function ReportsPage() {
   }, [activeReport, isSettingsOpen]);
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, rdPublicToken, rdPrivateToken, rdClientId, rdClientSecret, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; rdPublicToken: string; rdPrivateToken: string; rdClientId: string; rdClientSecret: string; googleSheetsUrl: string }) => {
+    mutationFn: async ({ id, ga4PropertyId, googleAdsId, metaAdsId, gscUrl, rdPublicToken, rdPrivateToken, rdClientId, rdClientSecret, nectarApiToken, googleSheetsUrl }: { id: string; ga4PropertyId: string; googleAdsId: string; metaAdsId: string; gscUrl: string; rdPublicToken: string; rdPrivateToken: string; rdClientId: string; rdClientSecret: string; nectarApiToken: string; googleSheetsUrl: string }) => {
       const { data, error } = await supabase
         .from("reports_config")
         .update({ 
@@ -192,6 +195,7 @@ function ReportsPage() {
           rd_private_token: rdPrivateToken || null,
           rd_client_id: rdClientId || null,
           rd_client_secret: rdClientSecret || null,
+          nectar_api_token: nectarApiToken || null,
         })
         .eq("id", id)
         .select()
@@ -239,6 +243,7 @@ function ReportsPage() {
       rdPrivateToken: rdPrivateToken.trim(),
       rdClientId: rdClientId.trim(),
       rdClientSecret: rdClientSecret.trim(),
+      nectarApiToken: nectarApiToken.trim(),
       googleSheetsUrl: googleSheetsUrl.trim(),
     });
   };
@@ -632,6 +637,24 @@ function ReportsPage() {
                           </div>
                         </div>
 
+                        <div className="grid gap-4 pt-2 border-t border-border/60">
+                          <div className="flex flex-col gap-2">
+                            <Label className="text-sm font-bold text-blue-600 dark:text-blue-400">Integração Nectar CRM</Label>
+                            <p className="text-xs text-muted-foreground">Insira o Token de API do Nectar CRM para sincronizar os dados de vendas (Negócios e Funil).</p>
+                          </div>
+                          <div className="grid gap-1.5">
+                            <Label htmlFor="nectarApiToken" className="text-xs font-semibold">Token de API (Nectar CRM)</Label>
+                            <Input
+                              id="nectarApiToken"
+                              type="password"
+                              placeholder="Cole o token da API aqui..."
+                              value={nectarApiToken}
+                              onChange={(e) => setNectarApiToken(e.target.value)}
+                              className="h-9 text-sm font-mono"
+                            />
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60 opacity-60">
                           <div className="grid gap-1.5">
                             <Label htmlFor="rdPublicToken" className="text-xs font-semibold">Token Público (Antigo / Legado)</Label>
@@ -946,6 +969,18 @@ function ReportsPage() {
               variant="ghost"
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
+                activeTab === "nectar" 
+                  ? "border-primary text-primary bg-primary/5" 
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => setActiveTab("nectar")}
+            >
+              Nectar CRM
+            </Button>
+            <Button
+              variant="ghost"
+              className={cn(
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "sheets" 
                   ? "border-primary text-primary bg-primary/5" 
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -973,7 +1008,24 @@ function ReportsPage() {
           )}
 
           {activeTab === "rd" && (
-            <RdMarketingTab rdEvents={rdEvents} activeReport={activeReport} />
+            <div className="mt-6 animate-in fade-in duration-500">
+              <RdMarketingTab 
+                activeReport={activeReport} 
+                startDateStr={startDateStr} 
+                endDateStr={endDateStr} 
+                rdEvents={rdEvents} 
+              />
+            </div>
+          )}
+
+          {activeTab === "nectar" && (
+            <div className="mt-6 animate-in fade-in duration-500">
+              <NectarCrmTab 
+                activeReport={activeReport} 
+                startDateStr={startDateStr} 
+                endDateStr={endDateStr} 
+              />
+            </div>
           )}
 
           {activeTab === "sheets" && (
