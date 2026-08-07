@@ -47,7 +47,15 @@ export function ExecutiveSummaryTab({ activeReport, startDateStr, endDateStr, is
       });
 
       if (!res.ok) {
-        throw new Error('Falha na resposta do servidor: ' + res.status);
+        let errMessage = `Status ${res.status}`;
+        try {
+          const errData = await res.json();
+          if (errData.error) errMessage = errData.error;
+        } catch {
+          const text = await res.text().catch(() => '');
+          if (text) errMessage = text;
+        }
+        throw new Error(errMessage);
       }
 
       toast.success("Parecer Executivo gerado com sucesso!");
