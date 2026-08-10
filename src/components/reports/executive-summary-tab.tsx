@@ -195,6 +195,23 @@ export function ExecutiveSummaryTab({
     }))
   ].sort((a, b) => b.cost - a.cost);
 
+  // Calcula o pior desempenho programaticamente (Parte 2.2)
+  const worstCampaign = campaignsList.reduce((worst, current) => {
+    if (current.leads === 0 && current.cost > 0) {
+      if (!worst || worst.leads > 0 || current.cost > worst.cost) return current;
+    }
+    if (current.leads > 0) {
+      const currentCpl = current.cost / current.leads;
+      const worstCpl = worst && worst.leads > 0 ? worst.cost / worst.leads : 0;
+      if (!worst || (worst.leads > 0 && currentCpl > worstCpl)) return current;
+    }
+    return worst;
+  }, null as any);
+
+  const attentionPoint = worstCampaign ? 
+    `A campanha "${worstCampaign.campaign}" (${worstCampaign.channel}) consumiu ${fmt(worstCampaign.cost)} gerando ${worstCampaign.leads === 0 ? 'nenhum candidato' : `apenas ${worstCampaign.leads} candidatos (CPL: ${fmt(worstCampaign.cost / worstCampaign.leads)})`}.` 
+    : data.campaign_attention_point;
+
   return (
     <div className="space-y-16 pb-16 animate-in fade-in duration-700 font-sans">
       
@@ -240,7 +257,7 @@ export function ExecutiveSummaryTab({
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(exec.total_investment)}</span>
+            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(rawMetrics?.consolidated?.totalCost || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Investimento Total</span>
           </div>
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
@@ -248,15 +265,15 @@ export function ExecutiveSummaryTab({
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Praças Impactadas</span>
           </div>
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(exec.total_leads)}</span>
+            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(rawMetrics?.consolidated?.totalLeads || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Candidatos (Leads)</span>
           </div>
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(exec.total_sales || 0)}</span>
+            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(rawMetrics?.wonDealsLength || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Contratações (Nectar)</span>
           </div>
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(exec.cpl)}</span>
+            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(rawMetrics?.consolidated?.blendedCpa || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Custo por Candidato</span>
           </div>
         </div>
@@ -302,16 +319,16 @@ export function ExecutiveSummaryTab({
           )}
         </div>
 
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Leitura Estratégica Regional</h2>
-          <div className="bg-[#1a2a5e] text-white p-6 rounded-lg shadow-md h-full flex items-center">
-            <p className="text-lg leading-relaxed font-light">
-              {data.regional_insight && !data.regional_insight.toLowerCase().includes("não consolidado") 
-                ? data.regional_insight 
-                : "As ações de mídia no período garantiram presença estratégica nas regiões-chave de atuação do cliente, focando em impulsionar a atração local de candidatos e ampliar a visibilidade da marca empregadora nas praças essenciais."}
-            </p>
+        {data.regional_insight && !data.regional_insight.toLowerCase().includes("não consolidado") && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Leitura Estratégica Regional</h2>
+            <div className="bg-[#1a2a5e] text-white p-6 rounded-lg shadow-md h-full flex items-center">
+              <p className="text-lg leading-relaxed font-light">
+                {data.regional_insight}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════
@@ -374,12 +391,12 @@ export function ExecutiveSummaryTab({
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Resultados do Impulsionamento</h2>
         
-        {data.campaign_attention_point && (
+        {attentionPoint && (
           <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex items-start gap-3 mb-6">
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-bold text-amber-800 text-sm mb-1">Ponto de Atenção Analítico</h4>
-              <p className="text-amber-700 text-sm">{data.campaign_attention_point}</p>
+              <p className="text-amber-700 text-sm">{attentionPoint}</p>
             </div>
           </div>
         )}

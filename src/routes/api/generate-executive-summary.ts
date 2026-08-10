@@ -101,7 +101,8 @@ DIRETRIZES OBRIGATÓRIAS E REGRAS DE OURO:
 3. LINGUAGEM DA AGÊNCIA PARA O CLIENTE: Os relatórios devem sempre valorizar a estratégia, a visibilidade gerada para a marca empregadora e as oportunidades de otimização de custo por candidato (CPL).
 4. IMPACTO PARA O NEGÓCIO: Os 4 pontos de Impacto para o Negócio DEVEM SER POSITIVOS E CONSTRUTIVOS. Use obrigatoriamente pilares estratégicos de valor (ex: "Visibilidade e Presença de Marca", "Pipeline de Atração de Talentos", "Eficiência Orçamentária e CPL", "Maturação do Funil de Recrutamento"). NUNCA critique a imagem do cliente nem acuse desperdício.
 5. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais e atração regional de candidatos. NUNCA diga "dados não consolidados".
-6. Se as contratações no CRM forem 0, explique de forma executiva que os candidatos gerados na mídia estão em etapa de triagem e qualificação no funil.`
+6. Se as contratações no CRM forem 0, explique de forma executiva que os candidatos gerados na mídia estão em etapa de triagem e qualificação no funil.
+7. É TERMINANTEMENTE PROIBIDO inventar números ou exemplos arbitrários. Todo número citado no texto (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON dos DADOS CONSOLIDADOS.`
 
           const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
 
@@ -120,17 +121,17 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
     "total_regions": 0 // ESTIME O NÚMERO DE PRAÇAS LENDO OS NOMES DAS CAMPANHAS. SE NÃO ACHAR, RETORNE 1.
   },
   "key_insights": [
-    "Insight 1 citando o volume de candidatos gerados e investimento alocado",
-    "Insight 2 sobre a eficiência de CPL ou canal com melhor volume de candidaturas",
+    "Insight 1 citando o volume EXATO de candidatos gerados e investimento alocado com base no JSON",
+    "Insight 2 sobre a eficiência REAL de CPL ou canal com melhor volume de candidaturas",
     "Insight 3 sobre a oportunidade de otimização contínua de criativos e atração"
   ],
   "channel_investment_insight": "Insight de destaque sobre a estratégia de distribuição de mídia (ex: 'Alocação focada no Meta Ads para ampliar o alcance do topo de funil')",
   "regional_insight": "Parágrafo elegante sobre a presença estratégica e cobertura de mídia nas praças essenciais de recrutamento.",
   "evolution_insight": "Análise do ritmo diário de investimento e constância das ações.",
   "media_strategy": [
-    { "title": "Pulverização geográfica", "description": "Como a mídia garantiu exposição nas praças prioritárias de recrutamento." },
-    { "title": "Ritmo contínuo e ágil", "description": "Formato de distribuição do orçamento para manter presença de marca." },
-    { "title": "Geração de Candidatos Escalonável", "description": "Como os canais impulsionaram o banco de talentos." }
+    { "title": "Distribuição entre canais", "description": "Descreva como o investimento foi distribuído (ex: valores ou X% em Google Ads, Y% em Meta Ads) usando os dados reais." },
+    { "title": "Ritmo de investimento", "description": "Analise a constância dos aportes diários no período com base nos dados do JSON." },
+    { "title": "Papel de cada canal", "description": "Descreva qual canal trouxe mais visibilidade e qual trouxe mais leads, provando com números reais do JSON." }
   ],
   "campaign_attention_point": "Identificação técnica e construtiva da campanha com maior CPL para ajuste de criativo (ex: 'A campanha X apresentou CPL acima da média e será otimizada no próximo ciclo.')",
   "business_impact": [
