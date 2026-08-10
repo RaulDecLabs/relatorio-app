@@ -262,10 +262,25 @@ function TemplatesPage() {
       return (data || []) as any[];
     }
   });
+
+  const { data: nectarDeals = [], isLoading: loadNectar } = useQuery({
+    queryKey: ["nectar-deals", activeReport?.id, startDateStr, endDateStr],
+    enabled: !!activeReport?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("nectar_deals")
+        .select("*")
+        .eq("report_id", activeReport!.id)
+        .gte("created_at", startDateStr)
+        .lte("created_at", endDateStr);
+      if (error) throw error;
+      return (data || []) as any[];
+    }
+  });
   
   const aiInsight = (aiInsightsList.length > 0 ? aiInsightsList[0] : null) as any;
 
-  const isLoading = loadGa || loadAds || loadFbAds || loadGsc || loadAi;
+  const isLoading = loadGa || loadAds || loadFbAds || loadGsc || loadAi || loadNectar;
 
   // -- CALCULATIONS --
   // We keep them separate per user request, and only merge at the end.
@@ -378,8 +393,7 @@ function TemplatesPage() {
           investimento: fbCost,
           cliques: fbClicks,
           conversoes: fbConversions,
-          cpa: fbCpa,
-          top_campanhas: topFbCampaigns.map(c => ({ nome: c.name, investimento: c.spend, conversoes: c.conversions }))
+          cpa: fbCpa
         },
         consolidado_trafego_pago: {
           investimento_total: totalCost,
@@ -395,6 +409,11 @@ function TemplatesPage() {
         seo_search_console: {
           cliques_organicos: gscClicks,
           impressoes: gscImpressions
+        },
+        crm_nectar: {
+          total_oportunidades: nectarDeals?.length || 0,
+          vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
+          receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
         }
       };
       
@@ -403,7 +422,9 @@ function TemplatesPage() {
         meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
         gsc: { clicks: gscClicks, impressions: gscImpressions },
         ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
-        consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks }
+        consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks },
+        totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
+        wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
       };
 
       const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -559,8 +580,7 @@ Diretrizes de Especialista:
                   investimento: fbCost,
                   cliques: fbClicks,
                   conversoes: fbConversions,
-                  cpa: fbCpa,
-                  top_campanhas: topFbCampaigns.map(c => ({ nome: c.name, investimento: c.spend, conversoes: c.conversions }))
+                  cpa: fbCpa
                 },
                 consolidado_trafego_pago: {
                   investimento_total: totalCost,
@@ -576,6 +596,11 @@ Diretrizes de Especialista:
                 seo_search_console: {
                   cliques_organicos: gscClicks,
                   impressoes: gscImpressions
+                },
+                crm_nectar: {
+                  total_oportunidades: nectarDeals?.length || 0,
+                  vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
+                  receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
                 }
               }}
               rawMetrics={{
@@ -583,7 +608,9 @@ Diretrizes de Especialista:
                 meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
                 gsc: { clicks: gscClicks, impressions: gscImpressions },
                 ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
-                consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks }
+                consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks },
+                totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
+                wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
               }}
             />
           </div>
