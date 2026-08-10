@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js'
 
 function cleanUrl(val: any): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
-  let cleaned = val.trim().replace(/^['"\\s`]+|['"\\s`]+$/g, '');
+  // Remove aspas, backticks e espaços das bordas. ATENÇÃO: \s = whitespace, NÃO \\s (que removeria a letra 's')
+  let cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
   try {
     const url = new URL(cleaned);
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined;
@@ -16,7 +17,8 @@ function cleanUrl(val: any): string | undefined {
 
 function cleanKey(val: any): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
-  const cleaned = val.trim().replace(/^['"\\s`]+|['"\\s`]+$/g, '');
+  // Remove aspas, backticks e espaços das bordas. ATENÇÃO: \s = whitespace, NÃO \\s (que removeria a letra 's')
+  const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
   return cleaned.length > 10 ? cleaned : undefined;
 }
 
@@ -77,7 +79,7 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
 
           // ────────── OpenAI ──────────
           let rawOpenaiApiKey = clientOpenaiKey || process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_OPENAI_API_KEY : undefined) || ''
-          const openaiApiKey = rawOpenaiApiKey.trim().replace(/^['"\\s`]+|['"\\s`]+$/g, '')
+          const openaiApiKey = rawOpenaiApiKey.trim().replace(/^['"\s`]+|['"\s`]+$/g, '')
           
           if (!openaiApiKey) {
             return new Response('OpenAI API Key not found. Please provide it or set VITE_OPENAI_API_KEY in your .env file.', { status: 500 })
