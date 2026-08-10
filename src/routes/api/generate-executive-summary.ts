@@ -122,7 +122,9 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
             }
           })
 
-          const openaiApiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY
+          let rawOpenaiApiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || ''
+          const openaiApiKey = rawOpenaiApiKey.trim().replace(/^['"\s`]+|['"\s`]+$/g, '')
+          
           if (!openaiApiKey) {
             return new Response('OpenAI API Key not found', { status: 500 })
           }
