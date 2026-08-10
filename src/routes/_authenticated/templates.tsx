@@ -262,10 +262,25 @@ function TemplatesPage() {
       return (data || []) as any[];
     }
   });
+
+  const { data: nectarDeals = [], isLoading: loadNectar } = useQuery({
+    queryKey: ["nectar-deals", activeReport?.id, startDateStr, endDateStr],
+    enabled: !!activeReport?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("nectar_deals")
+        .select("*")
+        .eq("report_id", activeReport!.id)
+        .gte("created_at", startDateStr)
+        .lte("created_at", endDateStr);
+      if (error) throw error;
+      return (data || []) as any[];
+    }
+  });
   
   const aiInsight = (aiInsightsList.length > 0 ? aiInsightsList[0] : null) as any;
 
-  const isLoading = loadGa || loadAds || loadFbAds || loadGsc || loadAi;
+  const isLoading = loadGa || loadAds || loadFbAds || loadGsc || loadAi || loadNectar;
 
   // -- CALCULATIONS --
   // We keep them separate per user request, and only merge at the end.
