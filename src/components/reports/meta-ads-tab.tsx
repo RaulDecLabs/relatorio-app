@@ -113,11 +113,10 @@ export function MetaAdsTab({ fbAdsMetrics, activeReport }: MetaAdsTabProps) {
         <CustomKpiCard label="CTR" value={`${data.avgFbAdsCTR.toFixed(2)}%`} icon={Percent} hint="Taxa de Cliques" color="green" />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <CustomKpiCard label="CPC Médio" value={data.avgFbAdsCPC.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} icon={DollarSign} hint="Custo Por Clique" color="amber" />
         <CustomKpiCard label="Conversões" value={data.totalFbAdsConversions.toLocaleString("pt-BR")} icon={TrendingUp} hint="Ações de valor realizadas" color="green" />
         <CustomKpiCard label="CPL" value={data.fbAdsCPL.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} icon={Activity} hint="Custo por Lead/Conversão" color="red" />
-        <CustomKpiCard label="ROAS" value={`${data.fbAdsROAS.toFixed(2)}x`} icon={Award} hint="Retorno sobre investimento" color="cyan" />
       </div>
 
       {/* Daily Performance Chart */}

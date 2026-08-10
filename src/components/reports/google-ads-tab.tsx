@@ -133,11 +133,9 @@ export function GoogleAdsTab({ adsMetrics, activeReport }: GoogleAdsTabProps) {
         <CustomKpiCard label="CTR Médio" value={`${data.avgAdsCTR.toFixed(2)}%`} icon={Percent} hint="Cliques / Impressões" color="green" />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <CustomKpiCard label="CPC Médio" value={data.avgAdsCPC.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} icon={DollarSign} hint="Custo médio por clique" color="amber" />
         <CustomKpiCard label="Conversões" value={data.totalAdsConversions.toLocaleString("pt-BR")} icon={Activity} hint="Ações valiosas concluídas" color="green" />
-        <CustomKpiCard label="Valor de Conversão" value={data.totalAdsConversionsValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} icon={ShoppingBag} hint="Faturamento gerado" color="amber" />
-        <CustomKpiCard label="ROAS Médio" value={`${data.adsROAS.toFixed(2)}x`} icon={Award} hint="Retorno sobre investimento" color="indigo" />
       </div>
 
       {/* Daily Cost Line Chart */}

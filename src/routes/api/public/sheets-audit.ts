@@ -148,7 +148,7 @@ export const Route = createFileRoute('/api/public/sheets-audit')({
             count: matchCount,
             total_rows_scanned: rows.length - 1,
             date_column_detected: parseCSVLine(rows[0])[dateColIndex],
-            sample_rows: matchedRows.slice(0, 10)
+            sample_rows: matchedRows.reverse().slice(0, 10)
           });
 
         } catch (fetchErr: any) {
