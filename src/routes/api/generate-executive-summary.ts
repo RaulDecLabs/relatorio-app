@@ -102,7 +102,7 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
 DIRETRIZES OBRIGATÓRIAS:
 - NUNCA mencione que você é uma IA, modelo, sistema automatizado ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente.
 - Use linguagem executiva, profissional, orientada a recrutamento e employer branding.
-- Não fale sobre "Vendas", "Receita" ou "ROI financeiro". O foco é "Investimento", "Candidaturas/Leads", "Atração de Talentos", "Praças" (Regiões).
+- Não foque em "ROI financeiro", mas sim em "Investimento", "Candidaturas/Leads", "Atração de Talentos", "Contratações/Vendas Fechadas" e "Praças" (Regiões).
 - Seja preciso com os números: use os dados reais fornecidos. Tente inferir a quantidade de praças observando os nomes das campanhas (se houver siglas de estados ou cidades).
 - Forneça recomendações acionáveis.
 - O tom deve ser de consultoria premium: analítico e estratégico.`
@@ -119,6 +119,7 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
     "headline": "Uma frase de impacto resumindo a captação de talentos no período (máx 15 palavras)",
     "total_investment": ${totalCost},
     "total_leads": ${totalConversions + fbLeads},
+    "total_sales": ${wonDealsLength},
     "cpl": ${Math.round(blendedCPL * 100) / 100},
     "total_regions": 14,
     "digital_percentage": 100

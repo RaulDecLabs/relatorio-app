@@ -226,10 +226,11 @@ export function ExecutiveSummaryTab({ activeReport, startDateStr, endDateStr, is
         )}
 
         {/* KPIs Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <KpiBlock label="Investimento Total" value={fmt(exec.total_investment)} icon={DollarSign} color="blue" />
           <KpiBlock label="Praças Impactadas" value={fmtNum(exec.total_regions || 0)} icon={Globe} color="cyan" />
           <KpiBlock label="Candidatos (Leads)" value={fmtNum(exec.total_leads)} icon={Users} color="indigo" />
+          <KpiBlock label="Contratações" value={fmtNum(exec.total_sales || 0)} icon={Award} color="emerald" />
           <KpiBlock label="Custo por Candidato" value={fmt(exec.cpl)} icon={Target} color="amber" />
         </div>
 
