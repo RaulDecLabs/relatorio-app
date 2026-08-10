@@ -75,7 +75,16 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
             startDateStr = startDate.toISOString().split('T')[0]
           }
 
-          const { totalCost = 0, totalConversions = 0, totalClicks = 0, totalImpressions = 0, blendedCPL = 0, blendedCPC = 0, roi = 0, totalRevenue = 0, fbLeads = 0, ga4Sessions = 0, wonDealsLength = 0 } = body.rawMetrics || {};
+          const rm = body.rawMetrics || {};
+          const totalCost = rm.consolidated?.totalCost || 0;
+          const totalConversions = rm.consolidated?.totalConversions || 0;
+          const totalClicks = rm.consolidated?.totalClicks || 0;
+          const blendedCPL = rm.consolidated?.blendedCpa || 0;
+          const totalRevenue = rm.totalRevenue || 0;
+          const wonDealsLength = rm.wonDealsLength || 0;
+          const roi = totalCost > 0 ? ((totalRevenue - totalCost) / totalCost) * 100 : 0;
+          const fbLeads = rm.meta_ads?.conversions || 0;
+          const ga4Sessions = rm.ga4?.sessions || 0;
 
           // ────────── OpenAI ──────────
           let rawOpenaiApiKey = clientOpenaiKey || process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_OPENAI_API_KEY : undefined) || ''

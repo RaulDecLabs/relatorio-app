@@ -180,9 +180,6 @@ export function ExecutiveSummaryTab({ activeReport, startDateStr, endDateStr, is
               <div className="w-12 h-0.5 bg-indigo-400/40 mt-2"></div>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="outline" className="bg-white/10 border-white/20 text-white/80 text-[10px] font-semibold tracking-wider uppercase px-3 py-1">
-                Confidencial
-              </Badge>
               {!isClient && (
                 <Button onClick={handleGenerate} disabled={isGenerating} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs">
                   {isGenerating ? <RefreshCcw className="w-3 h-3 animate-spin mr-1.5" /> : <RefreshCcw className="w-3 h-3 mr-1.5" />}
