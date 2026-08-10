@@ -608,6 +608,9 @@ Diretrizes de Especialista:
                   endDateStr={endDateStr} 
                   isClient={isClient}
                   days={dateRange}
+                  mergedChartData={mergedChartData}
+                  topAdsCampaigns={topAdsCampaigns}
+                  topFbCampaigns={topFbCampaigns}
                   fullDataContext={{
                     cliente: activeReport.name || "Cliente",
                     periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
@@ -627,7 +630,7 @@ Diretrizes de Especialista:
                     },
                     consolidado_trafego_pago: {
                       investimento_total: totalCost,
-                      conversoes_totais: totalConversions,
+                      conversoes_totais_pagas: totalConversions, // SOMA DO GOOGLE E META EXCLUSIVAMENTE
                       cpa_blended_geral: blendedCpa
                     },
                     ga4: {
@@ -644,6 +647,12 @@ Diretrizes de Especialista:
                       total_oportunidades: nectarDeals?.length || 0,
                       vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
                       receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
+                    },
+                    planilha_sheets: {
+                      leads_manuais: 0 // Espaço para integração futura
+                    },
+                    totais_gerais: {
+                      total_leads: totalConversions + 0 // Adicionar leads do sheets aqui no futuro
                     }
                   }}
                   rawMetrics={{
@@ -651,7 +660,7 @@ Diretrizes de Especialista:
                     meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
                     gsc: { clicks: gscClicks, impressions: gscImpressions },
                     ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
-                    consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks },
+                    consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks, totalLeads: totalConversions },
                     totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
                     wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
                   }}

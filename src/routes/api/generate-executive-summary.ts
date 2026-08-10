@@ -77,14 +77,10 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
 
           const rm = body.rawMetrics || {};
           const totalCost = rm.consolidated?.totalCost || 0;
-          const totalConversions = rm.consolidated?.totalConversions || 0;
-          const totalClicks = rm.consolidated?.totalClicks || 0;
+          const totalLeads = rm.consolidated?.totalLeads || 0;
           const blendedCPL = rm.consolidated?.blendedCpa || 0;
           const totalRevenue = rm.totalRevenue || 0;
           const wonDealsLength = rm.wonDealsLength || 0;
-          const roi = totalCost > 0 ? ((totalRevenue - totalCost) / totalCost) * 100 : 0;
-          const fbLeads = rm.meta_ads?.conversions || 0;
-          const ga4Sessions = rm.ga4?.sessions || 0;
 
           // ────────── OpenAI ──────────
           let rawOpenaiApiKey = clientOpenaiKey || process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_OPENAI_API_KEY : undefined) || ''
@@ -97,14 +93,16 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
           const { default: OpenAI } = await import('openai')
           const openai = new OpenAI({ apiKey: openaiApiKey })
 
-          const systemPrompt = `Você é um Estrategista Sênior de Employer Branding e Atração de Talentos. Você está assinando um Parecer Executivo para a diretoria do cliente — um documento altamente profissional, analítico e estratégico focado em recrutamento.
+          const systemPrompt = `Você é um Estrategista Sênior de Employer Branding e Atração de Talentos. Você está assinando um Parecer Executivo para a diretoria do cliente — um documento altamente profissional, analítico e estratégico focado em recrutamento e mídia.
 
 DIRETRIZES OBRIGATÓRIAS:
-- NUNCA mencione que você é uma IA, modelo, sistema automatizado ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente.
-- Use linguagem executiva, profissional, orientada a recrutamento e employer branding.
-- Não foque em "ROI financeiro", mas sim em "Investimento", "Candidaturas/Leads", "Atração de Talentos", "Contratações/Vendas Fechadas" e "Praças" (Regiões).
+- NUNCA mencione que você é uma IA, modelo, sistema automatizado ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente da agência.
+- Use linguagem executiva, profissional, orientada a recrutamento, captação e employer branding.
+- Não foque em "ROI financeiro genérico", mas sim em "Investimento", "Candidaturas/Leads", "Atração de Talentos", "Contratações/Vendas Fechadas" e "Praças" (Regiões).
 - Seja preciso com os números: use os dados reais fornecidos. Tente inferir a quantidade de praças observando os nomes das campanhas (se houver siglas de estados ou cidades).
-- Forneça recomendações acionáveis.
+- Nunca invente números. Se um dado não estiver disponível, apenas não o mencione ou indique como limitação no texto analítico.
+- Adapte o tom: se a performance for ruim, sinalize risco e necessidade de revisão; se for boa, sinalize ganho e oportunidade de escalar.
+- Identifique outliers: a campanha/canal com pior custo por resultado e a com melhor custo devem aparecer nomeados no texto.
 - O tom deve ser de consultoria premium: analítico e estratégico.`
 
           const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
@@ -112,49 +110,49 @@ DIRETRIZES OBRIGATÓRIAS:
 DADOS CONSOLIDADOS:
 ${JSON.stringify(fullDataContext, null, 2)}
 
-Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguindo EXATAMENTE este schema:
+Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguindo EXATAMENTE este schema estrutural e preenchendo as chaves com suas análises:
 
 {
   "executive_summary": {
     "headline": "Uma frase de impacto resumindo a captação de talentos no período (máx 15 palavras)",
     "total_investment": ${totalCost},
-    "total_leads": ${totalConversions + fbLeads},
+    "total_leads": ${totalLeads},
     "total_sales": ${wonDealsLength},
     "cpl": ${Math.round(blendedCPL * 100) / 100},
-    "total_regions": 14,
-    "digital_percentage": 100
+    "total_regions": 0 // ESTIME O NÚMERO DE PRAÇAS LENDO OS NOMES DAS CAMPANHAS. SE NÃO ACHAR, RETORNE 1.
   },
   "key_insights": [
-    "Insight 1 sobre concentração de investimento e volume de candidaturas",
-    "Insight 2 sobre a praça/região de maior destaque",
-    "Insight 3 sobre a eficiência de custo por candidato (CPL)",
-    "Insight 4 sobre ações de divulgação"
+    "Insight 1 citando investimento vs resultado de leads",
+    "Insight 2 sobre a praça/região de maior destaque ou o canal de melhor CPL",
+    "Insight 3 identificando algum gargalo ou ponto positivo claro"
   ],
+  "channel_investment_insight": "Insight-frase de destaque sobre como o investimento está distribuído (ex: 'X% do investimento concentrado em Meta Ads para topo de funil')",
+  "regional_insight": "Parágrafo curto de Leitura Estratégica sobre as regiões impactadas e a distribuição geográfica.",
+  "evolution_insight": "Insight sobre o pico de investimento ou o ritmo diário das ações.",
   "media_strategy": [
     { "title": "Pulverização geográfica", "description": "Análise de como as campanhas cobriram as praças necessárias." },
     { "title": "Ritmo contínuo e ágil", "description": "Análise do formato de investimento e ajustes de otimização." },
     { "title": "Geração de Candidatos Escalonável", "description": "Como os canais apoiaram o volume de leads." }
   ],
-  "channel_performance": {
-    "summary": "Resumo de 2-3 frases do desempenho geral de mídia na geração de candidatos.",
-    "highlights": ["Destaque positivo 1", "Ponto de atenção 2"]
-  },
+  "campaign_attention_point": "Insight de IA identificando a campanha com pior custo/resultado (ex: 'Atibaia/SP: R$1.176,04 gerou apenas 1 lead. Necessidade de revisão na segmentação.')",
   "business_impact": [
-    { "title": "Visibilidade ampliada das vagas", "description": "Como a presença constante garantiu exposição." },
-    { "title": "Atração de talentos mais ágil", "description": "Como o volume de leads encurta o ciclo." },
-    { "title": "Uso eficiente do orçamento", "description": "Como a mídia direcionada evitou dispersão." }
+    { "title": "Título do impacto 1", "description": "Como a presença constante garantiu exposição ou gerou risco se o custo estiver alto.", "tone": "positive" },
+    { "title": "Título do impacto 2", "description": "Como o volume de leads encurta o ciclo ou dificulta se a conversão do Nectar CRM for 0.", "tone": "warning" },
+    { "title": "Título do impacto 3", "description": "Uso eficiente ou ineficiente do orçamento.", "tone": "positive" },
+    { "title": "Título do impacto 4", "description": "Análise final do alinhamento ao Employer Branding.", "tone": "positive" }
   ],
   "next_steps": [
-    { "title": "Integrar métricas de performance", "description": "Conectar relatórios ao controle de contratações.", "timeline": "Imediato" },
-    { "title": "Padronizar registro por praça e vaga", "description": "Vincular investimento a códigos de vaga para calcular custo por contratação.", "timeline": "Próximo mês" },
-    { "title": "Testar alocação orçamentária", "description": "Usar padrão das praças de maior demanda como base.", "timeline": "Próxima semana" }
+    { "title": "Ação 1", "description": "Recomendação baseada nos gaps identificados nos dados." },
+    { "title": "Ação 2", "description": "Recomendação baseada na performance de canais/campanhas." },
+    { "title": "Ação 3", "description": "O que fazer com os leads no CRM." },
+    { "title": "Ação 4", "description": "Estratégia para o próximo período." }
   ]
 }
 
-IMPORTANTE:
-- Para o campo 'total_regions', estime o número lendo os nomes das campanhas (conte cidades/estados únicos). Se não for possível, retorne 1.
+IMPORTANTE: 
 - Use os valores numéricos EXATOS pré-calculados em executive_summary.
-- Preencha os textos analíticos com base nos dados reais.`
+- Preencha os textos analíticos com base nos dados REAIS fornecidos no JSON.
+- A chave 'tone' no business_impact deve ser 'positive', 'warning' ou 'negative'.`
 
           const chatCompletion = await openai.chat.completions.create({
             messages: [
