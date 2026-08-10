@@ -9,6 +9,8 @@ import {
   Zap, Search, Facebook, Activity, Eye, Clock, Table2, History, Key, Loader2, RefreshCw
 } from "lucide-react";
 import { ExecutiveSummaryTab } from "@/components/reports/executive-summary-tab";
+import { OverviewTab } from "@/components/reports/overview-tab";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -587,18 +589,21 @@ Diretrizes de Especialista:
               </div>
               
               <TabsContent value="visao-geral" className="mt-0">
-                <OverviewTab 
-                  mergedChartData={mergedChartData}
-                  topAdsCampaigns={topAdsCampaigns}
-                  topFbCampaigns={topFbCampaigns}
-                  startDateStr={startDateStr}
-                  endDateStr={endDateStr}
-                />
+                <ErrorBoundary>
+                  <OverviewTab 
+                    mergedChartData={mergedChartData}
+                    topAdsCampaigns={topAdsCampaigns}
+                    topFbCampaigns={topFbCampaigns}
+                    startDateStr={startDateStr}
+                    endDateStr={endDateStr}
+                  />
+                </ErrorBoundary>
               </TabsContent>
 
               <TabsContent value="parecer-executivo" className="mt-0 space-y-16">
-                <ExecutiveSummaryTab 
-                  activeReport={activeReport} 
+                <ErrorBoundary>
+                  <ExecutiveSummaryTab 
+                    activeReport={activeReport} 
                   startDateStr={startDateStr} 
                   endDateStr={endDateStr} 
                   isClient={isClient}
@@ -651,6 +656,7 @@ Diretrizes de Especialista:
                     wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
                   }}
                 />
+              </ErrorBoundary>
               </TabsContent>
             </Tabs>
           </div>
