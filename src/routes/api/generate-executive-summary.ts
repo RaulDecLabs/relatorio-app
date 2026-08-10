@@ -102,7 +102,8 @@ DIRETRIZES OBRIGATÓRIAS E REGRAS DE OURO:
 4. IMPACTO PARA O NEGÓCIO: Os 4 pontos de Impacto para o Negócio DEVEM SER POSITIVOS E CONSTRUTIVOS. Use obrigatoriamente pilares estratégicos de valor (ex: "Visibilidade e Presença de Marca", "Pipeline de Atração de Talentos", "Eficiência Orçamentária e CPL", "Maturação do Funil de Recrutamento"). NUNCA critique a imagem do cliente nem acuse desperdício.
 5. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais e atração regional de candidatos. NUNCA diga "dados não consolidados".
 6. Se as contratações no CRM forem 0, explique de forma executiva que os candidatos gerados na mídia estão em etapa de triagem e qualificação no funil.
-7. É TERMINANTEMENTE PROIBIDO inventar números ou exemplos arbitrários. Todo número citado no texto (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON dos DADOS CONSOLIDADOS.`
+7. É TERMINANTEMENTE PROIBIDO inventar números ou exemplos arbitrários. Todo número citado no texto (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON dos DADOS CONSOLIDADOS.
+8. PRÓXIMOS PASSOS: Devem ser ações estratégicas e práticas de Atração de Talentos e Employer Branding (ex: 'Otimização de Criativos nas Campanhas', 'Realocação Estratégica de Verba', 'Agilidade na Triagem no CRM', 'Expansão em Praças Prioritárias'). É TOTALMENTE PROIBIDO gerar clichês genéricos de marketing como 'Testes A/B', 'Análise de Segmentação' ou 'Relatório de Conclusão'.`
 
           const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
 

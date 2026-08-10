@@ -168,7 +168,24 @@ export function ExecutiveSummaryTab({
     return item;
   });
 
-  const nextSteps = data.next_steps || [];
+  const defaultNextSteps = [
+    { title: "Otimização de Criativos nas Campanhas", description: "Refinar anúncios e chamadas das campanhas de maior CPL para aumentar a atração de candidatos qualificados." },
+    { title: "Realocação Estratégica de Verba", description: "Direcionar maior parcela do orçamento de mídia para os canais que registraram o menor custo por candidato." },
+    { title: "Agilidade na Triagem no CRM", description: "Alinhar o fluxo de atendimento com a equipe de recrutamento para abordar os candidatos captados com máxima agilidade." },
+    { title: "Expansão em Praças Prioritárias", description: "Intensificar o impulsionamento nas cidades e regiões operacionais estratégicas com maior demanda de vagas." }
+  ];
+
+  const rawNextSteps = data.next_steps || [];
+  const nextSteps = (rawNextSteps.length === 4 ? rawNextSteps : defaultNextSteps).map((item: any, i: number) => {
+    const titleLower = (item.title || "").toLowerCase();
+    const descLower = (item.description || "").toLowerCase();
+    const isGeneric = titleLower.includes("testes a/b") || titleLower.includes("relatório de conclusão") || titleLower.includes("análise de segmentação") || titleLower.includes("otimização de anúncios") || descLower.includes("testes a/b") || descLower.includes("garantir que estão atingindo");
+    
+    if (isGeneric || !item.title) {
+      return defaultNextSteps[i % defaultNextSteps.length];
+    }
+    return item;
+  });
 
   const fmt = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
   const fmtNum = (val: number) => new Intl.NumberFormat('pt-BR').format(val || 0);
@@ -484,7 +501,7 @@ export function ExecutiveSummaryTab({
       </div>
 
       {/* FOOTER */}
-      <div className="pt-16 pb-4 text-center border-t border-slate-200 mt-16">
+      <div className="pt-6 pb-4 text-center border-t border-slate-200 mt-6">
         <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">{activeReport?.name}</p>
         <p className="text-xs text-slate-500">Documento executivo emitido via InsightOS • {new Date().toLocaleDateString('pt-BR')}</p>
       </div>
