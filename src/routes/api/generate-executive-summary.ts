@@ -37,8 +37,17 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
           const SUPABASE_URL = cleanUrl(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL) || defaultUrl;
           const SUPABASE_KEY = cleanKey(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY) || defaultKey;
 
+          const { default: ws } = await import('ws')
+          
+          if (typeof globalThis.WebSocket === 'undefined' && typeof window === 'undefined') {
+            (globalThis as any).WebSocket = ws;
+          }
+
           const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-            auth: { persistSession: false }
+            auth: { persistSession: false },
+            realtime: {
+              transport: ws as any,
+            },
           })
 
           // 1. Obter configs do relatorio
