@@ -108,6 +108,9 @@ export const Route = createFileRoute('/api/public/sheets-audit')({
             
             // Matches DD/MM/YYYY format
             const dmyMatch = dateVal.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+            // Matches YYYY-MM-DD format
+            const ymdMatch = dateVal.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+
             if (dmyMatch) {
               const day = parseInt(dmyMatch[1], 10);
               const month = parseInt(dmyMatch[2], 10) - 1; // 0-indexed
@@ -122,7 +125,22 @@ export const Route = createFileRoute('/api/public/sheets-audit')({
               } else {
                 parsedDate = new Date(year, month, day);
               }
+            } else if (ymdMatch) {
+              const year = parseInt(ymdMatch[1], 10);
+              const month = parseInt(ymdMatch[2], 10) - 1; // 0-indexed
+              const day = parseInt(ymdMatch[3], 10);
+              const timePart = dateVal.split(' ')[1];
+              if (timePart) {
+                const parts = timePart.split(':');
+                const hh = parseInt(parts[0], 10) || 0;
+                const mm = parseInt(parts[1], 10) || 0;
+                const ss = parseInt(parts[2], 10) || 0;
+                parsedDate = new Date(year, month, day, hh, mm, ss);
+              } else {
+                parsedDate = new Date(year, month, day);
+              }
             } else {
+              // Fallback to JS Date parser
               parsedDate = new Date(dateVal);
             }
 

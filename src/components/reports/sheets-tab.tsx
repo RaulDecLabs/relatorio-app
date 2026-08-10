@@ -57,11 +57,15 @@ export function SheetsTab({
           ) : !sheetsAudit?.ok ? (
             <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground bg-muted/20">
               <FileSpreadsheet className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
-              <p className="font-medium text-foreground">Nenhuma planilha vinculada para esta empresa</p>
+              <p className="font-medium text-foreground">
+                {sheetsAudit?.error && sheetsAudit.error.includes("No sheet configured") 
+                  ? "Nenhuma planilha vinculada para esta empresa" 
+                  : (sheetsAudit?.error || "Erro ao carregar a planilha.")}
+              </p>
               <p className="mt-1 text-xs">
                 {isClient ? 
                   "Aguarde enquanto nossa equipe vincula a planilha de acompanhamento e auditoria de conversões do seu projeto." : 
-                  "Para conectar o Google Sheets desta empresa, clique no botão Configurar (⚙️) no topo da página e cole a URL da planilha."
+                  "Para conectar o Google Sheets desta empresa, verifique a URL e as permissões de compartilhamento ('Qualquer pessoa com o link')."
                 }
               </p>
             </div>

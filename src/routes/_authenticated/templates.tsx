@@ -394,7 +394,22 @@ function TemplatesPage() {
         seo_search_console: {
           cliques_organicos: gscClicks,
           impressoes: gscImpressions
+        },
+        crm_nectar: {
+          total_oportunidades: nectarDeals?.length || 0,
+          vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
+          receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
         }
+      };
+      
+      const rawMetrics = {
+        google_ads: { cost: adsCost, clicks: adsClicks, conversions: adsConversions, cpa: adsCpa },
+        meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
+        gsc: { clicks: gscClicks, impressions: gscImpressions },
+        ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
+        consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks },
+        totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
+        wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
       };
 
       const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -536,6 +551,52 @@ Diretrizes de Especialista:
               endDateStr={endDateStr} 
               isClient={isClient}
               days={dateRange}
+              fullDataContext={{
+                cliente: activeReport.name || "Cliente",
+                periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
+                google_ads: {
+                  investimento: adsCost,
+                  cliques: adsClicks,
+                  conversoes: adsConversions,
+                  cpa: adsCpa,
+                  top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
+                },
+                meta_ads_facebook: {
+                  investimento: fbCost,
+                  cliques: fbClicks,
+                  conversoes: fbConversions,
+                  cpa: fbCpa
+                },
+                consolidado_trafego_pago: {
+                  investimento_total: totalCost,
+                  conversoes_totais: totalConversions,
+                  cpa_blended_geral: blendedCpa
+                },
+                ga4: {
+                  sessoes: gaSessions,
+                  usuarios: gaUsers,
+                  pageviews: gaPageViews,
+                  tempo_medio_sessao_segundos: gaAvgSessionDuration
+                },
+                seo_search_console: {
+                  cliques_organicos: gscClicks,
+                  impressoes: gscImpressions
+                },
+                crm_nectar: {
+                  total_oportunidades: nectarDeals?.length || 0,
+                  vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
+                  receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
+                }
+              }}
+              rawMetrics={{
+                google_ads: { cost: adsCost, clicks: adsClicks, conversions: adsConversions, cpa: adsCpa },
+                meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
+                gsc: { clicks: gscClicks, impressions: gscImpressions },
+                ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
+                consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks },
+                totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
+                wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
+              }}
             />
           </div>
         )}

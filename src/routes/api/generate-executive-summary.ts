@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
 
+
 function cleanUrl(val: any): string | undefined {
   if (!val || typeof val !== 'string') return undefined;
   let cleaned = val.trim().replace(/^['"\\s`]+|['"\\s`]+$/g, '');
@@ -25,17 +26,29 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
       POST: async ({ request }) => {
         try {
           const body = await request.json()
-          const { reportId, days = 7, startDateStr: clientStart, endDateStr: clientEnd } = body
+          const { reportId, activeReport, days = 7, startDateStr: clientStart, endDateStr: clientEnd, openaiApiKey: clientOpenaiKey, fullDataContext } = body
 
-          if (!reportId) {
-            return new Response('Missing reportId', { status: 400 })
+          if (!reportId || !activeReport || !fullDataContext) {
+            return new Response('Missing reportId, activeReport, or fullDataContext data', { status: 400 })
           }
 
           const defaultUrl = "https://btdgetidtawjtqrvzybh.supabase.co";
           const defaultKey = "sb_publishable_ajCs5VZ3suNt9i1DJBtW5w_UNqtw4xm";
 
-          const SUPABASE_URL = cleanUrl(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL) || defaultUrl;
-          const SUPABASE_KEY = cleanKey(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY) || defaultKey;
+          const SUPABASE_URL = cleanUrl(
+            process.env.SUPABASE_URL || 
+            process.env.VITE_SUPABASE_URL ||
+            (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_SUPABASE_URL : undefined)
+          ) || defaultUrl;
+          
+          const SUPABASE_KEY = cleanKey(
+            process.env.SUPABASE_SERVICE_ROLE_KEY || 
+            process.env.SUPABASE_PUBLISHABLE_KEY || 
+            process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+            (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY : undefined)
+          ) || defaultKey;
+
+          const authHeader = request.headers.get('Authorization')
 
           const { default: ws } = await import('ws')
           
@@ -45,19 +58,11 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
 
           const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
             auth: { persistSession: false },
+            global: { headers: authHeader ? { Authorization: authHeader } : {} },
             realtime: { transport: ws as any },
           })
 
-          // 1. Obter configs do relatorio
-          const { data: config, error: configError } = await supabase
-            .from('reports_config')
-            .select('*')
-            .eq('id', reportId)
-            .single()
-
-          if (configError || !config) {
-            return new Response('Report config not found', { status: 404 })
-          }
+          const config = activeReport;
 
           let startDateStr = clientStart;
           let endDateStr = clientEnd;
@@ -70,179 +75,14 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
             startDateStr = startDate.toISOString().split('T')[0]
           }
 
-          // 2. Coletar TODOS os dados disponíveis em paralelo
-          const fetchMetrics = async (tableName: string) => {
-            if (!tableName) return []
-            const { data } = await supabase
-              .from(tableName)
-              .select('*')
-              .gte('metric_date', startDateStr)
-              .lte('metric_date', endDateStr)
-            return data || []
-          }
-
-          const [ga4Raw, googleAdsRaw, metaAdsRaw, gscRaw, nectarResult] = await Promise.all([
-            fetchMetrics(config.table_name),
-            fetchMetrics(config.ads_table_name),
-            fetchMetrics(config.fb_ads_table_name),
-            fetchMetrics(config.gsc_table_name),
-            supabase.from('nectar_deals').select('*').eq('report_id', reportId).gte('created_at', startDateStr)
-          ])
-
-          // ────────── GA4 ──────────
-          const ga4 = ga4Raw || []
-          const ga4Sessions = ga4.reduce((s: number, r: any) => s + (Number(r.sessions) || 0), 0)
-          const ga4Users = ga4.reduce((s: number, r: any) => s + (Number(r.total_users) || 0), 0)
-          const ga4PageViews = ga4.reduce((s: number, r: any) => s + (Number(r.page_views) || 0), 0)
-          const ga4AvgDuration = ga4Sessions > 0
-            ? ga4.reduce((s: number, r: any) => s + (Number(r.average_session_duration || 0) * Number(r.sessions || 0)), 0) / ga4Sessions
-            : 0
-          const ga4BounceRate = ga4.length > 0
-            ? ga4.reduce((s: number, r: any) => s + (Number(r.bounce_rate || 0)), 0) / ga4.length
-            : 0
-
-          // ────────── Google Ads ──────────
-          const gAds = googleAdsRaw || []
-          const gAdsCost = gAds.reduce((s: number, r: any) => s + (Number(r.cost) || 0), 0)
-          const gAdsClicks = gAds.reduce((s: number, r: any) => s + (Number(r.clicks) || 0), 0)
-          const gAdsImpressions = gAds.reduce((s: number, r: any) => s + (Number(r.impressions) || 0), 0)
-          const gAdsConversions = gAds.reduce((s: number, r: any) => s + (Number(r.conversions) || 0), 0)
-          const gAdsCTR = gAdsImpressions > 0 ? (gAdsClicks / gAdsImpressions) * 100 : 0
-          const gAdsCPC = gAdsClicks > 0 ? gAdsCost / gAdsClicks : 0
-          const gAdsCPL = gAdsConversions > 0 ? gAdsCost / gAdsConversions : 0
-
-          // Top campanhas Google Ads
-          const gAdsCampaignMap: Record<string, any> = {}
-          gAds.forEach((r: any) => {
-            const name = r.campaign_name || 'Sem Nome'
-            if (!gAdsCampaignMap[name]) gAdsCampaignMap[name] = { name, cost: 0, clicks: 0, impressions: 0, conversions: 0 }
-            gAdsCampaignMap[name].cost += Number(r.cost) || 0
-            gAdsCampaignMap[name].clicks += Number(r.clicks) || 0
-            gAdsCampaignMap[name].impressions += Number(r.impressions) || 0
-            gAdsCampaignMap[name].conversions += Number(r.conversions) || 0
-          })
-          const topGAdsCampaigns = Object.values(gAdsCampaignMap).sort((a: any, b: any) => b.cost - a.cost).slice(0, 5)
-
-          // ────────── Meta Ads ──────────
-          const fbAds = metaAdsRaw || []
-          const fbCost = fbAds.reduce((s: number, r: any) => s + (Number(r.spend) || 0), 0)
-          const fbClicks = fbAds.reduce((s: number, r: any) => s + (Number(r.clicks) || 0), 0)
-          const fbImpressions = fbAds.reduce((s: number, r: any) => s + (Number(r.impressions) || 0), 0)
-          const fbConversions = fbAds.reduce((s: number, r: any) => s + (Number(r.conversions) || 0), 0)
-          const fbLeads = fbAds.reduce((s: number, r: any) => s + (Number(r.leads) || 0), 0)
-          const fbCTR = fbImpressions > 0 ? (fbClicks / fbImpressions) * 100 : 0
-          const fbCPC = fbClicks > 0 ? fbCost / fbClicks : 0
-          const fbCPL = fbConversions > 0 ? fbCost / fbConversions : 0
-
-          // Top campanhas Meta Ads
-          const fbCampaignMap: Record<string, any> = {}
-          fbAds.forEach((r: any) => {
-            const name = r.campaign_name || 'Sem Nome'
-            if (!fbCampaignMap[name]) fbCampaignMap[name] = { name, spend: 0, clicks: 0, impressions: 0, conversions: 0 }
-            fbCampaignMap[name].spend += Number(r.spend) || 0
-            fbCampaignMap[name].clicks += Number(r.clicks) || 0
-            fbCampaignMap[name].impressions += Number(r.impressions) || 0
-            fbCampaignMap[name].conversions += Number(r.conversions) || 0
-          })
-          const topFbCampaigns = Object.values(fbCampaignMap).sort((a: any, b: any) => b.spend - a.spend).slice(0, 5)
-
-          // ────────── GSC (Search Console) ──────────
-          const gsc = gscRaw || []
-          const gscClicks = gsc.reduce((s: number, r: any) => s + (Number(r.clicks) || 0), 0)
-          const gscImpressions = gsc.reduce((s: number, r: any) => s + (Number(r.impressions) || 0), 0)
-          const gscCTR = gscImpressions > 0 ? (gscClicks / gscImpressions) * 100 : 0
-          const gscAvgPosition = gsc.length > 0
-            ? gsc.reduce((s: number, r: any) => s + (Number(r.position) || 0), 0) / gsc.length
-            : 0
-
-          // ────────── Nectar CRM ──────────
-          const deals = nectarResult.data || []
-          const totalDeals = deals.length
-          const wonDeals = deals.filter((d: any) => d.status === 'Ganho')
-          const lostDeals = deals.filter((d: any) => d.status === 'Perdido')
-          const totalRevenue = wonDeals.reduce((s: number, d: any) => s + (Number(d.value) || 0), 0)
-          const avgTicket = wonDeals.length > 0 ? totalRevenue / wonDeals.length : 0
-          const winRate = totalDeals > 0 ? (wonDeals.length / totalDeals) * 100 : 0
-
-          // ────────── Consolidado ──────────
-          const totalCost = gAdsCost + fbCost
-          const totalConversions = gAdsConversions + fbConversions
-          const totalClicks = gAdsClicks + fbClicks
-          const totalImpressions = gAdsImpressions + fbImpressions
-          const blendedCPL = totalConversions > 0 ? totalCost / totalConversions : 0
-          const blendedCPC = totalClicks > 0 ? totalCost / totalClicks : 0
-          const roi = totalCost > 0 ? ((totalRevenue - totalCost) / totalCost) * 100 : 0
-
-          // ────────── Montar contexto completo para a IA ──────────
-          const fullDataContext = {
-            cliente: config.name,
-            periodo: `${startDateStr} a ${endDateStr} (${days} dias)`,
-            
-            resumo_consolidado: {
-              investimento_total: totalCost,
-              conversoes_totais: totalConversions,
-              cliques_totais: totalClicks,
-              impressoes_totais: totalImpressions,
-              cpl_medio: blendedCPL,
-              cpc_medio: blendedCPC,
-              roi_percentual: roi,
-              receita_vendas: totalRevenue,
-            },
-
-            google_ads: {
-              investimento: gAdsCost,
-              cliques: gAdsClicks,
-              impressoes: gAdsImpressions,
-              conversoes: gAdsConversions,
-              ctr: gAdsCTR,
-              cpc_medio: gAdsCPC,
-              cpl: gAdsCPL,
-              top_campanhas: topGAdsCampaigns,
-            },
-
-            meta_ads: {
-              investimento: fbCost,
-              cliques: fbClicks,
-              impressoes: fbImpressions,
-              conversoes: fbConversions,
-              leads: fbLeads,
-              ctr: fbCTR,
-              cpc_medio: fbCPC,
-              cpl: fbCPL,
-              top_campanhas: topFbCampaigns,
-            },
-
-            seo_search_console: {
-              cliques_organicos: gscClicks,
-              impressoes: gscImpressions,
-              ctr_organico: gscCTR,
-              posicao_media: gscAvgPosition,
-            },
-
-            website_ga4: {
-              sessoes: ga4Sessions,
-              usuarios_unicos: ga4Users,
-              pageviews: ga4PageViews,
-              tempo_medio_sessao_segundos: ga4AvgDuration,
-              taxa_rejeicao: ga4BounceRate,
-            },
-
-            crm_nectar: {
-              total_oportunidades: totalDeals,
-              vendas_ganhas: wonDeals.length,
-              vendas_perdidas: lostDeals.length,
-              receita_total: totalRevenue,
-              ticket_medio: avgTicket,
-              taxa_conversao_crm: winRate,
-            }
-          }
+          const { totalCost = 0, totalConversions = 0, totalClicks = 0, totalImpressions = 0, blendedCPL = 0, blendedCPC = 0, roi = 0, totalRevenue = 0, fbLeads = 0, ga4Sessions = 0, wonDealsLength = 0 } = body.rawMetrics || {};
 
           // ────────── OpenAI ──────────
-          let rawOpenaiApiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || ''
-          const openaiApiKey = rawOpenaiApiKey.trim().replace(/^['"\\s`]+|['"\\s`]+$/g, '')
+          let rawOpenaiApiKey = clientOpenaiKey || process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_OPENAI_API_KEY : undefined) || ''
+          const openaiApiKey = rawOpenaiApiKey.trim().replace(/^['"\s`]+|['"\s`]+$/g, '')
           
           if (!openaiApiKey) {
-            return new Response('OpenAI API Key not found', { status: 500 })
+            return new Response('OpenAI API Key not found. Please provide it or set VITE_OPENAI_API_KEY in your .env file.', { status: 500 })
           }
 
           const { default: OpenAI } = await import('openai')
@@ -271,7 +111,7 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
     "headline": "Uma frase de impacto de 1 linha resumindo o desempenho geral do período (máximo 15 palavras)",
     "total_investment": ${totalCost},
     "total_leads": ${totalConversions + fbLeads},
-    "total_sales": ${wonDeals.length},
+    "total_sales": ${wonDealsLength},
     "total_revenue": ${totalRevenue},
     "roi": ${Math.round(roi * 10) / 10},
     "cpl": ${Math.round(blendedCPL * 100) / 100},
@@ -366,14 +206,7 @@ IMPORTANTE:
 
           // Salvar métricas brutas junto com a análise para exibição direta
           if (responseJson) {
-            responseJson._raw_metrics = {
-              google_ads: { cost: gAdsCost, clicks: gAdsClicks, impressions: gAdsImpressions, conversions: gAdsConversions, ctr: gAdsCTR, cpc: gAdsCPC, cpl: gAdsCPL },
-              meta_ads: { cost: fbCost, clicks: fbClicks, impressions: fbImpressions, conversions: fbConversions, leads: fbLeads, ctr: fbCTR, cpc: fbCPC, cpl: fbCPL },
-              gsc: { clicks: gscClicks, impressions: gscImpressions, ctr: gscCTR, position: gscAvgPosition },
-              ga4: { sessions: ga4Sessions, users: ga4Users, pageviews: ga4PageViews, avgDuration: ga4AvgDuration, bounceRate: ga4BounceRate },
-              crm: { deals: totalDeals, won: wonDeals.length, lost: lostDeals.length, revenue: totalRevenue, avgTicket, winRate },
-              consolidated: { totalCost, totalConversions, totalClicks, totalImpressions, blendedCPL, blendedCPC, roi }
-            }
+            responseJson._raw_metrics = body.rawMetrics || {}
 
             const { error: insertError } = await supabase
               .from('executive_summaries')

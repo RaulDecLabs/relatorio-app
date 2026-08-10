@@ -13,7 +13,17 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function ExecutiveSummaryTab({ activeReport, startDateStr, endDateStr, isClient, days }: { activeReport: any, startDateStr: string, endDateStr: string, isClient: boolean, days: string }) {
+interface ExecutiveSummaryTabProps {
+  activeReport: any;
+  startDateStr: string;
+  endDateStr: string;
+  isClient: boolean;
+  days: string;
+  fullDataContext?: any;
+  rawMetrics?: any;
+}
+
+export function ExecutiveSummaryTab({ activeReport, startDateStr, endDateStr, isClient, days, fullDataContext, rawMetrics }: ExecutiveSummaryTabProps) {
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -42,14 +52,23 @@ export function ExecutiveSummaryTab({ activeReport, startDateStr, endDateStr, is
   const handleGenerate = async () => {
     try {
       setIsGenerating(true);
+      const openaiKey = localStorage.getItem("openai_api_key") || "";
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/api/generate-executive-summary', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(session ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+        },
         body: JSON.stringify({
           reportId: activeReport.id,
+          activeReport: activeReport,
           days: parseInt(days) || 7,
           startDateStr,
-          endDateStr
+          endDateStr,
+          openaiApiKey: openaiKey,
+          fullDataContext,
+          rawMetrics
         })
       });
 
