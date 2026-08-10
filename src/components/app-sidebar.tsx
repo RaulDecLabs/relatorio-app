@@ -31,7 +31,7 @@ const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, staffOnly: true },
   { title: "Clientes", url: "/clients", icon: Users, staffOnly: true },
   { title: "Relatórios de Canais", url: "/reports", icon: FileText, staffOnly: false },
-
+  { title: "Parecer Executivo", url: "/templates", icon: LayoutTemplate, staffOnly: false },
 ];
 
 const opsItems = [

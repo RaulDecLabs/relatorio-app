@@ -30,7 +30,6 @@ import { MetaAdsTab } from "@/components/reports/meta-ads-tab";
 import { GscTab } from "@/components/reports/gsc-tab";
 import { SheetsTab } from "@/components/reports/sheets-tab";
 import { NectarCrmTab } from "@/components/reports/nectar-crm-tab";
-import { ExecutiveSummaryTab } from "@/components/reports/executive-summary-tab";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
@@ -48,7 +47,7 @@ function ReportsPage() {
   const [newGscUrl, setNewGscUrl] = useState("");
   const [newGoogleSheetsUrl, setNewGoogleSheetsUrl] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "nectar" | "sheets" | "executive_summary">("executive_summary");
+  const [activeTab, setActiveTab] = useState<"traffic" | "ads" | "fb_ads" | "gsc" | "nectar" | "sheets">("traffic");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [ga4PropertyId, setGa4PropertyId] = useState("");
   const [googleAdsId, setGoogleAdsId] = useState("");
@@ -810,18 +809,6 @@ function ReportsPage() {
               variant="ghost"
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
-                activeTab === "executive_summary" 
-                  ? "border-primary text-primary bg-primary/5" 
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              )}
-              onClick={() => setActiveTab("executive_summary")}
-            >
-              Parecer Executivo
-            </Button>
-            <Button
-              variant="ghost"
-              className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "traffic" 
                   ? "border-primary text-primary bg-primary/5" 
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -892,15 +879,6 @@ function ReportsPage() {
             </Button>
           </div>
 
-          {activeTab === "executive_summary" && (
-            <ExecutiveSummaryTab 
-              activeReport={activeReport} 
-              startDateStr={startDateStr} 
-              endDateStr={endDateStr} 
-              isClient={isClient}
-              days={dateRange}
-            />
-          )}
 
           {activeTab === "traffic" && (
             <TrafficTab metrics={metrics} activeReport={activeReport} />
