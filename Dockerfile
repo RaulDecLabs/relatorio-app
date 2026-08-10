@@ -1,27 +1,27 @@
-# Usar a imagem oficial do Node.js
-FROM node:20-alpine
+FROM node:20-alpine AS builder
 
-# Definir diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copiar os arquivos de dependências
-COPY package*.json ./
-
 # Instalar dependências
-RUN npm install --legacy-peer-deps
+COPY package.json package-lock.json* ./
+RUN npm install
 
-# Copiar todo o código do projeto
+# Copiar código-fonte e buildar
 COPY . .
+RUN npm run build
 
-# Alterar o preset do Vite/Nitro para Node.js puro antes do build
-# Usamos sed para substituir o preset: 'vercel' (se existir)
-RUN sed -i "s/preset: 'vercel'/preset: 'node-server'/g" vite.config.ts
+# Imagem de produção
+FROM node:20-alpine
 
-# Fazer o build do projeto com Nitro forçado para node-server sem usar cache antigo
-RUN NITRO_PRESET=node-server npm run build && ls -la .output && ls -la .output/server
+WORKDIR /app
 
-# Expor a porta 3000
+# Copiar apenas a build gerada pelo Nitro (TanStack Start)
+COPY --from=builder /app/.output ./.output
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
 EXPOSE 3000
 
-# Comando para rodar o servidor em produção
+# Iniciar o servidor Node (Nitro)
 CMD ["node", ".output/server/index.mjs"]
