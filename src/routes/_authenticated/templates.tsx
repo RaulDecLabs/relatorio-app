@@ -271,9 +271,9 @@ function TemplatesPage() {
     enabled: !!activeReport?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("nectar_deals")
+        .from("nectar_deals" as any)
         .select("*")
-        .eq("report_id", activeReport!.id)
+        .eq("report_id" as any, activeReport!.id)
         .gte("created_at", startDateStr)
         .lte("created_at", endDateStr);
       if (error) throw error;
@@ -579,95 +579,88 @@ Diretrizes de Especialista:
             Selecione um cliente para visualizar o relatório executivo.
           </div>
         ) : (
-          <div className="space-y-6">
-            <Tabs defaultValue="visao-geral" className="w-full">
-              <div className="flex items-center justify-center mb-8">
-                <TabsList className="bg-card/50 backdrop-blur-md border border-border/50 rounded-full p-1 shadow-sm">
-                  <TabsTrigger value="visao-geral" className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Visão Geral</TabsTrigger>
-                  <TabsTrigger value="parecer-executivo" className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Parecer Executivo</TabsTrigger>
-                </TabsList>
-              </div>
-              
-              <TabsContent value="visao-geral" className="mt-0">
-                <ErrorBoundary>
-                  <OverviewTab 
-                    mergedChartData={mergedChartData}
-                    topAdsCampaigns={topAdsCampaigns}
-                    topFbCampaigns={topFbCampaigns}
-                    startDateStr={startDateStr}
-                    endDateStr={endDateStr}
-                  />
-                </ErrorBoundary>
-              </TabsContent>
+          <div className="space-y-16">
+            <ErrorBoundary>
+              <ExecutiveSummaryTab 
+                activeReport={activeReport} 
+                startDateStr={startDateStr} 
+                endDateStr={endDateStr} 
+                isClient={isClient}
+                days={dateRange}
+                mergedChartData={mergedChartData}
+                topAdsCampaigns={topAdsCampaigns}
+                topFbCampaigns={topFbCampaigns}
+                fullDataContext={{
+                  cliente: activeReport.name || "Cliente",
+                  periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
+                  google_ads: {
+                    investimento: adsCost,
+                    cliques: adsClicks,
+                    conversoes: adsConversions,
+                    cpa: adsCpa,
+                    top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
+                  },
+                  meta_ads_facebook: {
+                    investimento: fbCost,
+                    cliques: fbClicks,
+                    conversoes: fbConversions,
+                    cpa: fbCpa,
+                    top_campanhas: topFbCampaigns.map(c => ({ nome: c.name, investimento: c.spend, conversoes: c.conversions }))
+                  },
+                  consolidado_trafego_pago: {
+                    investimento_total: totalCost,
+                    conversoes_totais_pagas: totalConversions, // SOMA DO GOOGLE E META EXCLUSIVAMENTE
+                    cpa_blended_geral: blendedCpa
+                  },
+                  ga4: {
+                    sessoes: gaSessions,
+                    usuarios: gaUsers,
+                    pageviews: gaPageViews,
+                    tempo_medio_sessao_segundos: gaAvgSessionDuration
+                  },
+                  seo_search_console: {
+                    cliques_organicos: gscClicks,
+                    impressoes: gscImpressions
+                  },
+                  crm_nectar: {
+                    total_oportunidades: nectarDeals?.length || 0,
+                    vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
+                    receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
+                  },
+                  planilha_sheets: {
+                    leads_manuais: 0 // Espaço para integração futura
+                  },
+                  totais_gerais: {
+                    total_leads: totalConversions + 0 // Adicionar leads do sheets aqui no futuro
+                  }
+                }}
+                rawMetrics={{
+                  google_ads: { cost: adsCost, clicks: adsClicks, conversions: adsConversions, cpa: adsCpa },
+                  meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
+                  gsc: { clicks: gscClicks, impressions: gscImpressions },
+                  ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
+                  consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks, totalLeads: totalConversions },
+                  totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
+                  wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
+                }}
+              />
+            </ErrorBoundary>
 
-              <TabsContent value="parecer-executivo" className="mt-0 space-y-16">
-                <ErrorBoundary>
-                  <ExecutiveSummaryTab 
-                    activeReport={activeReport} 
-                  startDateStr={startDateStr} 
-                  endDateStr={endDateStr} 
-                  isClient={isClient}
-                  days={dateRange}
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-16 space-y-8">
+              <div>
+                <h2 className="text-3xl font-black text-[#1a2a5e] dark:text-slate-100 tracking-tight font-serif">Métricas Detalhadas</h2>
+                <p className="text-muted-foreground mt-1">Visão analítica operacional e dashboards das campanhas.</p>
+              </div>
+              <ErrorBoundary>
+                <OverviewTab 
                   mergedChartData={mergedChartData}
                   topAdsCampaigns={topAdsCampaigns}
                   topFbCampaigns={topFbCampaigns}
-                  fullDataContext={{
-                    cliente: activeReport.name || "Cliente",
-                    periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
-                    google_ads: {
-                      investimento: adsCost,
-                      cliques: adsClicks,
-                      conversoes: adsConversions,
-                      cpa: adsCpa,
-                      top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
-                    },
-                    meta_ads_facebook: {
-                      investimento: fbCost,
-                      cliques: fbClicks,
-                      conversoes: fbConversions,
-                      cpa: fbCpa,
-                      top_campanhas: topFbCampaigns.map(c => ({ nome: c.name, investimento: c.spend, conversoes: c.conversions }))
-                    },
-                    consolidado_trafego_pago: {
-                      investimento_total: totalCost,
-                      conversoes_totais_pagas: totalConversions, // SOMA DO GOOGLE E META EXCLUSIVAMENTE
-                      cpa_blended_geral: blendedCpa
-                    },
-                    ga4: {
-                      sessoes: gaSessions,
-                      usuarios: gaUsers,
-                      pageviews: gaPageViews,
-                      tempo_medio_sessao_segundos: gaAvgSessionDuration
-                    },
-                    seo_search_console: {
-                      cliques_organicos: gscClicks,
-                      impressoes: gscImpressions
-                    },
-                    crm_nectar: {
-                      total_oportunidades: nectarDeals?.length || 0,
-                      vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
-                      receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
-                    },
-                    planilha_sheets: {
-                      leads_manuais: 0 // Espaço para integração futura
-                    },
-                    totais_gerais: {
-                      total_leads: totalConversions + 0 // Adicionar leads do sheets aqui no futuro
-                    }
-                  }}
-                  rawMetrics={{
-                    google_ads: { cost: adsCost, clicks: adsClicks, conversions: adsConversions, cpa: adsCpa },
-                    meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
-                    gsc: { clicks: gscClicks, impressions: gscImpressions },
-                    ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
-                    consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks, totalLeads: totalConversions },
-                    totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
-                    wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
-                  }}
+                  startDateStr={startDateStr}
+                  endDateStr={endDateStr}
                 />
               </ErrorBoundary>
-              </TabsContent>
-            </Tabs>
+            </div>
           </div>
         )}
       </main>

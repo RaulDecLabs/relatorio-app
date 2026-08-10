@@ -98,10 +98,11 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
 DIRETRIZES OBRIGATÓRIAS:
 - NUNCA mencione que você é uma IA, modelo, sistema automatizado ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente da agência.
 - Use linguagem executiva, profissional, orientada a recrutamento, captação e employer branding.
-- Não foque em "ROI financeiro genérico", mas sim em "Investimento", "Candidaturas/Leads", "Atração de Talentos", "Contratações/Vendas Fechadas" e "Praças" (Regiões).
+- É TOTALMENTE PROIBIDO usar a palavra "ROI" ou termos como "Retorno sobre Investimento", "perda de investimento", "perda total", ou "lucro". O foco exclusivo é atração de candidatos, volume de leads e eficiência de custo por candidato (CPL).
+- Se as contratações/vendas fechadas no CRM forem 0, limite-se a dizer que não foram registradas contratações no período analítico, sem associar isso a "perda de investimento" ou "retorno negativo".
 - Seja preciso com os números: use os dados reais fornecidos. Tente inferir a quantidade de praças observando os nomes das campanhas (se houver siglas de estados ou cidades).
 - Nunca invente números. Se um dado não estiver disponível, apenas não o mencione ou indique como limitação no texto analítico.
-- Adapte o tom: se a performance for ruim, sinalize risco e necessidade de revisão; se for boa, sinalize ganho e oportunidade de escalar.
+- Adapte o tom: se a performance de captação for ruim (CPL alto ou zero leads), sinalize necessidade de otimização de criativos e segmentação; se for boa, sinalize ganho e oportunidade de escalar.
 - Identifique outliers: a campanha/canal com pior custo por resultado e a com melhor custo devem aparecer nomeados no texto.
 - O tom deve ser de consultoria premium: analítico e estratégico.`
 
@@ -122,11 +123,11 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
     "total_regions": 0 // ESTIME O NÚMERO DE PRAÇAS LENDO OS NOMES DAS CAMPANHAS. SE NÃO ACHAR, RETORNE 1.
   },
   "key_insights": [
-    "Insight 1 citando investimento vs resultado de leads",
+    "Insight 1 citando investimento vs resultado de leads (ex: volume de candidatos gerados)",
     "Insight 2 sobre a praça/região de maior destaque ou o canal de melhor CPL",
-    "Insight 3 identificando algum gargalo ou ponto positivo claro"
+    "Insight 3 identificando algum gargalo ou ponto positivo claro na captação (sem nunca usar a palavra ROI)"
   ],
-  "channel_investment_insight": "Insight-frase de destaque sobre como o investimento está distribuído (ex: 'X% do investimento concentrado em Meta Ads para topo de funil')",
+  "channel_investment_insight": "Insight-frase de destaque sobre como o investimento está distribuído (ex: 'X% do investimento concentrado em Meta Ads para atração')",
   "regional_insight": "Parágrafo curto de Leitura Estratégica sobre as regiões impactadas e a distribuição geográfica.",
   "evolution_insight": "Insight sobre o pico de investimento ou o ritmo diário das ações.",
   "media_strategy": [
@@ -136,24 +137,24 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
   ],
   "campaign_attention_point": "Insight de IA identificando a campanha com pior custo/resultado (ex: 'Atibaia/SP: R$1.176,04 gerou apenas 1 lead. Necessidade de revisão na segmentação.')",
   "business_impact": [
-    { "title": "Título do impacto 1", "description": "Como a presença constante garantiu exposição ou gerou risco se o custo estiver alto.", "tone": "positive" },
-    { "title": "Título do impacto 2", "description": "Como o volume de leads encurta o ciclo ou dificulta se a conversão do Nectar CRM for 0.", "tone": "warning" },
-    { "title": "Título do impacto 3", "description": "Uso eficiente ou ineficiente do orçamento.", "tone": "positive" },
-    { "title": "Título do impacto 4", "description": "Análise final do alinhamento ao Employer Branding.", "tone": "positive" }
+    { "title": "Título do impacto 1", "description": "Como a presença constante garantiu exposição ou gerou necessidade de ajuste de CPL.", "tone": "positive" },
+    { "title": "Título do impacto 2", "description": "Como o volume de leads encurta o ciclo ou se o fluxo no CRM precisa de maturação.", "tone": "warning" },
+    { "title": "Título do impacto 3", "description": "Eficiência na alocação de verba entre canais.", "tone": "positive" },
+    { "title": "Título do impacto 4", "description": "Alinhamento das ações com as metas de contratação e fortalecimento de marca.", "tone": "positive" }
   ],
   "next_steps": [
-    { "title": "Ação 1", "description": "Recomendação baseada nos gaps identificados nos dados." },
+    { "title": "Ação 1", "description": "Recomendação baseada nos gaps identificados de CPL." },
     { "title": "Ação 2", "description": "Recomendação baseada na performance de canais/campanhas." },
-    { "title": "Ação 3", "description": "O que fazer com os leads no CRM." },
+    { "title": "Ação 3", "description": "Ajuste na triagem ou no acompanhamento de candidatos." },
     { "title": "Ação 4", "description": "Estratégia para o próximo período." }
   ]
 }
 
 IMPORTANTE: 
+- NUNCA use a palavra ROI ou fale de perda/ganho de investimento financeiro. Fale em Custo por Lead (CPL), eficiência orçamentária e captação de talentos.
 - Use os valores numéricos EXATOS pré-calculados em executive_summary.
 - Preencha os textos analíticos com base nos dados REAIS fornecidos no JSON.
 - A chave 'tone' no business_impact deve ser 'positive', 'warning' ou 'negative'.`
-
           const chatCompletion = await openai.chat.completions.create({
             messages: [
               { role: 'system', content: systemPrompt },

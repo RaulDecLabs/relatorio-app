@@ -50,9 +50,9 @@ export function ExecutiveSummaryTab({
     enabled: !!activeReport?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("executive_summaries")
+        .from("executive_summaries" as any)
         .select("*")
-        .eq("report_id", activeReport.id)
+        .eq("report_id" as any, activeReport.id)
         .gte("period_start", startDateStr)
         .lte("period_end", endDateStr)
         .order("created_at", { ascending: false })
@@ -116,7 +116,9 @@ export function ExecutiveSummaryTab({
     );
   }
 
-  if (!summary || !summary.summary_data) {
+  const summaryAny = summary as any;
+
+  if (!summaryAny || !summaryAny.summary_data) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center bg-[#f4f6fb] rounded-2xl border border-slate-200">
         <Brain className="w-16 h-16 text-slate-300 mb-4" />
@@ -134,7 +136,7 @@ export function ExecutiveSummaryTab({
     );
   }
 
-  const data = summary.summary_data;
+  const data = summaryAny.summary_data;
   const exec = data.executive_summary || {};
   const insights = data.key_insights || [];
   const mediaStrategy = data.media_strategy || [];
