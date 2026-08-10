@@ -275,30 +275,17 @@ export function ExecutiveSummaryTab({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════
-          SEÇÃO 3 & 4: CANAIS E REGIÕES
+          SEÇÃO 3 & 4: INSIGHTS ADICIONAIS
       ═══════════════════════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Investimento por Canal</h2>
-          <div className="h-[200px] w-full bg-[#f4f6fb] rounded-lg border border-slate-200 p-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={channelData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                <XAxis type="number" tickFormatter={(v) => `R$${v/1000}k`} stroke="#94a3b8" fontSize={12} />
-                <YAxis dataKey="name" type="category" width={80} stroke="#64748b" fontSize={12} fontWeight="bold" />
-                <RechartsTooltip 
-                  cursor={{fill: 'rgba(0,0,0,0.04)'}}
-                  contentStyle={{ backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value: number) => [fmt(value), 'Investimento']}
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32} />
-              </BarChart>
-            </ResponsiveContainer>
+        {data.channel_investment_insight && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Investimento por Canal</h2>
+            <div className="bg-[#f4f6fb] text-[#1a2a5e] border border-slate-200 p-6 rounded-lg h-full flex items-center">
+              <p className="text-lg leading-relaxed font-light">{data.channel_investment_insight}</p>
+            </div>
           </div>
-          {data.channel_investment_insight && (
-            <p className="text-slate-600 bg-blue-50/50 p-4 rounded border-l-2 border-blue-200">{data.channel_investment_insight}</p>
-          )}
-        </div>
+        )}
 
         {data.regional_insight && !data.regional_insight.toLowerCase().includes("não consolidado") && (
           <div className="space-y-6">
@@ -315,28 +302,12 @@ export function ExecutiveSummaryTab({
       {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 5: EVOLUÇÃO
       ═══════════════════════════════════════════════════════════════ */}
-      {mergedChartData.length > 0 && (
+      {data.evolution_insight && (
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Evolução do Investimento</h2>
-          <div className="h-[250px] w-full bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mergedChartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickMargin={10} minTickGap={30} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickFormatter={(v) => `R$${v}`} />
-                <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#1a2a5e', borderRadius: '6px', border: 'none', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
-                  formatter={(value: number) => [fmt(value), 'Custo Diário']}
-                  labelStyle={{ color: '#cbd5e1', marginBottom: '4px' }}
-                />
-                <Line type="monotone" dataKey="totalCost" stroke="#d32f2f" strokeWidth={3} dot={{r: 3, fill: '#d32f2f', strokeWidth: 0}} activeDot={{r: 6}} />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="bg-slate-50 border border-slate-200 p-6 rounded-lg text-slate-700 font-light text-lg">
+            {data.evolution_insight}
           </div>
-          {data.evolution_insight && (
-            <p className="text-slate-600 bg-slate-50 p-4 rounded border border-slate-100">{data.evolution_insight}</p>
-          )}
         </div>
       )}
 
@@ -423,20 +394,25 @@ export function ExecutiveSummaryTab({
       {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 9: IMPACTO PARA O NEGÓCIO
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Impacto para o Negócio</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-[#1e2a53] -mx-8 px-8 py-12 rounded-xl text-white space-y-8 my-10 shadow-inner">
+        <div>
+          <h2 className="text-3xl font-bold font-serif mb-2">Impacto para o Negócio</h2>
+          <p className="text-[#a0aeca] font-light">
+            Ganhos qualitativos da estratégia de divulgação para a marca empregadora {activeReport?.name}
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {businessImpact.map((impact: any, i: number) => (
-            <div key={i} className="bg-[#1a2a5e] text-white p-6 rounded-lg relative overflow-hidden group">
+            <div key={i} className="bg-[#151d3b] p-8 rounded-lg relative overflow-hidden group border border-[#2a3867]">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-full transition-transform group-hover:scale-110" />
               
-              <div className="flex items-start gap-4 relative z-10">
-                <div className="w-10 h-10 rounded-full bg-[#d32f2f] text-white flex items-center justify-center font-black flex-shrink-0 text-lg shadow-lg">
+              <div className="flex items-start gap-5 relative z-10">
+                <div className="w-12 h-12 rounded-full bg-[#d32f2f] text-white flex items-center justify-center font-black flex-shrink-0 text-xl shadow-lg">
                   {i + 1}
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg mb-2">{impact.title}</h4>
-                  <p className="text-slate-300 text-sm leading-relaxed">{impact.description}</p>
+                  <h4 className="font-bold text-lg mb-3 text-white">{impact.title}</h4>
+                  <p className="text-[#a0aeca] text-sm leading-relaxed">{impact.description}</p>
                 </div>
               </div>
             </div>
