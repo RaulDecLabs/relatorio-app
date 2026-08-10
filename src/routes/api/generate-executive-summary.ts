@@ -173,13 +173,16 @@ IMPORTANTE:
 
           let responseJson = null
           try {
-            const content = chatCompletion.choices[0].message.content
+            let content = chatCompletion.choices[0].message.content || ''
+            // Limpa formatação markdown se a IA colocar
+            content = content.replace(/```json/gi, '').replace(/```/g, '').trim();
+            
             if (content) {
               responseJson = JSON.parse(content)
             }
           } catch (e) {
             console.error('Failed to parse OpenAI JSON', e)
-            return new Response('Invalid JSON from OpenAI', { status: 500 })
+            return new Response('Erro na formatação da IA: o resultado não foi um JSON válido.', { status: 500 })
           }
 
           // Salvar métricas brutas junto com a análise para exibição direta

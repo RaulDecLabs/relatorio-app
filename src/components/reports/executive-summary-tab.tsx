@@ -84,7 +84,8 @@ export function ExecutiveSummaryTab({
       });
 
       if (!response.ok) {
-        throw new Error('Falha ao gerar relatório');
+        const errorText = await response.text().catch(() => 'Erro desconhecido');
+        throw new Error(errorText || 'Falha ao gerar relatório');
       }
 
       return response.json();
