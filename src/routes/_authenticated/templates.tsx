@@ -309,7 +309,7 @@ function TemplatesPage() {
   const adsConversions = adsMetrics.reduce((sum, item) => sum + (item.conversions || 0), 0);
   const adsCpa = adsConversions > 0 ? adsCost / adsConversions : 0;
 
-  const topAdsCampaigns = useMemo(() => {
+  const allAdsCampaigns = useMemo(() => {
     const map = new Map<string, any>();
     adsMetrics.forEach(d => {
       const name = d.campaign_name || "Desconhecido";
@@ -322,8 +322,10 @@ function TemplatesPage() {
       c.cost += Number(d.cost || 0);
       c.conversions += Number(d.conversions || 0);
     });
-    return Array.from(map.values()).sort((a, b) => b.cost - a.cost).slice(0, 5); // Top 5
+    return Array.from(map.values()).sort((a, b) => b.cost - a.cost);
   }, [adsMetrics]);
+
+  const topAdsCampaigns = useMemo(() => allAdsCampaigns.slice(0, 5), [allAdsCampaigns]);
 
   // Facebook Ads
   const fbCost = fbAdsMetrics.reduce((sum, item) => sum + (item.spend || 0), 0);
@@ -331,7 +333,7 @@ function TemplatesPage() {
   const fbConversions = fbAdsMetrics.reduce((sum, item) => sum + (item.conversions || 0), 0);
   const fbCpa = fbConversions > 0 ? fbCost / fbConversions : 0;
 
-  const topFbCampaigns = useMemo(() => {
+  const allFbCampaigns = useMemo(() => {
     const map = new Map<string, any>();
     fbAdsMetrics.forEach(d => {
       const name = d.campaign_name || "Desconhecido";
@@ -344,8 +346,10 @@ function TemplatesPage() {
       c.cost += Number(d.spend || 0);
       c.conversions += Number(d.conversions || 0);
     });
-    return Array.from(map.values()).sort((a, b) => b.cost - a.cost).slice(0, 10); // Top 10
+    return Array.from(map.values()).sort((a, b) => b.cost - a.cost);
   }, [fbAdsMetrics]);
+
+  const topFbCampaigns = useMemo(() => allFbCampaigns.slice(0, 10), [allFbCampaigns]);
 
 
   // GSC
@@ -407,13 +411,14 @@ function TemplatesPage() {
           cliques: adsClicks,
           conversoes: adsConversions,
           cpa: adsCpa,
-          top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
+          todas_campanhas: allAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
         },
         meta_ads_facebook: {
           investimento: fbCost,
           cliques: fbClicks,
           conversoes: fbConversions,
-          cpa: fbCpa
+          cpa: fbCpa,
+          todas_campanhas: allFbCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
         },
         consolidado_trafego_pago: {
           investimento_total: totalCost,
@@ -598,14 +603,14 @@ Diretrizes de Especialista:
                     cliques: adsClicks,
                     conversoes: adsConversions,
                     cpa: adsCpa,
-                    top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
+                    todas_campanhas: allAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
                   },
                   meta_ads_facebook: {
                     investimento: fbCost,
                     cliques: fbClicks,
                     conversoes: fbConversions,
                     cpa: fbCpa,
-                    top_campanhas: topFbCampaigns.map(c => ({ nome: c.name, investimento: c.spend, conversoes: c.conversions }))
+                    todas_campanhas: allFbCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
                   },
                   consolidado_trafego_pago: {
                     investimento_total: totalCost,

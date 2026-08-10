@@ -129,10 +129,17 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
   "channel_investment_insight": "Insight de destaque sobre a estratégia de distribuição de mídia (ex: 'Alocação focada no Meta Ads para ampliar o alcance do topo de funil')",
   "regional_insight": "Parágrafo elegante sobre a presença estratégica e cobertura de mídia nas praças essenciais de recrutamento.",
   "evolution_insight": "Análise do ritmo diário de investimento e constância das ações.",
+  "regional_investment": [
+    { "region": "[Nome da praça extraída das campanhas]", "cost": 0, "percentage": 0 }
+  ],
+  "regional_summary": {
+    "top_region_text": "[Ex: R$ X investidos na praça Y (Z% do total) — praça prioritária no período]",
+    "secondary_region_text": "[Ex: R$ X aplicados em campanhas multirregionais...]"
+  },
   "media_strategy": [
-    { "title": "Distribuição entre canais", "description": "Descreva como o investimento foi distribuído (ex: valores ou X% em Google Ads, Y% em Meta Ads) usando os dados reais." },
-    { "title": "Ritmo de investimento", "description": "Analise a constância dos aportes diários no período com base nos dados do JSON." },
-    { "title": "Papel de cada canal", "description": "Descreva qual canal trouxe mais visibilidade e qual trouxe mais leads, provando com números reais do JSON." }
+    { "number": "1", "title": "[Título 1, ex: Pulverização geográfica]", "data_highlight": "[Dado exato, ex: X disparos em Y dias, cobrindo Z praças]", "description": "[Descrição analítica]" },
+    { "number": "2", "title": "[Título 2, ex: Ritmo contínuo]", "data_highlight": "[Dado exato, ex: Investimento diário contínuo]", "description": "[Descrição analítica]" },
+    { "number": "3", "title": "[Título 3, ex: Uso de canais]", "data_highlight": "[Dado exato de investimento em um canal específico]", "description": "[Descrição analítica]" }
   ],
   "campaign_attention_point": "Identificação técnica e construtiva da campanha com maior CPL para ajuste de criativo (ex: 'A campanha X apresentou CPL acima da média e será otimizada no próximo ciclo.')",
   "business_impact": [

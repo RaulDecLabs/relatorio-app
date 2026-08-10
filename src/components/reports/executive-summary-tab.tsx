@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  LineChart, Line
+  LineChart, Line, Cell
 } from "recharts";
 
 interface ExecutiveSummaryTabProps {
@@ -312,83 +312,175 @@ export function ExecutiveSummaryTab({
       )}
 
       {/* ══════════════════════════════════════════════════════════════
+          SEÇÃO 5.5: INVESTIMENTO POR REGIÃO
+      ═══════════════════════════════════════════════════════════════ */}
+      {data.regional_investment && data.regional_investment.length > 0 && (
+        <div className="space-y-6 pt-10">
+          <div className="border-b pb-2 border-slate-200">
+            <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Investimento por Região</h2>
+            <p className="text-slate-500 font-light">Alocação geográfica do orçamento — {data.regional_investment.length} praças atendidas</p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8">
+              <div className="h-[400px] w-full mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data.regional_investment} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                    <XAxis type="number" hide />
+                    <YAxis dataKey="region" type="category" stroke="#475569" fontSize={11} tickMargin={10} width={150} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
+                    <RechartsTooltip 
+                      cursor={{fill: 'rgba(0,0,0,0.02)'}}
+                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      formatter={(value: number) => [fmt(value), 'Investimento']}
+                    />
+                    <Bar dataKey="cost" fill="#1a2a5e" radius={[0, 4, 4, 0]} barSize={24}>
+                      {
+                        data.regional_investment.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill="#1a2a5e" />
+                        ))
+                      }
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className="lg:col-span-4 flex flex-col gap-4 justify-center">
+              {data.regional_summary?.top_region_text && (
+                <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
+                  <div className="text-3xl font-bold text-[#1a2a5e] font-serif mb-3">
+                    {(() => {
+                      const match = data.regional_summary.top_region_text.match(/(R\$ [\d.,]+)/);
+                      return match ? match[1] : "Destaque";
+                    })()}
+                  </div>
+                  <p className="text-slate-600 text-sm leading-relaxed">{data.regional_summary.top_region_text}</p>
+                </div>
+              )}
+              {data.regional_summary?.secondary_region_text && (
+                <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
+                  <div className="text-3xl font-bold text-[#1a2a5e] font-serif mb-3">
+                    {(() => {
+                      const match = data.regional_summary.secondary_region_text.match(/(R\$ [\d.,]+)/);
+                      return match ? match[1] : "Multirregional";
+                    })()}
+                  </div>
+                  <p className="text-slate-600 text-sm leading-relaxed">{data.regional_summary.secondary_region_text}</p>
+                </div>
+              )}
+              {data.regional_insight && (
+                <div className="bg-[#1a2a5e] p-6 rounded-xl text-white shadow-md mt-2">
+                  <h4 className="font-bold mb-2">Leitura estratégica</h4>
+                  <p className="text-slate-300 text-sm font-light leading-relaxed">{data.regional_insight}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 6: ESTRATÉGIA DE MÍDIA
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="space-y-8">
-        <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Estratégia de Mídia Digital</h2>
+      <div className="space-y-8 pt-10">
+        <div className="border-b pb-2 border-slate-200">
+          <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Estratégia de Mídia Digital</h2>
+          <p className="text-slate-500 font-light">Como o investimento em campanhas foi operacionalizado</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {mediaStrategy.map((strategy: any, i: number) => (
-            <div key={i} className="bg-white border border-slate-200 p-6 rounded-lg relative">
-              <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-[#1a2a5e] text-white flex items-center justify-center font-bold text-sm border-4 border-white">
-                {i + 1}
+            <div key={i} className="bg-[#f8f9fc] border border-slate-100 p-8 rounded-xl relative shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-full bg-[#1a2a5e] text-white flex items-center justify-center font-bold text-xl mb-6 shadow-sm">
+                {strategy.number || (i + 1)}
               </div>
-              <h4 className="font-bold text-[#1a2a5e] mb-2">{strategy.title}</h4>
-              <p className="text-slate-600 text-sm leading-relaxed">{strategy.description}</p>
+              <h4 className="font-bold text-[#1a2a5e] text-lg mb-3">{strategy.title}</h4>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">{strategy.data_highlight}</p>
+              <p className="text-slate-500 text-sm font-light leading-relaxed">{strategy.description}</p>
             </div>
           ))}
-        </div>
-        <div className="bg-slate-50 border border-slate-200 p-4 rounded text-xs text-slate-500 flex items-start gap-3">
-          <Info className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-          <p>
-            <strong>Nota Metodológica:</strong> Os dados consideram a atribuição padrão das plataformas (Meta e Google). 
-            Em caso de ausência de chaves universais (como UTMs perfeitas e e-mails exatos), pequenas divergências entre 
-            o volume reportado pelas redes e as oportunidades geradas no NectarCRM são naturais no mercado.
-          </p>
         </div>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════
-          SEÇÃO 7: RESULTADOS IMPULSIONAMENTO
+          SEÇÃO 7: RESULTADOS IMPULSIONAMENTO (META ADS)
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Resultados do Impulsionamento</h2>
+      <div className="space-y-6 pt-10">
+        <div className="border-b pb-2 border-slate-200">
+          <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Resultados do Impulsionamento (Meta Ads)</h2>
+          <p className="text-slate-500 font-light">Cliques, impressões e leads — amostra das principais campanhas do Ads Manager</p>
+        </div>
         
-        {attentionPoint && (
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex items-start gap-3 mb-6">
-            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-bold text-amber-800 text-sm mb-1">Ponto de Atenção Analítico</h4>
-              <p className="text-amber-700 text-sm">{attentionPoint}</p>
+        {/* CARDS DE RESUMO DO META */}
+        {(() => {
+          const fbTotalClicks = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.clicks || 0), 0);
+          const fbTotalImps = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.impressions || 0), 0);
+          const fbTotalLeads = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.conversions || 0), 0);
+          const fbTotalCost = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.cost || 0), 0);
+          
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
+                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(fbTotalClicks)}</div>
+                <div className="font-bold text-slate-700 mb-1">Cliques no link</div>
+                <div className="text-xs text-slate-500">{fmt(fbTotalCost)} investidos • CPC médio {fmt(fbTotalClicks > 0 ? fbTotalCost / fbTotalClicks : 0)}</div>
+              </div>
+              <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
+                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(fbTotalImps)}</div>
+                <div className="font-bold text-slate-700 mb-1">Visualizações / Impressões</div>
+                <div className="text-xs text-slate-500">{fmt(fbTotalCost)} investidos • CPM médio {fmt(fbTotalImps > 0 ? (fbTotalCost / fbTotalImps) * 1000 : 0)}</div>
+              </div>
+              <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
+                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(fbTotalLeads)}</div>
+                <div className="font-bold text-slate-700 mb-1">Leads gerados</div>
+                <div className="text-xs text-slate-500">{fmt(fbTotalCost)} investidos • CPL médio {fmt(fbTotalLeads > 0 ? fbTotalCost / fbTotalLeads : 0)}</div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
-        <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-slate-200 shadow-sm">
           <table className="w-full text-sm text-left">
-            <thead className="bg-[#f4f6fb] text-slate-600 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+            <thead className="bg-[#1a2a5e] text-white font-bold text-xs tracking-wider">
               <tr>
-                <th className="px-4 py-3">Campanha</th>
-                <th className="px-4 py-3">Canal</th>
-                <th className="px-4 py-3 text-right">Candidatos</th>
-                <th className="px-4 py-3 text-right">Investido</th>
-                <th className="px-4 py-3 text-right">CPL (Custo por Lead)</th>
+                <th className="px-4 py-4">Conjunto de anúncios / Região</th>
+                <th className="px-4 py-4">Métrica</th>
+                <th className="px-4 py-4 text-right">Resultado</th>
+                <th className="px-4 py-4 text-right">Custo/resultado</th>
+                <th className="px-4 py-4 text-right">Investido</th>
               </tr>
             </thead>
             <tbody>
-              {campaignsList.length > 0 ? campaignsList.slice(0, 10).map((c, i) => (
-                <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 last:border-0">
-                  <td className="px-4 py-3 font-medium text-slate-800 truncate max-w-[200px]">{c.campaign}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant="outline" className={c.channel === 'Google Ads' ? 'text-blue-600 border-blue-200 bg-blue-50' : 'text-indigo-600 border-indigo-200 bg-indigo-50'}>
-                      {c.channel}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-right text-slate-600">{fmtNum(c.leads)}</td>
-                  <td className="px-4 py-3 text-right text-slate-600">{fmt(c.cost)}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-slate-800">
-                    {c.leads > 0 ? fmt(c.cost / c.leads) : '-'}
-                  </td>
-                </tr>
-              )) : (
+              {topFbCampaigns.length > 0 ? topFbCampaigns.map((c: any, i: number) => {
+                const isLead = c.conversions > 0;
+                const metricName = isLead ? "Leads" : "Cliques no link";
+                const resultVal = isLead ? c.conversions : c.clicks;
+                const costPer = resultVal > 0 ? c.cost / resultVal : 0;
+                
+                return (
+                  <tr key={i} className="border-b border-slate-200 hover:bg-slate-50 last:border-0 bg-white">
+                    <td className="px-4 py-3 text-slate-600 truncate max-w-[250px]">{c.name}</td>
+                    <td className="px-4 py-3 text-slate-600">{metricName}</td>
+                    <td className="px-4 py-3 text-right font-bold text-[#1a2a5e]">{fmtNum(resultVal)}</td>
+                    <td className="px-4 py-3 text-right text-slate-500">{fmt(costPer)}</td>
+                    <td className="px-4 py-3 text-right text-slate-500">{fmt(c.cost)}</td>
+                  </tr>
+                );
+              }) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500 italic">
-                    Dados de campanhas individuais não carregados.
+                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500 italic bg-white">
+                    Nenhuma campanha do Meta Ads registrada no período.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        
+        {attentionPoint && (
+          <div className="bg-[#fcf8f8] border-l-4 border-red-600 p-4 rounded-r-lg mt-4 text-sm text-slate-700">
+            <span className="font-bold text-red-700">Ponto de atenção:</span> {attentionPoint}
+          </div>
+        )}
       </div>
 
       {/* ══════════════════════════════════════════════════════════════
