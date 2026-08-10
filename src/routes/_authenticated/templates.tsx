@@ -651,21 +651,6 @@ Diretrizes de Especialista:
               />
             </ErrorBoundary>
 
-            <div className="border-t border-slate-200 dark:border-slate-800 pt-16 space-y-8">
-              <div>
-                <h2 className="text-3xl font-black text-[#1a2a5e] dark:text-slate-100 tracking-tight font-serif">Métricas Detalhadas</h2>
-                <p className="text-muted-foreground mt-1">Visão analítica operacional e dashboards das campanhas.</p>
-              </div>
-              <ErrorBoundary>
-                <OverviewTab 
-                  mergedChartData={mergedChartData}
-                  topAdsCampaigns={topAdsCampaigns}
-                  topFbCampaigns={topFbCampaigns}
-                  startDateStr={startDateStr}
-                  endDateStr={endDateStr}
-                />
-              </ErrorBoundary>
-            </div>
           </div>
         )}
       </main>

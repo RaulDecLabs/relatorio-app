@@ -167,13 +167,17 @@ export function ExecutiveSummaryTab({
       campaign: c.name,
       channel: 'Google Ads',
       leads: c.conversions || 0,
-      cost: c.cost || 0
+      cost: c.cost || 0,
+      clicks: c.clicks || 0,
+      impressions: c.impressions || 0
     })),
     ...topFbCampaigns.map((c: any) => ({
       campaign: c.name,
       channel: 'Meta Ads',
       leads: c.conversions || 0,
-      cost: c.cost || 0
+      cost: c.cost || 0,
+      clicks: c.clicks || 0,
+      impressions: c.impressions || 0
     }))
   ].sort((a, b) => b.cost - a.cost);
 
@@ -237,15 +241,17 @@ export function ExecutiveSummaryTab({
           </p>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className={`grid grid-cols-2 gap-4 ${exec.total_regions > 1 ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
             <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(rawMetrics?.consolidated?.totalCost || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Investimento Total</span>
           </div>
-          <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(exec.total_regions || 1)}</span>
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Praças Impactadas</span>
-          </div>
+          {exec.total_regions > 1 && (
+            <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
+              <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(exec.total_regions)}</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Praças Impactadas</span>
+            </div>
+          )}
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
             <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(rawMetrics?.consolidated?.totalLeads || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Candidatos (Leads)</span>
@@ -403,37 +409,37 @@ export function ExecutiveSummaryTab({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════
-          SEÇÃO 7: RESULTADOS IMPULSIONAMENTO (META ADS)
+          SEÇÃO 7: RESULTADOS IMPULSIONAMENTO
       ═══════════════════════════════════════════════════════════════ */}
       <div className="space-y-6 pt-10">
         <div className="border-b pb-2 border-slate-200">
-          <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Resultados do Impulsionamento (Meta Ads)</h2>
-          <p className="text-slate-500 font-light">Cliques, impressões e leads — amostra das principais campanhas do Ads Manager</p>
+          <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Resultados do Impulsionamento</h2>
+          <p className="text-slate-500 font-light">Cliques, impressões e leads — amostra das principais campanhas</p>
         </div>
         
-        {/* CARDS DE RESUMO DO META */}
+        {/* CARDS DE RESUMO */}
         {(() => {
-          const fbTotalClicks = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.clicks || 0), 0);
-          const fbTotalImps = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.impressions || 0), 0);
-          const fbTotalLeads = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.conversions || 0), 0);
-          const fbTotalCost = topFbCampaigns.reduce((sum: number, c: any) => sum + (c.cost || 0), 0);
+          const totalClicks = campaignsList.reduce((sum: number, c: any) => sum + (c.clicks || 0), 0);
+          const totalImps = campaignsList.reduce((sum: number, c: any) => sum + (c.impressions || 0), 0);
+          const totalLeads = campaignsList.reduce((sum: number, c: any) => sum + (c.leads || 0), 0);
+          const totalCost = campaignsList.reduce((sum: number, c: any) => sum + (c.cost || 0), 0);
           
           return (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
-                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(fbTotalClicks)}</div>
+                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(totalClicks)}</div>
                 <div className="font-bold text-slate-700 mb-1">Cliques no link</div>
-                <div className="text-xs text-slate-500">{fmt(fbTotalCost)} investidos • CPC médio {fmt(fbTotalClicks > 0 ? fbTotalCost / fbTotalClicks : 0)}</div>
+                <div className="text-xs text-slate-500">{fmt(totalCost)} investidos • CPC médio {fmt(totalClicks > 0 ? totalCost / totalClicks : 0)}</div>
               </div>
               <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
-                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(fbTotalImps)}</div>
+                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(totalImps)}</div>
                 <div className="font-bold text-slate-700 mb-1">Visualizações / Impressões</div>
-                <div className="text-xs text-slate-500">{fmt(fbTotalCost)} investidos • CPM médio {fmt(fbTotalImps > 0 ? (fbTotalCost / fbTotalImps) * 1000 : 0)}</div>
+                <div className="text-xs text-slate-500">{fmt(totalCost)} investidos • CPM médio {fmt(totalImps > 0 ? (totalCost / totalImps) * 1000 : 0)}</div>
               </div>
               <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
-                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(fbTotalLeads)}</div>
+                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(totalLeads)}</div>
                 <div className="font-bold text-slate-700 mb-1">Leads gerados</div>
-                <div className="text-xs text-slate-500">{fmt(fbTotalCost)} investidos • CPL médio {fmt(fbTotalLeads > 0 ? fbTotalCost / fbTotalLeads : 0)}</div>
+                <div className="text-xs text-slate-500">{fmt(totalCost)} investidos • CPL médio {fmt(totalLeads > 0 ? totalCost / totalLeads : 0)}</div>
               </div>
             </div>
           );
@@ -444,6 +450,7 @@ export function ExecutiveSummaryTab({
             <thead className="bg-[#1a2a5e] text-white font-bold text-xs tracking-wider">
               <tr>
                 <th className="px-4 py-4">Conjunto de anúncios / Região</th>
+                <th className="px-4 py-4">Canal</th>
                 <th className="px-4 py-4">Métrica</th>
                 <th className="px-4 py-4 text-right">Resultado</th>
                 <th className="px-4 py-4 text-right">Custo/resultado</th>
@@ -451,15 +458,20 @@ export function ExecutiveSummaryTab({
               </tr>
             </thead>
             <tbody>
-              {topFbCampaigns.length > 0 ? topFbCampaigns.map((c: any, i: number) => {
-                const isLead = c.conversions > 0;
+              {campaignsList.length > 0 ? campaignsList.map((c: any, i: number) => {
+                const isLead = c.leads > 0;
                 const metricName = isLead ? "Leads" : "Cliques no link";
-                const resultVal = isLead ? c.conversions : c.clicks;
+                const resultVal = isLead ? c.leads : c.clicks;
                 const costPer = resultVal > 0 ? c.cost / resultVal : 0;
                 
                 return (
                   <tr key={i} className="border-b border-slate-200 hover:bg-slate-50 last:border-0 bg-white">
-                    <td className="px-4 py-3 text-slate-600 truncate max-w-[250px]">{c.name}</td>
+                    <td className="px-4 py-3 text-slate-600 truncate max-w-[250px]">{c.campaign}</td>
+                    <td className="px-4 py-3 text-slate-600 font-medium">
+                      <span className={`px-2 py-1 rounded text-xs ${c.channel === 'Google Ads' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'}`}>
+                        {c.channel}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-slate-600">{metricName}</td>
                     <td className="px-4 py-3 text-right font-bold text-[#1a2a5e]">{fmtNum(resultVal)}</td>
                     <td className="px-4 py-3 text-right text-slate-500">{fmt(costPer)}</td>
@@ -468,8 +480,8 @@ export function ExecutiveSummaryTab({
                 );
               }) : (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500 italic bg-white">
-                    Nenhuma campanha do Meta Ads registrada no período.
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500 italic bg-white">
+                    Nenhuma campanha registrada no período.
                   </td>
                 </tr>
               )}
