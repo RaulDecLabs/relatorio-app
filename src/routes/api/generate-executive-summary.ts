@@ -25,7 +25,7 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
       POST: async ({ request }) => {
         try {
           const body = await request.json()
-          const { reportId, days = 7 } = body
+          const { reportId, days = 7, startDateStr: clientStart, endDateStr: clientEnd } = body
 
           if (!reportId) {
             return new Response('Missing reportId', { status: 400 })
@@ -61,11 +61,16 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
             return new Response('Report config not found', { status: 404 })
           }
 
-          const endDate = new Date()
-          const startDate = new Date()
-          startDate.setDate(startDate.getDate() - days)
-          const endDateStr = endDate.toISOString().split('T')[0]
-          const startDateStr = startDate.toISOString().split('T')[0]
+          let startDateStr = clientStart;
+          let endDateStr = clientEnd;
+          
+          if (!startDateStr || !endDateStr) {
+            const endDate = new Date()
+            const startDate = new Date()
+            startDate.setDate(startDate.getDate() - days)
+            endDateStr = endDate.toISOString().split('T')[0]
+            startDateStr = startDate.toISOString().split('T')[0]
+          }
 
           // 2. Coletar dados
           const fetchMetrics = async (tableName: string) => {

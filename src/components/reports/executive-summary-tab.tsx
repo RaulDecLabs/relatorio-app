@@ -42,7 +42,9 @@ export function ExecutiveSummaryTab({ activeReport, startDateStr, endDateStr, is
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reportId: activeReport.id,
-          days: parseInt(days) || 7
+          days: parseInt(days) || 7,
+          startDateStr,
+          endDateStr
         })
       });
 
