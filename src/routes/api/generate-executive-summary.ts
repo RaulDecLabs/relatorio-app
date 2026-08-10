@@ -136,16 +136,16 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
   ],
   "campaign_attention_point": "Identificação técnica e construtiva da campanha com maior CPL para ajuste de criativo (ex: 'A campanha X apresentou CPL acima da média e será otimizada no próximo ciclo.')",
   "business_impact": [
-    { "title": "Visibilidade e Presença de Marca", "description": "A exposição contínua fortaleceu a atração de candidatos e a marca empregadora no mercado.", "tone": "positive" },
-    { "title": "Construção de Banco de Talentos", "description": "Volume expressivo de candidaturas geradas alimentando a esteira de triagem.", "tone": "positive" },
-    { "title": "Eficiência Orçamentária", "description": "Direcionamento estratégico do investimento focado em canais de alta conversão.", "tone": "positive" },
-    { "title": "Maturação do Funil de Atração", "description": "Aprendizado de dados para refinar os critérios de qualificação nos próximos ciclos.", "tone": "positive" }
+    { "title": "[Gere o 1º pilar estratégico impactado]", "description": "[Analise os dados e comprove este impacto com fatos das campanhas]" },
+    { "title": "[Gere o 2º pilar estratégico impactado]", "description": "[Analise os dados e comprove este impacto com fatos das campanhas]" },
+    { "title": "[Gere o 3º pilar estratégico impactado]", "description": "[Analise os dados e comprove este impacto com fatos das campanhas]" },
+    { "title": "[Gere o 4º pilar estratégico impactado]", "description": "[Analise os dados e comprove este impacto com fatos das campanhas]" }
   ],
   "next_steps": [
-    { "title": "Otimização de Criativos", "description": "Refinar anúncios das campanhas com maior CPL." },
-    { "title": "Alocação Estratégica de Verba", "description": "Priorizar os canais com menor custo por candidato." },
-    { "title": "Acompanhamento no CRM", "description": "Acelerar a triagem dos candidatos captados pelas campanhas." },
-    { "title": "Expansão de Praças", "description": "Testar novas abordagens nas regiões de maior demanda." }
+    { "title": "[Gere a 1ª ação estratégica para o próximo ciclo]", "description": "[Justifique a ação baseando-se no desempenho real dos canais ou campanhas]" },
+    { "title": "[Gere a 2ª ação estratégica para o próximo ciclo]", "description": "[Justifique a ação baseando-se no desempenho real dos canais ou campanhas]" },
+    { "title": "[Gere a 3ª ação estratégica para o próximo ciclo]", "description": "[Justifique a ação baseando-se no desempenho real dos canais ou campanhas]" },
+    { "title": "[Gere a 4ª ação estratégica para o próximo ciclo]", "description": "[Justifique a ação baseando-se no desempenho real dos canais ou campanhas]" }
   ]
 }
 

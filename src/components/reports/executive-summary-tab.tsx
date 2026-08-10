@@ -148,44 +148,8 @@ export function ExecutiveSummaryTab({
 
   const mediaStrategy = data.media_strategy || [];
 
-  // Mapeamento construtivo caso a resposta antiga do banco tenha termos pejorativos
-  const defaultImpacts = [
-    { title: "Visibilidade e Presença de Marca", description: "A exposição contínua fortaleceu a atração de candidatos e a autoridade da marca empregadora no mercado." },
-    { title: "Construção de Banco de Talentos", description: "Volume expressivo de candidaturas geradas alimentando a esteira de triagem de seleção." },
-    { title: "Eficiência Orçamentária", description: "Direcionamento estratégico do investimento em mídia focado nos canais de maior conversão." },
-    { title: "Maturação do Funil de Atração", description: "Aprendizado contínuo com dados para refinar critérios de qualificação nos próximos ciclos." }
-  ];
-
-  const rawBusinessImpact = data.business_impact || [];
-  const businessImpact = (rawBusinessImpact.length === 4 ? rawBusinessImpact : defaultImpacts).map((item: any, i: number) => {
-    const titleLower = (item.title || "").toLowerCase();
-    const descLower = (item.description || "").toLowerCase();
-    const isBad = titleLower.includes("desperdício") || titleLower.includes("risco") || titleLower.includes("prejuízo") || titleLower.includes("perda") || descLower.includes("sem retorno financeiro") || descLower.includes("desperdício");
-    
-    if (isBad || !item.title) {
-      return defaultImpacts[i % defaultImpacts.length];
-    }
-    return item;
-  });
-
-  const defaultNextSteps = [
-    { title: "Otimização de Criativos nas Campanhas", description: "Refinar anúncios e chamadas das campanhas de maior CPL para aumentar a atração de candidatos qualificados." },
-    { title: "Realocação Estratégica de Verba", description: "Direcionar maior parcela do orçamento de mídia para os canais que registraram o menor custo por candidato." },
-    { title: "Agilidade na Triagem no CRM", description: "Alinhar o fluxo de atendimento com a equipe de recrutamento para abordar os candidatos captados com máxima agilidade." },
-    { title: "Expansão em Praças Prioritárias", description: "Intensificar o impulsionamento nas cidades e regiões operacionais estratégicas com maior demanda de vagas." }
-  ];
-
-  const rawNextSteps = data.next_steps || [];
-  const nextSteps = (rawNextSteps.length === 4 ? rawNextSteps : defaultNextSteps).map((item: any, i: number) => {
-    const titleLower = (item.title || "").toLowerCase();
-    const descLower = (item.description || "").toLowerCase();
-    const isGeneric = titleLower.includes("testes a/b") || titleLower.includes("relatório de conclusão") || titleLower.includes("análise de segmentação") || titleLower.includes("otimização de anúncios") || descLower.includes("testes a/b") || descLower.includes("garantir que estão atingindo");
-    
-    if (isGeneric || !item.title) {
-      return defaultNextSteps[i % defaultNextSteps.length];
-    }
-    return item;
-  });
+  const businessImpact = data.business_impact || [];
+  const nextSteps = data.next_steps || [];
 
   const fmt = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
   const fmtNum = (val: number) => new Intl.NumberFormat('pt-BR').format(val || 0);
