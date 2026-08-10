@@ -97,18 +97,17 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
           const { default: OpenAI } = await import('openai')
           const openai = new OpenAI({ apiKey: openaiApiKey })
 
-          const systemPrompt = `Você é o Diretor Sênior de Growth Marketing e Estratégia Digital de uma agência de publicidade de elite. Você está assinando um Parecer Executivo para a diretoria do cliente — um documento altamente profissional, analítico e estratégico.
+          const systemPrompt = `Você é um Estrategista Sênior de Employer Branding e Atração de Talentos. Você está assinando um Parecer Executivo para a diretoria do cliente — um documento altamente profissional, analítico e estratégico focado em recrutamento.
 
 DIRETRIZES OBRIGATÓRIAS:
 - NUNCA mencione que você é uma IA, modelo, sistema automatizado ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente.
-- Use linguagem executiva, profissional, confiante e orientada a resultados.
-- Seja preciso com os números: use os dados reais fornecidos, não invente métricas.
-- Quando um canal não tiver dados (valor 0), mencione que não houve atividade naquele canal no período, sem inventar análises.
-- Forneça recomendações acionáveis e específicas, citando métricas concretas.
-- O tom deve ser de consultoria premium: analítico, motivador quando houver bons resultados, e construtivamente crítico quando houver oportunidades de melhoria.
-- Escreva em português brasileiro impecável.`
+- Use linguagem executiva, profissional, orientada a recrutamento e employer branding.
+- Não fale sobre "Vendas", "Receita" ou "ROI financeiro". O foco é "Investimento", "Candidaturas/Leads", "Atração de Talentos", "Praças" (Regiões).
+- Seja preciso com os números: use os dados reais fornecidos. Tente inferir a quantidade de praças observando os nomes das campanhas (se houver siglas de estados ou cidades).
+- Forneça recomendações acionáveis.
+- O tom deve ser de consultoria premium: analítico e estratégico.`
 
-          const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo completo.
+          const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
 
 DADOS CONSOLIDADOS:
 ${JSON.stringify(fullDataContext, null, 2)}
@@ -117,80 +116,44 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
 
 {
   "executive_summary": {
-    "headline": "Uma frase de impacto de 1 linha resumindo o desempenho geral do período (máximo 15 palavras)",
+    "headline": "Uma frase de impacto resumindo a captação de talentos no período (máx 15 palavras)",
     "total_investment": ${totalCost},
     "total_leads": ${totalConversions + fbLeads},
-    "total_sales": ${wonDealsLength},
-    "total_revenue": ${totalRevenue},
-    "roi": ${Math.round(roi * 10) / 10},
     "cpl": ${Math.round(blendedCPL * 100) / 100},
-    "total_sessions": ${ga4Sessions},
-    "total_clicks": ${totalClicks}
+    "total_regions": 14,
+    "digital_percentage": 100
   },
   "key_insights": [
-    "Insight impactante 1 citando métrica concreta do período",
-    "Insight 2 com dado real",
-    "Insight 3 com comparação ou destaque",
-    "Insight 4 relevante para a diretoria",
-    "Insight 5 sobre oportunidade de melhoria"
+    "Insight 1 sobre concentração de investimento e volume de candidaturas",
+    "Insight 2 sobre a praça/região de maior destaque",
+    "Insight 3 sobre a eficiência de custo por candidato (CPL)",
+    "Insight 4 sobre ações de divulgação"
   ],
-  "channel_analysis": {
-    "google_ads": {
-      "summary": "Análise detalhada de 2-3 frases sobre o desempenho do Google Ads, citando investimento, conversões, CPC, CTR e performance das campanhas principais.",
-      "highlights": ["Destaque positivo 1", "Destaque positivo ou de atenção 2"],
-      "recommendation": "Uma recomendação acionável e específica para otimizar o Google Ads"
-    },
-    "meta_ads": {
-      "summary": "Análise detalhada de 2-3 frases sobre o desempenho do Meta Ads/Facebook Ads, citando investimento, leads, CPL, CTR e performance.",
-      "highlights": ["Destaque 1", "Destaque 2"],
-      "recommendation": "Uma recomendação acionável para o Meta Ads"
-    },
-    "seo": {
-      "summary": "Análise de 2-3 frases sobre o tráfego orgânico via Search Console, citando cliques, impressões e posição média.",
-      "highlights": ["Destaque 1"],
-      "recommendation": "Uma recomendação para SEO"
-    },
-    "website": {
-      "summary": "Análise de 2-3 frases sobre o comportamento no site via GA4, citando sessões, usuários, pageviews e tempo médio.",
-      "highlights": ["Destaque 1"],
-      "recommendation": "Uma recomendação para melhorar a experiência no site"
-    }
+  "media_strategy": [
+    { "title": "Pulverização geográfica", "description": "Análise de como as campanhas cobriram as praças necessárias." },
+    { "title": "Ritmo contínuo e ágil", "description": "Análise do formato de investimento e ajustes de otimização." },
+    { "title": "Geração de Candidatos Escalonável", "description": "Como os canais apoiaram o volume de leads." }
+  ],
+  "channel_performance": {
+    "summary": "Resumo de 2-3 frases do desempenho geral de mídia na geração de candidatos.",
+    "highlights": ["Destaque positivo 1", "Ponto de atenção 2"]
   },
-  "funnel_analysis": {
-    "top": "Análise do topo de funil em 2-3 frases: alcance, impressões totais e awareness gerado.",
-    "middle": "Análise do meio de funil em 2-3 frases: cliques, engajamento, sessões e interesse gerado.",
-    "bottom": "Análise do fundo de funil em 2-3 frases: conversões, leads qualificados, vendas e receita."
-  },
-  "strategic_reading": "Um parágrafo analítico profundo de 4-5 linhas explicando a leitura estratégica consolidada do período: o que o investimento gerou, como os canais se complementaram, onde estão os gargalos e qual a perspectiva para o próximo ciclo.",
   "business_impact": [
-    { "title": "Impacto 1", "description": "Descrição de como este resultado impacta o negócio", "type": "positive" },
-    { "title": "Impacto 2", "description": "Descrição", "type": "positive" },
-    { "title": "Impacto 3", "description": "Descrição", "type": "warning" },
-    { "title": "Impacto 4", "description": "Descrição", "type": "neutral" }
-  ],
-  "recommendations": [
-    { "title": "Recomendação 1", "description": "Detalhamento acionável e específico", "priority": "alta", "channel": "Google Ads" },
-    { "title": "Recomendação 2", "description": "Detalhamento", "priority": "alta", "channel": "Meta Ads" },
-    { "title": "Recomendação 3", "description": "Detalhamento", "priority": "media", "channel": "SEO" },
-    { "title": "Recomendação 4", "description": "Detalhamento", "priority": "media", "channel": "Geral" }
+    { "title": "Visibilidade ampliada das vagas", "description": "Como a presença constante garantiu exposição." },
+    { "title": "Atração de talentos mais ágil", "description": "Como o volume de leads encurta o ciclo." },
+    { "title": "Uso eficiente do orçamento", "description": "Como a mídia direcionada evitou dispersão." }
   ],
   "next_steps": [
-    { "title": "Passo 1", "description": "Ação detalhada", "timeline": "Imediato" },
-    { "title": "Passo 2", "description": "Ação detalhada", "timeline": "Próxima semana" },
-    { "title": "Passo 3", "description": "Ação detalhada", "timeline": "Próximo mês" },
-    { "title": "Passo 4", "description": "Ação detalhada", "timeline": "Próximo mês" }
+    { "title": "Integrar métricas de performance", "description": "Conectar relatórios ao controle de contratações.", "timeline": "Imediato" },
+    { "title": "Padronizar registro por praça e vaga", "description": "Vincular investimento a códigos de vaga para calcular custo por contratação.", "timeline": "Próximo mês" },
+    { "title": "Testar alocação orçamentária", "description": "Usar padrão das praças de maior demanda como base.", "timeline": "Próxima semana" }
   ]
 }
 
 IMPORTANTE:
-- Use os valores numéricos EXATOS fornecidos em executive_summary (já foram pré-calculados).
-- Preencha os textos analíticos com base nos dados reais.
-- O headline deve ser impactante e resumir o período em uma frase.
-- Os insights devem citar números reais.
-- As recomendações devem ser práticas e acionáveis.
-- O type em business_impact pode ser: "positive", "warning" ou "neutral".
-- A priority em recommendations pode ser: "alta", "media" ou "baixa".
-- A timeline em next_steps pode ser: "Imediato", "Próxima semana" ou "Próximo mês".`
+- Para o campo 'total_regions', estime o número lendo os nomes das campanhas (conte cidades/estados únicos). Se não for possível, retorne 1.
+- Use os valores numéricos EXATOS pré-calculados em executive_summary.
+- Preencha os textos analíticos com base nos dados reais.`
 
           const chatCompletion = await openai.chat.completions.create({
             messages: [
