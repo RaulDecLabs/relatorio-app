@@ -189,25 +189,37 @@ IMPORTANTE:
           if (responseJson) {
             responseJson._raw_metrics = body.rawMetrics || {}
 
-            // Remove o sumário anterior se existir, para permitir a regeneração limpa
-            await supabase
+            const { data: existingRecord } = await supabase
               .from('executive_summaries')
-              .delete()
+              .select('id')
               .eq('report_id', reportId)
               .eq('period_start', startDateStr)
               .eq('period_end', endDateStr)
+              .single()
 
-            const { error: insertError } = await supabase
-              .from('executive_summaries')
-              .insert({
-                report_id: reportId,
-                period_start: startDateStr,
-                period_end: endDateStr,
-                summary_data: responseJson
-              })
+            let dbError = null;
 
-            if (insertError) {
-              console.error('Error inserting executive summary', insertError)
+            if (existingRecord) {
+              const { error } = await supabase
+                .from('executive_summaries')
+                .update({ summary_data: responseJson })
+                .eq('id', existingRecord.id)
+              dbError = error;
+            } else {
+              const { error } = await supabase
+                .from('executive_summaries')
+                .insert({
+                  report_id: reportId,
+                  period_start: startDateStr,
+                  period_end: endDateStr,
+                  summary_data: responseJson
+                })
+              dbError = error;
+            }
+
+            if (dbError) {
+              console.error('Error saving executive summary to DB:', dbError)
+              return new Response(`Erro ao salvar no banco de dados: ${dbError.message}`, { status: 500 })
             }
           }
 

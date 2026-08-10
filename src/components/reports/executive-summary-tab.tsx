@@ -149,8 +149,24 @@ export function ExecutiveSummaryTab({
 
   const mediaStrategy = data.media_strategy || [];
 
-  const businessImpact = data.business_impact || [];
-  const nextSteps = data.next_steps || [];
+  const rawBusinessImpact = data.business_impact || [];
+  const businessImpact = rawBusinessImpact.filter((impact: any) => {
+    const title = (impact.title || "").toLowerCase();
+    return !title.includes("desperdício de recursos") && 
+           !title.includes("necessidade de revisão estratégica") &&
+           !title.includes("oportunidade de aprendizado") &&
+           !title.includes("risco à imagem da marca") &&
+           !title.includes("pilar estratégico"); // placeholders antigos
+  });
+
+  const rawNextSteps = data.next_steps || [];
+  const nextSteps = rawNextSteps.filter((step: any) => {
+    const title = (step.title || "").toLowerCase();
+    return !title.includes("análise de segmentação") &&
+           !title.includes("otimização de anúncios") &&
+           !title.includes("testes a/b") &&
+           !title.includes("relatório de conclusão");
+  });
 
   const fmt = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
   const fmtNum = (val: number) => new Intl.NumberFormat('pt-BR').format(val || 0);
