@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import { useRoles } from "@/hooks/use-role";
 import { supabase } from "@/integrations/supabase/client";
@@ -328,6 +329,23 @@ function TemplatesPage() {
   const fbConversions = fbAdsMetrics.reduce((sum, item) => sum + (item.conversions || 0), 0);
   const fbCpa = fbConversions > 0 ? fbCost / fbConversions : 0;
 
+  const topFbCampaigns = useMemo(() => {
+    const map = new Map<string, any>();
+    fbAdsMetrics.forEach(d => {
+      const name = d.campaign_name || "Desconhecido";
+      if (!map.has(name)) {
+        map.set(name, { name, impressions: 0, clicks: 0, cost: 0, conversions: 0 });
+      }
+      const c = map.get(name);
+      c.impressions += d.impressions || 0;
+      c.clicks += d.clicks || 0;
+      c.cost += Number(d.spend || 0);
+      c.conversions += Number(d.conversions || 0);
+    });
+    return Array.from(map.values()).sort((a, b) => b.cost - a.cost).slice(0, 10); // Top 10
+  }, [fbAdsMetrics]);
+
+
   // GSC
   const gscClicks = gscMetrics.reduce((sum, item) => sum + (item.clicks || 0), 0);
   const gscImpressions = gscMetrics.reduce((sum, item) => sum + (item.impressions || 0), 0);
@@ -559,60 +577,82 @@ Diretrizes de Especialista:
             Selecione um cliente para visualizar o relatório executivo.
           </div>
         ) : (
-          <div className="space-y-16">
-            <ExecutiveSummaryTab 
-              activeReport={activeReport} 
-              startDateStr={startDateStr} 
-              endDateStr={endDateStr} 
-              isClient={isClient}
-              days={dateRange}
-              fullDataContext={{
-                cliente: activeReport.name || "Cliente",
-                periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
-                google_ads: {
-                  investimento: adsCost,
-                  cliques: adsClicks,
-                  conversoes: adsConversions,
-                  cpa: adsCpa,
-                  top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
-                },
-                meta_ads_facebook: {
-                  investimento: fbCost,
-                  cliques: fbClicks,
-                  conversoes: fbConversions,
-                  cpa: fbCpa
-                },
-                consolidado_trafego_pago: {
-                  investimento_total: totalCost,
-                  conversoes_totais: totalConversions,
-                  cpa_blended_geral: blendedCpa
-                },
-                ga4: {
-                  sessoes: gaSessions,
-                  usuarios: gaUsers,
-                  pageviews: gaPageViews,
-                  tempo_medio_sessao_segundos: gaAvgSessionDuration
-                },
-                seo_search_console: {
-                  cliques_organicos: gscClicks,
-                  impressoes: gscImpressions
-                },
-                crm_nectar: {
-                  total_oportunidades: nectarDeals?.length || 0,
-                  vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
-                  receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
-                }
-              }}
-              rawMetrics={{
-                google_ads: { cost: adsCost, clicks: adsClicks, conversions: adsConversions, cpa: adsCpa },
-                meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
-                gsc: { clicks: gscClicks, impressions: gscImpressions },
-                ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
-                consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks },
-                totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
-                wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
-              }}
-            />
+          <div className="space-y-6">
+            <Tabs defaultValue="visao-geral" className="w-full">
+              <div className="flex items-center justify-center mb-8">
+                <TabsList className="bg-card/50 backdrop-blur-md border border-border/50 rounded-full p-1 shadow-sm">
+                  <TabsTrigger value="visao-geral" className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Visão Geral</TabsTrigger>
+                  <TabsTrigger value="parecer-executivo" className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Parecer Executivo</TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <TabsContent value="visao-geral" className="mt-0">
+                <OverviewTab 
+                  mergedChartData={mergedChartData}
+                  topAdsCampaigns={topAdsCampaigns}
+                  topFbCampaigns={topFbCampaigns}
+                  startDateStr={startDateStr}
+                  endDateStr={endDateStr}
+                />
+              </TabsContent>
+
+              <TabsContent value="parecer-executivo" className="mt-0 space-y-16">
+                <ExecutiveSummaryTab 
+                  activeReport={activeReport} 
+                  startDateStr={startDateStr} 
+                  endDateStr={endDateStr} 
+                  isClient={isClient}
+                  days={dateRange}
+                  fullDataContext={{
+                    cliente: activeReport.name || "Cliente",
+                    periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
+                    google_ads: {
+                      investimento: adsCost,
+                      cliques: adsClicks,
+                      conversoes: adsConversions,
+                      cpa: adsCpa,
+                      top_campanhas: topAdsCampaigns.map(c => ({ nome: c.name, investimento: c.cost, conversoes: c.conversions }))
+                    },
+                    meta_ads_facebook: {
+                      investimento: fbCost,
+                      cliques: fbClicks,
+                      conversoes: fbConversions,
+                      cpa: fbCpa,
+                      top_campanhas: topFbCampaigns.map(c => ({ nome: c.name, investimento: c.spend, conversoes: c.conversions }))
+                    },
+                    consolidado_trafego_pago: {
+                      investimento_total: totalCost,
+                      conversoes_totais: totalConversions,
+                      cpa_blended_geral: blendedCpa
+                    },
+                    ga4: {
+                      sessoes: gaSessions,
+                      usuarios: gaUsers,
+                      pageviews: gaPageViews,
+                      tempo_medio_sessao_segundos: gaAvgSessionDuration
+                    },
+                    seo_search_console: {
+                      cliques_organicos: gscClicks,
+                      impressoes: gscImpressions
+                    },
+                    crm_nectar: {
+                      total_oportunidades: nectarDeals?.length || 0,
+                      vendas_ganhas: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0,
+                      receita_total: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0
+                    }
+                  }}
+                  rawMetrics={{
+                    google_ads: { cost: adsCost, clicks: adsClicks, conversions: adsConversions, cpa: adsCpa },
+                    meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
+                    gsc: { clicks: gscClicks, impressions: gscImpressions },
+                    ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
+                    consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks },
+                    totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
+                    wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </main>
