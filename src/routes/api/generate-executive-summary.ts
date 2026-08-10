@@ -103,7 +103,8 @@ DIRETRIZES OBRIGATÓRIAS E REGRAS DE OURO:
 5. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais e atração regional de candidatos. NUNCA diga "dados não consolidados".
 6. Se as contratações no CRM forem 0, explique de forma executiva que os candidatos gerados na mídia estão em etapa de triagem e qualificação no funil.
 7. É TERMINANTEMENTE PROIBIDO inventar números ou exemplos arbitrários. Todo número citado no texto (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON dos DADOS CONSOLIDADOS.
-8. PRÓXIMOS PASSOS: Devem ser ações estratégicas e práticas de Atração de Talentos e Employer Branding (ex: 'Otimização de Criativos nas Campanhas', 'Realocação Estratégica de Verba', 'Agilidade na Triagem no CRM', 'Expansão em Praças Prioritárias'). É TOTALMENTE PROIBIDO gerar clichês genéricos de marketing como 'Testes A/B', 'Análise de Segmentação' ou 'Relatório de Conclusão'.`
+8. PRÓXIMOS PASSOS: Devem ser ações estratégicas e práticas de Atração de Talentos e Employer Branding (ex: 'Otimização de Criativos nas Campanhas', 'Realocação Estratégica de Verba', 'Agilidade na Triagem no CRM', 'Expansão em Praças Prioritárias'). É TOTALMENTE PROIBIDO gerar clichês genéricos de marketing como 'Testes A/B', 'Análise de Segmentação' ou 'Relatório de Conclusão'.
+9. INFORMAÇÕES FALSAS E ALUCINAÇÕES: É RIGOROSAMENTE PROIBIDO inventar informações, métricas, locais ou nomes de campanhas. Se você não tiver o dado exato fornecido no JSON de entrada, não invente. No "campaign_attention_point", escolha UMA campanha real que exista na lista "todas_campanhas" (Google ou Meta) fornecida abaixo e descreva o cenário real dela.`
 
           const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
 
