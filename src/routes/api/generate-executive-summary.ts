@@ -50,16 +50,9 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
 
           const authHeader = request.headers.get('Authorization')
 
-          const { default: ws } = await import('ws')
-          
-          if (typeof globalThis.WebSocket === 'undefined' && typeof window === 'undefined') {
-            (globalThis as any).WebSocket = ws;
-          }
-
           const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
             auth: { persistSession: false },
-            global: { headers: authHeader ? { Authorization: authHeader } : {} },
-            realtime: { transport: ws as any },
+            global: { headers: authHeader ? { Authorization: authHeader } : {} }
           })
 
           const config = activeReport;
