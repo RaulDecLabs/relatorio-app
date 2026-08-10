@@ -9,6 +9,10 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   nitro: {
     preset: 'node-server',
+    rollupConfig: {
+      // Não externalizar nada — openai e ws devem ser embutidos no bundle do servidor
+      external: [],
+    },
   },
   tanstackStart: {
     server: { entry: "server" },
@@ -16,7 +20,8 @@ export default defineConfig({
   vite: {
     build: {
       rollupOptions: {
-        external: ['ws', 'openai'],
+        // Apenas dependências nativas do Node que não precisam ser empacotadas
+        external: [],
       },
     },
     server: {

@@ -77,7 +77,7 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
 
           // ────────── OpenAI ──────────
           let rawOpenaiApiKey = clientOpenaiKey || process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || (typeof import.meta !== 'undefined' && (import.meta as any).env ? (import.meta as any).env.VITE_OPENAI_API_KEY : undefined) || ''
-          const openaiApiKey = rawOpenaiApiKey.trim().replace(/^['"\s`]+|['"\s`]+$/g, '')
+          const openaiApiKey = rawOpenaiApiKey.trim().replace(/^['"\\s`]+|['"\\s`]+$/g, '')
           
           if (!openaiApiKey) {
             return new Response('OpenAI API Key not found. Please provide it or set VITE_OPENAI_API_KEY in your .env file.', { status: 500 })
@@ -92,68 +92,70 @@ DIRETRIZES OBRIGATÓRIAS E REGRAS DE OURO:
 1. NUNCA mencione que você é uma IA, modelo ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente da agência.
 2. É TOTALMENTE PROIBIDO usar as palavras "ROI", "Retorno sobre Investimento", "perda de investimento", "perda total", "lucro", "prejuízo", "desperdício de recursos" ou "risco à imagem da marca".
 3. LINGUAGEM DA AGÊNCIA PARA O CLIENTE: Os relatórios devem sempre valorizar a estratégia, a visibilidade gerada para a marca empregadora e as oportunidades de otimização de custo por candidato (CPL).
-4. IMPACTO PARA O NEGÓCIO: O tom deve refletir a PERFORMANCE REAL. Se o CPL estiver saudável e o volume de leads for bom, adote um tom de Eficiência e Oportunidade de Escala. Se a verba foi gasta sem candidatos, aí sim faça um alerta de realocação (sem nunca usar "prejuízo" ou "desperdício"). NUNCA copie fielmente os títulos de exemplos (como "Oportunidade de Aprendizado" ou "Risco à Imagem da Marca").
-5. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais e atração regional de candidatos. NUNCA diga "dados não consolidados".
-6. Se as contratações no CRM forem 0, explique de forma executiva que os candidatos gerados na mídia estão em etapa de triagem e qualificação no funil.
-7. É TERMINANTEMENTE PROIBIDO inventar números ou exemplos arbitrários. Todo número citado no texto (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON dos DADOS CONSOLIDADOS.
-8. PRÓXIMOS PASSOS: Devem ser recomendações PRÁTICAS baseadas nas lacunas REAIS identificadas nos DADOS CONSOLIDADOS. Se não houver dados de região, recomende "Parametrização UTM por praça". Se Contratações (total_sales) for 0, recomende "Aproximação e feedback rápido do Nectar CRM". É TOTALMENTE PROIBIDO gerar clichês genéricos de marketing como 'Testes A/B', 'Análise de Segmentação' ou 'Relatório de Conclusão'.
-9. INFORMAÇÕES FALSAS E ALUCINAÇÕES: É RIGOROSAMENTE PROIBIDO inventar informações, métricas, locais ou nomes de campanhas. Se você não tiver o dado exato fornecido no JSON de entrada, não invente. No "campaign_attention_point", escolha UMA campanha real que exista na lista "todas_campanhas" (Google ou Meta) fornecida abaixo e descreva o cenário real dela.`
+4. IMPACTO PARA O NEGÓCIO: O tom deve refletir a PERFORMANCE REAL. Se o CPL estiver saudável e o volume de leads for bom, adote tom de Eficiência e Oportunidade de Escala. Se a verba foi gasta sem candidatos, faça um alerta de realocação (sem nunca usar "prejuízo" ou "desperdício"). NUNCA copie títulos de exemplos.
+5. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais. NUNCA diga "dados não consolidados".
+6. Se as contratações no CRM forem 0, explique executivamente que os candidatos gerados estão em etapa de triagem e qualificação no funil.
+7. É TERMINANTEMENTE PROIBIDO inventar números. Todo número citado (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON de entrada.
+8. PRÓXIMOS PASSOS: Recomendações PRÁTICAS baseadas nas lacunas REAIS dos dados. É TOTALMENTE PROIBIDO usar clichês como 'Testes A/B', 'Análise de Segmentação' ou 'Relatório de Conclusão'.
+9. ALUCINAÇÕES: É RIGOROSAMENTE PROIBIDO inventar informações, métricas, locais ou nomes de campanhas. No "campaign_attention_point", escolha UMA campanha real da lista fornecida.`
 
           const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
 
 DADOS CONSOLIDADOS:
 ${JSON.stringify(fullDataContext, null, 2)}
 
-Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguindo EXATAMENTE este schema estrutural e preenchendo as chaves com suas análises:
+Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks, sem comentários JS) seguindo EXATAMENTE este schema e preenchendo com análises reais baseadas nos dados fornecidos acima:
 
 {
   "executive_summary": {
-    "headline": "Frase estratégica valorizando a atração de talentos e alcance no período (máx 15 palavras)",
+    "headline": "Frase estratégica valorizando a atração de talentos no período (máx 15 palavras)",
     "total_investment": ${totalCost},
     "total_leads": ${totalLeads},
     "total_sales": ${wonDealsLength},
     "cpl": ${Math.round(blendedCPL * 100) / 100},
-    "total_regions": 0 // ESTIME O NÚMERO DE PRAÇAS LENDO OS NOMES DAS CAMPANHAS. SE NÃO ACHAR, RETORNE 1.
+    "total_regions": 1
   },
   "key_insights": [
-    "Insight 1 citando o volume EXATO de candidatos gerados e investimento alocado (use os números do JSON, NÃO invente exemplos fictícios)",
-    "Insight 2 sobre a eficiência REAL de CPL ou canal com melhor volume de candidaturas",
-    "Insight 3 sobre a oportunidade de otimização contínua de criativos e atração"
+    "Insight 1 com valores reais do JSON sobre volume de candidatos e investimento",
+    "Insight 2 sobre eficiência de CPL ou canal com melhor performance real",
+    "Insight 3 sobre oportunidade de melhoria baseada nos dados reais"
   ],
-  "channel_investment_insight": "Insight de destaque sobre a estratégia de distribuição de mídia (ex: 'Foco no canal [X] para ampliar topo de funil')",
-  "regional_insight": "Parágrafo elegante sobre a presença estratégica e cobertura de mídia nas praças essenciais de recrutamento.",
-  "evolution_insight": "Análise do ritmo diário de investimento e constância das ações.",
+  "channel_investment_insight": "Insight estratégico sobre a distribuição do investimento entre os canais, usando os valores reais do JSON",
+  "regional_insight": "Parágrafo analítico e elegante sobre presença geográfica das campanhas nas praças de recrutamento",
+  "evolution_insight": "Análise sobre o ritmo de investimento e consistência das ações no período",
   "regional_investment": [
-    { "region": "[Nome da praça extraída das campanhas]", "cost": 0, "percentage": 0 }
+    { "region": "Nome da praça extraído dos nomes das campanhas", "cost": 0, "percentage": 0 }
   ],
   "regional_summary": {
-    "top_region_text": "[Ex: A maior fatia (Z%) foi investida na praça prioritária Y]",
-    "secondary_region_text": "[Ex: O restante foi aplicado em campanhas multirregionais...]"
+    "top_region_text": "Texto sobre a praça com maior investimento, incluindo o valor e percentual reais",
+    "secondary_region_text": "Texto sobre as demais praças ou campanhas multirregionais"
   },
   "media_strategy": [
-    { "number": "1", "title": "Distribuição entre canais", "data_highlight": "[Ex: X% da verba foi alocada no Google Ads, Y% no Meta Ads]", "description": "[Análise do porquê dessa distribuição]" },
-    { "number": "2", "title": "Ritmo de investimento", "data_highlight": "[Ex: Campanhas ativas em X dias do período com pico no dia Y]", "description": "[Análise da consistência da verba diária]" },
-    { "number": "3", "title": "Papel de cada canal", "data_highlight": "[Ex: Canal X focou em alcance, Canal Y gerou maior fatia de leads]", "description": "[Análise de qual canal performou melhor para atração]" }
+    { "number": "1", "title": "Distribuição entre canais", "data_highlight": "Percentual real de cada canal baseado no JSON", "description": "Análise do porquê dessa distribuição" },
+    { "number": "2", "title": "Ritmo de investimento", "data_highlight": "Dias ativos e consistência real da verba no período", "description": "Análise da consistência da verba diária" },
+    { "number": "3", "title": "Papel de cada canal", "data_highlight": "Qual canal gerou mais leads vs mais alcance", "description": "Qual canal performou melhor para atração de candidatos" }
   ],
-  "campaign_attention_point": "Identificação técnica e construtiva da campanha com maior CPL para ajuste de criativo (ex: 'A campanha X apresentou CPL acima da média e será otimizada no próximo ciclo.')",
+  "campaign_attention_point": "Identifique UMA campanha real da lista fornecida que teve o pior CPL ou zero conversões e descreva de forma construtiva e técnica",
   "business_impact": [
-    { "title": "[Gere um impacto estratégico positivo ou corretivo baseado no CPL real]", "description": "[Analise os dados e comprove este impacto com fatos das campanhas]" },
-    { "title": "[Gere outro impacto de negócio]", "description": "[Justificativa baseada no JSON]" },
-    { "title": "[Terceiro pilar de impacto]", "description": "[Justificativa baseada no JSON]" },
-    { "title": "[Quarto pilar de impacto]", "description": "[Justificativa baseada no JSON]" }
+    { "title": "Título de impacto positivo ou corretivo baseado no CPL real", "description": "Comprove o impacto com dados reais das campanhas do JSON" },
+    { "title": "Segundo impacto real de negócio", "description": "Justifique com dados reais do JSON" },
+    { "title": "Terceiro pilar de impacto real", "description": "Justifique com dados reais do JSON" },
+    { "title": "Quarto pilar de impacto real", "description": "Justifique com dados reais do JSON" }
   ],
   "next_steps": [
-    { "title": "[Passo 1 baseado em lacunas reais dos dados]", "description": "[Descreva a ação recomendada sem usar clichês]" },
-    { "title": "[Passo 2 baseado em lacunas reais dos dados]", "description": "[Ação prática]" },
-    { "title": "[Passo 3 baseado em lacunas reais dos dados]", "description": "[Ação prática]" },
-    { "title": "[Passo 4 baseado em lacunas reais dos dados]", "description": "[Ação prática]" }
+    { "title": "Passo 1 baseado em lacuna real identificada nos dados", "description": "Ação prática recomendada" },
+    { "title": "Passo 2 baseado em lacuna real identificada nos dados", "description": "Ação prática recomendada" },
+    { "title": "Passo 3 baseado em lacuna real identificada nos dados", "description": "Ação prática recomendada" },
+    { "title": "Passo 4 baseado em lacuna real identificada nos dados", "description": "Ação prática recomendada" }
   ]
 }
 
-IMPORTANTE:
+REGRAS FINAIS:
+- total_regions: estime o número de praças geográficas únicas lendo os nomes das campanhas. Se não identificar, use 1.
 - NUNCA use as palavras ROI, prejuízo, desperdício ou risco à imagem.
-- Mantenha um tom altamente profissional, construtivo e que valorize o trabalho da agência.
+- Tom altamente profissional, construtivo e que valorize o trabalho da agência.
 - Use os valores numéricos EXATOS pré-calculados em executive_summary.`
+
           const chatCompletion = await openai.chat.completions.create({
             messages: [
               { role: 'system', content: systemPrompt },

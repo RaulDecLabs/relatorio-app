@@ -140,11 +140,19 @@ export function ExecutiveSummaryTab({
   const data = summaryAny.summary_data;
   const exec = data.executive_summary || {};
   
-  // Filtrar qualquer frase legada negativa de ROI ou prejuízo
+  // Filtrar insights legados do banco antigo — remover qualquer texto que seja placeholder ou dado inventado
   const rawInsights = data.key_insights || [];
   const insights = rawInsights.filter((insight: string) => {
     const lower = (insight || "").toLowerCase();
-    return !lower.includes("roi") && !lower.includes("perda total") && !lower.includes("desperdício") && !lower.includes("prejuízo");
+    // Bloqueio de termos negativos proibidos
+    if (lower.includes("roi") || lower.includes("perda total") || lower.includes("desperdício") || lower.includes("prejuízo")) return false;
+    // Bloqueio de frases genéricas e hardcoded do banco antigo
+    if (lower.includes("sem vendas geradas")) return false;
+    if (lower.includes("apenas 6 conversões")) return false;
+    if (lower.includes("534,92") || lower.includes("534.92")) return false;
+    if (lower.startsWith("escreva aqui")) return false;
+    if (lower.startsWith("insight 1") || lower.startsWith("insight 2") || lower.startsWith("insight 3")) return false;
+    return true;
   });
 
   const mediaStrategy = data.media_strategy || [];
@@ -218,30 +226,41 @@ export function ExecutiveSummaryTab({
     <div className="space-y-16 pb-16 animate-in fade-in duration-700 font-sans">
       
       {/* ══════════════════════════════════════════════════════════════
-          SEÇÃO 1: CAPA
+          SEÇÃO 1: CAPA HERO
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="border-b-4 border-[#1a2a5e] pb-8 relative">
-        {!isClient && (
-          <Button onClick={handleGenerate} disabled={isGenerating} variant="outline" size="sm" className="absolute top-0 right-0 border-slate-300 text-slate-600 hover:bg-slate-100">
-            {isGenerating ? <RefreshCcw className="w-3 h-3 animate-spin mr-1.5" /> : <RefreshCcw className="w-3 h-3 mr-1.5" />}
-            Regerar Parecer
-          </Button>
-        )}
-        <div className="inline-block bg-[#1a2a5e] text-white text-xs font-bold px-3 py-1 mb-6 tracking-widest uppercase">
-          PARECER EXECUTIVO INSTITUCIONAL
+      <div className="relative bg-gradient-to-br from-[#0f1c42] via-[#1a2a5e] to-[#243572] rounded-2xl overflow-hidden p-10 md:p-14 shadow-2xl">
+        {/* Efeito de brilho decorativo */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#d32f2f]/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
+        
+        {/* Badge + botão na mesma linha */}
+        <div className="relative z-10 flex items-center justify-between mb-8">
+          <div className="inline-block border border-white/30 text-white/80 text-[10px] font-bold px-4 py-1.5 tracking-[0.2em] uppercase rounded-sm">
+            PARECER EXECUTIVO INSTITUCIONAL
+          </div>
+          {!isClient && (
+            <Button onClick={handleGenerate} disabled={isGenerating} size="sm" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
+              {isGenerating ? <RefreshCcw className="w-3 h-3 animate-spin mr-1.5" /> : <RefreshCcw className="w-3 h-3 mr-1.5" />}
+              Regerar Parecer
+            </Button>
+          )}
         </div>
-        <h1 className="text-4xl md:text-5xl font-black text-[#1a2a5e] mb-4 font-serif leading-tight">
-          Resultados das<br />Ações de Divulgação
-        </h1>
-        <p className="text-slate-600 text-lg md:text-xl font-light mb-8 max-w-3xl">
-          Consolidação estratégica de investimentos em mídia, mobilização e atração de talentos.
-        </p>
-        <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-500">
-          <span className="text-[#1a2a5e]">{activeReport?.name}</span>
-          <span>/</span>
-          <span>PERÍODO: {startDateStr} a {endDateStr}</span>
-          <span>/</span>
-          <span className="text-[#d32f2f]">{days === "yesterday" ? "ONTEM" : `ÚLTIMOS ${days} DIAS`}</span>
+
+        {/* Título dinâmico da IA ou fallback */}
+        <div className="relative z-10">
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-5 font-serif leading-tight">
+            {exec.headline ? exec.headline : (<>Resultados das<br />Ações de Divulgação</>)}
+          </h1>
+          <p className="text-white/70 text-lg md:text-xl font-light mb-10 max-w-3xl">
+            Consolidação estratégica de investimentos em mídia, mobilização e atração de talentos.
+          </p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-semibold text-white/60">
+            <span className="text-white font-bold">{activeReport?.name}</span>
+            <span className="text-white/30">·</span>
+            <span>Período: {startDateStr} a {endDateStr}</span>
+            <span className="text-white/30">·</span>
+            <span className="text-[#ff6b6b] font-bold">{days === "yesterday" ? "ONTEM" : `Últimos ${days} dias`}</span>
+          </div>
         </div>
       </div>
 
