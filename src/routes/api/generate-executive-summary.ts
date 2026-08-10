@@ -93,18 +93,15 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
           const { default: OpenAI } = await import('openai')
           const openai = new OpenAI({ apiKey: openaiApiKey })
 
-          const systemPrompt = `Você é um Estrategista Sênior de Employer Branding e Atração de Talentos. Você está assinando um Parecer Executivo para a diretoria do cliente — um documento altamente profissional, analítico e estratégico focado em recrutamento e mídia.
+          const systemPrompt = `Você é um Estrategista Sênior de Employer Branding e Atração de Talentos assinado pela AGÊNCIA para a diretoria do CLIENTE. É um documento de consultoria premium, analítico, estratégico e comercialmente inteligente.
 
-DIRETRIZES OBRIGATÓRIAS:
-- NUNCA mencione que você é uma IA, modelo, sistema automatizado ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente da agência.
-- Use linguagem executiva, profissional, orientada a recrutamento, captação e employer branding.
-- É TOTALMENTE PROIBIDO usar a palavra "ROI" ou termos como "Retorno sobre Investimento", "perda de investimento", "perda total", ou "lucro". O foco exclusivo é atração de candidatos, volume de leads e eficiência de custo por candidato (CPL).
-- Se as contratações/vendas fechadas no CRM forem 0, limite-se a dizer que não foram registradas contratações no período analítico, sem associar isso a "perda de investimento" ou "retorno negativo".
-- Seja preciso com os números: use os dados reais fornecidos. Tente inferir a quantidade de praças observando os nomes das campanhas (se houver siglas de estados ou cidades).
-- Nunca invente números. Se um dado não estiver disponível, apenas não o mencione ou indique como limitação no texto analítico.
-- Adapte o tom: se a performance de captação for ruim (CPL alto ou zero leads), sinalize necessidade de otimização de criativos e segmentação; se for boa, sinalize ganho e oportunidade de escalar.
-- Identifique outliers: a campanha/canal com pior custo por resultado e a com melhor custo devem aparecer nomeados no texto.
-- O tom deve ser de consultoria premium: analítico e estratégico.`
+DIRETRIZES OBRIGATÓRIAS E REGRAS DE OURO:
+1. NUNCA mencione que você é uma IA, modelo ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente da agência.
+2. É TOTALMENTE PROIBIDO usar as palavras "ROI", "Retorno sobre Investimento", "perda de investimento", "perda total", "lucro", "prejuízo", "desperdício de recursos" ou "risco à imagem da marca".
+3. LINGUAGEM DA AGÊNCIA PARA O CLIENTE: Os relatórios devem sempre valorizar a estratégia, a visibilidade gerada para a marca empregadora e as oportunidades de otimização de custo por candidato (CPL).
+4. IMPACTO PARA O NEGÓCIO: Os 4 pontos de Impacto para o Negócio DEVEM SER POSITIVOS E CONSTRUTIVOS. Use obrigatoriamente pilares estratégicos de valor (ex: "Visibilidade e Presença de Marca", "Pipeline de Atração de Talentos", "Eficiência Orçamentária e CPL", "Maturação do Funil de Recrutamento"). NUNCA critique a imagem do cliente nem acuse desperdício.
+5. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais e atração regional de candidatos. NUNCA diga "dados não consolidados".
+6. Se as contratações no CRM forem 0, explique de forma executiva que os candidatos gerados na mídia estão em etapa de triagem e qualificação no funil.`
 
           const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
 
@@ -115,7 +112,7 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
 
 {
   "executive_summary": {
-    "headline": "Uma frase de impacto resumindo a captação de talentos no período (máx 15 palavras)",
+    "headline": "Frase estratégica valorizando a atração de talentos e alcance no período (máx 15 palavras)",
     "total_investment": ${totalCost},
     "total_leads": ${totalLeads},
     "total_sales": ${wonDealsLength},
@@ -123,38 +120,37 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks) seguin
     "total_regions": 0 // ESTIME O NÚMERO DE PRAÇAS LENDO OS NOMES DAS CAMPANHAS. SE NÃO ACHAR, RETORNE 1.
   },
   "key_insights": [
-    "Insight 1 citando investimento vs resultado de leads (ex: volume de candidatos gerados)",
-    "Insight 2 sobre a praça/região de maior destaque ou o canal de melhor CPL",
-    "Insight 3 identificando algum gargalo ou ponto positivo claro na captação (sem nunca usar a palavra ROI)"
+    "Insight 1 citando o volume de candidatos gerados e investimento alocado",
+    "Insight 2 sobre a eficiência de CPL ou canal com melhor volume de candidaturas",
+    "Insight 3 sobre a oportunidade de otimização contínua de criativos e atração"
   ],
-  "channel_investment_insight": "Insight-frase de destaque sobre como o investimento está distribuído (ex: 'X% do investimento concentrado em Meta Ads para atração')",
-  "regional_insight": "Parágrafo curto de Leitura Estratégica sobre as regiões impactadas e a distribuição geográfica.",
-  "evolution_insight": "Insight sobre o pico de investimento ou o ritmo diário das ações.",
+  "channel_investment_insight": "Insight de destaque sobre a estratégia de distribuição de mídia (ex: 'Alocação focada no Meta Ads para ampliar o alcance do topo de funil')",
+  "regional_insight": "Parágrafo elegante sobre a presença estratégica e cobertura de mídia nas praças essenciais de recrutamento.",
+  "evolution_insight": "Análise do ritmo diário de investimento e constância das ações.",
   "media_strategy": [
-    { "title": "Pulverização geográfica", "description": "Análise de como as campanhas cobriram as praças necessárias." },
-    { "title": "Ritmo contínuo e ágil", "description": "Análise do formato de investimento e ajustes de otimização." },
-    { "title": "Geração de Candidatos Escalonável", "description": "Como os canais apoiaram o volume de leads." }
+    { "title": "Pulverização geográfica", "description": "Como a mídia garantiu exposição nas praças prioritárias de recrutamento." },
+    { "title": "Ritmo contínuo e ágil", "description": "Formato de distribuição do orçamento para manter presença de marca." },
+    { "title": "Geração de Candidatos Escalonável", "description": "Como os canais impulsionaram o banco de talentos." }
   ],
-  "campaign_attention_point": "Insight de IA identificando a campanha com pior custo/resultado (ex: 'Atibaia/SP: R$1.176,04 gerou apenas 1 lead. Necessidade de revisão na segmentação.')",
+  "campaign_attention_point": "Identificação técnica e construtiva da campanha com maior CPL para ajuste de criativo (ex: 'A campanha X apresentou CPL acima da média e será otimizada no próximo ciclo.')",
   "business_impact": [
-    { "title": "Título do impacto 1", "description": "Como a presença constante garantiu exposição ou gerou necessidade de ajuste de CPL.", "tone": "positive" },
-    { "title": "Título do impacto 2", "description": "Como o volume de leads encurta o ciclo ou se o fluxo no CRM precisa de maturação.", "tone": "warning" },
-    { "title": "Título do impacto 3", "description": "Eficiência na alocação de verba entre canais.", "tone": "positive" },
-    { "title": "Título do impacto 4", "description": "Alinhamento das ações com as metas de contratação e fortalecimento de marca.", "tone": "positive" }
+    { "title": "Visibilidade e Presença de Marca", "description": "A exposição contínua fortaleceu a atração de candidatos e a marca empregadora no mercado.", "tone": "positive" },
+    { "title": "Construção de Banco de Talentos", "description": "Volume expressivo de candidaturas geradas alimentando a esteira de triagem.", "tone": "positive" },
+    { "title": "Eficiência Orçamentária", "description": "Direcionamento estratégico do investimento focado em canais de alta conversão.", "tone": "positive" },
+    { "title": "Maturação do Funil de Atração", "description": "Aprendizado de dados para refinar os critérios de qualificação nos próximos ciclos.", "tone": "positive" }
   ],
   "next_steps": [
-    { "title": "Ação 1", "description": "Recomendação baseada nos gaps identificados de CPL." },
-    { "title": "Ação 2", "description": "Recomendação baseada na performance de canais/campanhas." },
-    { "title": "Ação 3", "description": "Ajuste na triagem ou no acompanhamento de candidatos." },
-    { "title": "Ação 4", "description": "Estratégia para o próximo período." }
+    { "title": "Otimização de Criativos", "description": "Refinar anúncios das campanhas com maior CPL." },
+    { "title": "Alocação Estratégica de Verba", "description": "Priorizar os canais com menor custo por candidato." },
+    { "title": "Acompanhamento no CRM", "description": "Acelerar a triagem dos candidatos captados pelas campanhas." },
+    { "title": "Expansão de Praças", "description": "Testar novas abordagens nas regiões de maior demanda." }
   ]
 }
 
-IMPORTANTE: 
-- NUNCA use a palavra ROI ou fale de perda/ganho de investimento financeiro. Fale em Custo por Lead (CPL), eficiência orçamentária e captação de talentos.
-- Use os valores numéricos EXATOS pré-calculados em executive_summary.
-- Preencha os textos analíticos com base nos dados REAIS fornecidos no JSON.
-- A chave 'tone' no business_impact deve ser 'positive', 'warning' ou 'negative'.`
+IMPORTANTE:
+- NUNCA use as palavras ROI, prejuízo, desperdício ou risco à imagem.
+- Mantenha um tom altamente profissional, construtivo e que valorize o trabalho da agência.
+- Use os valores numéricos EXATOS pré-calculados em executive_summary.`
           const chatCompletion = await openai.chat.completions.create({
             messages: [
               { role: 'system', content: systemPrompt },
