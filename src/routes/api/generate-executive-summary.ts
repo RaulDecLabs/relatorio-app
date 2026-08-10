@@ -185,6 +185,14 @@ IMPORTANTE:
           if (responseJson) {
             responseJson._raw_metrics = body.rawMetrics || {}
 
+            // Remove o sumário anterior se existir, para permitir a regeneração limpa
+            await supabase
+              .from('executive_summaries')
+              .delete()
+              .eq('report_id', reportId)
+              .eq('period_start', startDateStr)
+              .eq('period_end', endDateStr)
+
             const { error: insertError } = await supabase
               .from('executive_summaries')
               .insert({
