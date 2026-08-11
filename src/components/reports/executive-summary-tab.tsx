@@ -249,7 +249,7 @@ export function ExecutiveSummaryTab({
         {/* Título dinâmico da IA ou fallback */}
         <div className="relative z-10">
           <h1 className="text-4xl md:text-6xl font-black text-white mb-5 font-serif leading-tight">
-            {exec.headline ? exec.headline : (<>Resultados das<br />Ações de Divulgação</>)}
+            {exec.headline ? exec.headline : (<>Resultados das<br />Ações de Divulgação de Vagas</>)}
           </h1>
           <p className="text-white/70 text-lg md:text-xl font-light mb-10 max-w-3xl">
             Consolidação estratégica de investimentos em mídia e divulgação de vagas.

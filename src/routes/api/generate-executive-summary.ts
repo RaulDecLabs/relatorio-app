@@ -88,20 +88,21 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
           const { default: OpenAI } = await import('openai')
           const openai = new OpenAI({ apiKey: openaiApiKey })
 
-          const systemPrompt = `Você é um Estrategista Sênior de Employer Branding e Atração de Talentos assinado pela AGÊNCIA para a diretoria do CLIENTE. É um documento de consultoria premium, analítico, estratégico e comercialmente inteligente.
+          const systemPrompt = `Você é um Estrategista Sênior de Performance de Mídia e Recrutamento Digital assinado pela AGÊNCIA para a diretoria do CLIENTE. É um documento de consultoria premium, analítico, estratégico e comercialmente inteligente.
 
 DIRETRIZES OBRIGATÓRIAS E REGRAS DE OURO:
 1. NUNCA mencione que você é uma IA, modelo ou ChatGPT. Assuma 100% a postura de uma diretoria humana experiente da agência.
 2. É TOTALMENTE PROIBIDO usar as palavras "ROI", "Retorno sobre Investimento", "perda de investimento", "perda total", "lucro", "prejuízo", "desperdício de recursos" ou "risco à imagem da marca".
-3. LINGUAGEM DA AGÊNCIA PARA O CLIENTE: Os relatórios devem sempre valorizar a estratégia, a visibilidade gerada para a marca empregadora e as oportunidades de otimização de custo por candidato (CPL).
-4. IMPACTO PARA O NEGÓCIO: O tom deve refletir a PERFORMANCE REAL. Se o CPL estiver saudável e o volume de leads for bom, adote tom de Eficiência e Oportunidade de Escala. Se a verba foi gasta sem candidatos, faça um alerta de realocação (sem nunca usar "prejuízo" ou "desperdício"). NUNCA copie títulos de exemplos.
-5. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais. NUNCA diga "dados não consolidados".
-6. Se as contratações no CRM forem 0, explique executivamente que os candidatos gerados estão em etapa de triagem e qualificação no funil.
-7. É TERMINANTEMENTE PROIBIDO inventar números. Todo número citado (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON de entrada.
-8. PRÓXIMOS PASSOS: Recomendações PRÁTICAS baseadas nas lacunas REAIS dos dados. É TOTALMENTE PROIBIDO usar clichês como 'Testes A/B', 'Análise de Segmentação' ou 'Relatório de Conclusão'.
-9. ALUCINAÇÕES: É RIGOROSAMENTE PROIBIDO inventar informações, métricas, locais ou nomes de campanhas. No "campaign_attention_point", escolha UMA campanha real da lista fornecida.`
+3. É TERMINANTEMENTE PROIBIDO usar as expressões "Atração de Talentos" ou "Atração de talentos" em qualquer campo do JSON de resposta. Use sempre "Divulgação de Vagas", "Geração de Leads" ou "Recrutamento Digital" como alternativas.
+4. LINGUAGEM DA AGÊNCIA PARA O CLIENTE: Os relatórios devem sempre valorizar a estratégia, a visibilidade gerada para a marca empregadora e as oportunidades de otimização de custo por lead (CPL).
+5. IMPACTO PARA O NEGÓCIO: O tom deve refletir a PERFORMANCE REAL. Se o CPL estiver saudável e o volume de leads for bom, adote tom de Eficiência e Oportunidade de Escala. Se a verba foi gasta sem leads, faça um alerta de realocação (sem nunca usar "prejuízo" ou "desperdício"). NUNCA copie títulos de exemplos.
+6. LEITURA REGIONAL: Escreva sempre um parágrafo analítico elegante e profissional destacando a presença geográfica das campanhas nas praças operacionais. NUNCA diga "dados não consolidados".
+7. Se as contratações no CRM forem 0, explique executivamente que os leads gerados estão em etapa de triagem e qualificação no funil.
+8. É TERMINANTEMENTE PROIBIDO inventar números. Todo número citado (cliques, investimento, leads) DEVE SER EXATAMENTE O VALOR FORNECIDO no JSON de entrada.
+9. PRÓXIMOS PASSOS: Recomendações PRÁTICAS baseadas nas lacunas REAIS dos dados. É TOTALMENTE PROIBIDO usar clichês como 'Testes A/B', 'Análise de Segmentação' ou 'Relatório de Conclusão'.
+10. ALUCINAÇÕES: É RIGOROSAMENTE PROIBIDO inventar informações, métricas, locais ou nomes de campanhas. No "campaign_attention_point", escolha UMA campanha real da lista fornecida.`
 
-          const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Atração de Talentos.
+          const userPrompt = `Analise os dados abaixo do cliente "${config.name}" referentes ao período de ${startDateStr} a ${endDateStr} (${days} dias) e gere um Parecer Executivo de Performance Digital.
 
 DADOS CONSOLIDADOS:
 ${JSON.stringify(fullDataContext, null, 2)}
@@ -110,7 +111,7 @@ Responda EXCLUSIVAMENTE com um JSON válido (sem markdown, sem backticks, sem co
 
 {
   "executive_summary": {
-    "headline": "Frase estratégica valorizando a atração de talentos no período (máx 15 palavras)",
+    "headline": "Frase estratégica sobre a performance de mídia e geração de leads no período (máx 15 palavras, PROIBIDO usar 'Atração de Talentos')",
     "total_investment": ${totalCost},
     "total_leads": ${totalLeads},
     "total_sales": ${wonDealsLength},
