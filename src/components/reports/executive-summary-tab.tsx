@@ -252,7 +252,7 @@ export function ExecutiveSummaryTab({
             {exec.headline ? exec.headline : (<>Resultados das<br />Ações de Divulgação</>)}
           </h1>
           <p className="text-white/70 text-lg md:text-xl font-light mb-10 max-w-3xl">
-            Consolidação estratégica de investimentos em mídia, mobilização e atração de talentos.
+            Consolidação estratégica de investimentos em mídia e divulgação de vagas.
           </p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-semibold text-white/60">
             <span className="text-white font-bold">{activeReport?.name}</span>
@@ -289,7 +289,7 @@ export function ExecutiveSummaryTab({
           )}
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
             <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(rawMetrics?.consolidated?.totalLeads || 0)}</span>
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Candidatos (Leads)</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Leads</span>
           </div>
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
             <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(rawMetrics?.wonDealsLength || 0)}</span>
@@ -297,7 +297,7 @@ export function ExecutiveSummaryTab({
           </div>
           <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
             <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(rawMetrics?.consolidated?.blendedCpa || 0)}</span>
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Custo por Candidato</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Custo por Lead</span>
           </div>
         </div>
 
