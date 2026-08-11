@@ -354,72 +354,95 @@ export function ExecutiveSummaryTab({
       )}
 
       {/* ══════════════════════════════════════════════════════════════
-          SEÇÃO 5.5: INVESTIMENTO POR REGIÃO
+          SEÇÃO 5.5: ALCANCE POR REGIÃO (GA4 — dados reais de sessões)
       ═══════════════════════════════════════════════════════════════ */}
-      {data.regional_investment && data.regional_investment.length > 0 && (
-        <div className="space-y-6 pt-10">
-          <div className="border-b pb-2 border-slate-200">
-            <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Investimento por Região</h2>
-            <p className="text-slate-500 font-light">Alocação geográfica do orçamento — {data.regional_investment.length} praças atendidas</p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8">
-              <div className="h-[400px] w-full mt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.regional_investment} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-                    <XAxis type="number" hide />
-                    <YAxis dataKey="region" type="category" stroke="#475569" fontSize={11} tickMargin={10} width={150} tickLine={false} axisLine={{ stroke: '#cbd5e1' }} />
-                    <RechartsTooltip 
-                      cursor={{fill: 'rgba(0,0,0,0.02)'}}
-                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                      formatter={(value: number) => [fmt(value), 'Investimento']}
-                    />
-                    <Bar dataKey="cost" fill="#1a2a5e" radius={[0, 4, 4, 0]} barSize={24}>
-                      {
-                        data.regional_investment.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill="#1a2a5e" />
-                        ))
-                      }
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+      {(() => {
+        // Usa cidades reais do GA4 passadas via rawMetrics — ignora dados da IA que não tem custo por cidade
+        const ga4Cities: { city: string; sessions: number }[] = rawMetrics?.ga4?.cities || [];
+        if (ga4Cities.length === 0) return null;
+
+        const totalSessions = ga4Cities.reduce((s, c) => s + c.sessions, 0);
+        const topCity = ga4Cities[0];
+
+        return (
+          <div className="space-y-6 pt-10">
+            <div className="border-b pb-2 border-slate-200">
+              <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Alcance por Região</h2>
+              <p className="text-slate-500 font-light">Sessões de usuários por cidade — fonte: Google Analytics 4 · {ga4Cities.length} cidades identificadas</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Gráfico de barras com sessões reais */}
+              <div className="lg:col-span-8">
+                <div className="h-[380px] w-full mt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={ga4Cities.map(c => ({ region: c.city, sessions: c.sessions }))}
+                      layout="vertical"
+                      margin={{ top: 5, right: 40, left: 10, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                      <XAxis type="number" hide />
+                      <YAxis
+                        dataKey="region"
+                        type="category"
+                        stroke="#475569"
+                        fontSize={11}
+                        tickMargin={10}
+                        width={140}
+                        tickLine={false}
+                        axisLine={{ stroke: '#cbd5e1' }}
+                      />
+                      <RechartsTooltip
+                        cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        formatter={(value: number) => [fmtNum(value), 'Sessões']}
+                      />
+                      <Bar dataKey="sessions" fill="#1a2a5e" radius={[0, 4, 4, 0]} barSize={22}>
+                        {ga4Cities.map((_: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={index === 0 ? '#d32f2f' : '#1a2a5e'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Cards laterais com insight regional da IA */}
+              <div className="lg:col-span-4 flex flex-col gap-4 justify-center">
+                {topCity && (
+                  <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
+                    <div className="text-3xl font-bold text-[#d32f2f] font-serif mb-1">
+                      {fmtNum(topCity.sessions)}
+                    </div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Sessões em {topCity.city}</div>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Maior concentração de tráfego — {totalSessions > 0 ? Math.round((topCity.sessions / totalSessions) * 100) : 0}% do total de sessões no período.
+                    </p>
+                  </div>
+                )}
+                <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
+                  <div className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">
+                    {fmtNum(totalSessions)}
+                  </div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Total de Sessões</div>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Distribuídas em {ga4Cities.length} {ga4Cities.length === 1 ? 'cidade' : 'cidades'} únicas identificadas pelo GA4 no período.
+                  </p>
+                </div>
+                {data.regional_insight && (
+                  <div className="bg-[#1a2a5e] p-6 rounded-xl text-white shadow-md">
+                    <h4 className="font-bold mb-2 text-sm">Leitura estratégica</h4>
+                    <p className="text-slate-300 text-sm font-light leading-relaxed">{data.regional_insight}</p>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="lg:col-span-4 flex flex-col gap-4 justify-center">
-              {data.regional_summary?.top_region_text && (
-                <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
-                  <div className="text-3xl font-bold text-[#1a2a5e] font-serif mb-3">
-                    {(() => {
-                      const match = data.regional_summary.top_region_text.match(/(R\$ [\d.,]+)/);
-                      return match ? match[1] : "Destaque";
-                    })()}
-                  </div>
-                  <p className="text-slate-600 text-sm leading-relaxed">{data.regional_summary.top_region_text}</p>
-                </div>
-              )}
-              {data.regional_summary?.secondary_region_text && (
-                <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
-                  <div className="text-3xl font-bold text-[#1a2a5e] font-serif mb-3">
-                    {(() => {
-                      const match = data.regional_summary.secondary_region_text.match(/(R\$ [\d.,]+)/);
-                      return match ? match[1] : "Multirregional";
-                    })()}
-                  </div>
-                  <p className="text-slate-600 text-sm leading-relaxed">{data.regional_summary.secondary_region_text}</p>
-                </div>
-              )}
-              {data.regional_insight && (
-                <div className="bg-[#1a2a5e] p-6 rounded-xl text-white shadow-md mt-2">
-                  <h4 className="font-bold mb-2">Leitura estratégica</h4>
-                  <p className="text-slate-300 text-sm font-light leading-relaxed">{data.regional_insight}</p>
-                </div>
-              )}
-            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
+
+
 
       {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 6: ESTRATÉGIA DE MÍDIA

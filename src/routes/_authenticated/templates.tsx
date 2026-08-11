@@ -656,7 +656,26 @@ Diretrizes de Especialista:
                   google_ads: { cost: adsCost, clicks: adsClicks, conversions: adsConversions, cpa: adsCpa },
                   meta_ads: { cost: fbCost, clicks: fbClicks, conversions: fbConversions, cpa: fbCpa },
                   gsc: { clicks: gscClicks, impressions: gscImpressions },
-                  ga4: { sessions: gaSessions, users: gaUsers, pageviews: gaPageViews, avgDuration: gaAvgSessionDuration },
+                  ga4: {
+                    sessions: gaSessions,
+                    users: gaUsers,
+                    pageviews: gaPageViews,
+                    avgDuration: gaAvgSessionDuration,
+                    // Cidades reais do GA4 por volume de sessões
+                    cities: (() => {
+                      const cityMap = new Map<string, number>();
+                      gaMetrics.forEach((d: any) => {
+                        const city = (d.city || '').trim();
+                        if (city && city !== '(not set)' && city !== 'not set') {
+                          cityMap.set(city, (cityMap.get(city) || 0) + (d.sessions || 0));
+                        }
+                      });
+                      return Array.from(cityMap.entries())
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 10)
+                        .map(([city, sessions]) => ({ city, sessions }));
+                    })()
+                  },
                   consolidated: { totalCost, totalConversions, blendedCpa, totalClicks: totalPaidClicks, totalLeads: totalConversions },
                   totalRevenue: nectarDeals?.filter((d: any) => d.status === 'Ganho').reduce((s: number, d: any) => s + (Number(d.value) || 0), 0) || 0,
                   wonDealsLength: nectarDeals?.filter((d: any) => d.status === 'Ganho').length || 0
