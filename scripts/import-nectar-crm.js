@@ -55,6 +55,40 @@ function mapStatus(statusCode) {
   return 'Aberto';
 }
 
+function extractOrigin(deal) {
+  return deal.origem?.nome || deal.origemObject?.nome || null;
+}
+
+function extractOwner(deal) {
+  return deal.responsavel?.nome || null;
+}
+
+function extractLossReason(deal) {
+  const justificativas = deal.justificativas;
+  if (!Array.isArray(justificativas) || justificativas.length === 0) return null;
+  const reasons = justificativas
+    .map((j) => {
+      if (typeof j === 'string') return j;
+      if (j && typeof j === 'object') return j.nome || j.motivo || j.descricao || j.texto || null;
+      return null;
+    })
+    .filter(Boolean);
+  return reasons.length > 0 ? reasons.join('; ') : null;
+}
+
+function extractProducts(deal) {
+  const produtos = deal.produtos;
+  if (!Array.isArray(produtos) || produtos.length === 0) return null;
+  const names = produtos
+    .map((p) => {
+      if (typeof p === 'string') return p;
+      if (p && typeof p === 'object') return p.nome || p.produto?.nome || p.descricao || null;
+      return null;
+    })
+    .filter(Boolean);
+  return names.length > 0 ? names.join(', ') : null;
+}
+
 async function run() {
   console.log("Iniciando rotina de extração do Nectar CRM...");
   
@@ -146,6 +180,10 @@ async function run() {
         created_at: deal.dataCriacao || new Date().toISOString(),
         updated_at: deal.dataAtualizacao || new Date().toISOString(),
         closed_at: deal.status === 0 || deal.status === 2 ? (deal.dataAtualizacao || new Date().toISOString()) : null,
+        origin_name: extractOrigin(deal),
+        owner_name: extractOwner(deal),
+        loss_reason: extractLossReason(deal),
+        product_names: extractProducts(deal),
         payload: deal
       }));
 

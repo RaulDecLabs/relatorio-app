@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Target, DollarSign, PieChart, ShieldAlert, CheckCircle2, TrendingUp, Users, AlertCircle, ArrowUpRight } from "lucide-react";
+import { Target, DollarSign, PieChart, ShieldAlert, CheckCircle2, TrendingUp, Users, AlertCircle, ArrowUpRight, Compass, XCircle, Package } from "lucide-react";
 import { SectionTitle, ReportConfig } from "@/components/reports/report-ui";
 import {
   Table,
@@ -83,6 +83,53 @@ export function NectarCrmTab({ activeReport, startDateStr, endDateStr, deals = [
     });
 
     return Object.values(stageCounts).sort((a, b) => b.count - a.count);
+  }, [deals]);
+
+  // Agrupa os negócios por Origem (Atribuição)
+  const originData = useMemo(() => {
+    const counts: Record<string, { name: string; count: number; value: number }> = {};
+
+    deals.forEach(deal => {
+      const origin = deal.origin_name || 'Não informado';
+      if (!counts[origin]) {
+        counts[origin] = { name: origin, count: 0, value: 0 };
+      }
+      counts[origin].count += 1;
+      counts[origin].value += Number(deal.value) || 0;
+    });
+
+    return Object.values(counts).sort((a, b) => b.count - a.count);
+  }, [deals]);
+
+  // Agrupa os motivos de perda (apenas negócios perdidos)
+  const lossReasonData = useMemo(() => {
+    const counts: Record<string, { name: string; count: number }> = {};
+
+    deals.filter(deal => deal.status === 'Perdido').forEach(deal => {
+      const reason = deal.loss_reason || 'Não informado';
+      if (!counts[reason]) {
+        counts[reason] = { name: reason, count: 0 };
+      }
+      counts[reason].count += 1;
+    });
+
+    return Object.values(counts).sort((a, b) => b.count - a.count);
+  }, [deals]);
+
+  // Agrupa os negócios por Produto
+  const productData = useMemo(() => {
+    const counts: Record<string, { name: string; count: number; value: number }> = {};
+
+    deals.forEach(deal => {
+      if (!deal.product_names) return;
+      if (!counts[deal.product_names]) {
+        counts[deal.product_names] = { name: deal.product_names, count: 0, value: 0 };
+      }
+      counts[deal.product_names].count += 1;
+      counts[deal.product_names].value += Number(deal.value) || 0;
+    });
+
+    return Object.values(counts).sort((a, b) => b.value - a.value);
   }, [deals]);
 
   // Formatação de Moeda
@@ -312,6 +359,115 @@ export function NectarCrmTab({ activeReport, startDateStr, endDateStr, deals = [
                     </TableBody>
                   </Table>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+            <Card className="border-border/60 shadow-sm col-span-1">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Compass className="h-5 w-5 text-cyan-500" /> Origem das Oportunidades
+                </CardTitle>
+                <CardDescription>Atribuição: de onde vieram os negócios</CardDescription>
+              </CardHeader>
+              <CardContent className="px-0 pt-0">
+                {originData.length === 0 ? (
+                  <p className="text-sm text-muted-foreground px-6 pb-4">Nenhuma origem informada pela API.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-muted/30">
+                        <TableRow>
+                          <TableHead className="font-semibold px-4">Origem</TableHead>
+                          <TableHead className="font-semibold text-center">Qtd.</TableHead>
+                          <TableHead className="font-semibold text-right px-4">Valor</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {originData.map((item) => (
+                          <TableRow key={item.name} className="hover:bg-muted/50 border-border/40 transition-colors">
+                            <TableCell className="px-4 py-3 text-sm">{item.name}</TableCell>
+                            <TableCell className="py-3 text-center text-sm">{item.count}</TableCell>
+                            <TableCell className="py-3 px-4 text-right font-mono text-sm text-foreground/80">
+                              {formatCurrency(item.value)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/60 shadow-sm col-span-1">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-rose-500" /> Motivos de Perda
+                </CardTitle>
+                <CardDescription>Por que as oportunidades perdidas não fecharam</CardDescription>
+              </CardHeader>
+              <CardContent className="px-0 pt-0">
+                {lossReasonData.length === 0 ? (
+                  <p className="text-sm text-muted-foreground px-6 pb-4">Nenhum negócio perdido no período.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-muted/30">
+                        <TableRow>
+                          <TableHead className="font-semibold px-4">Motivo</TableHead>
+                          <TableHead className="font-semibold text-center px-4">Qtd.</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {lossReasonData.map((item) => (
+                          <TableRow key={item.name} className="hover:bg-muted/50 border-border/40 transition-colors">
+                            <TableCell className="px-4 py-3 text-sm">{item.name}</TableCell>
+                            <TableCell className="py-3 px-4 text-center text-sm">{item.count}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/60 shadow-sm col-span-1">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Package className="h-5 w-5 text-amber-500" /> Produtos
+                </CardTitle>
+                <CardDescription>Negócios por produto/serviço vendido</CardDescription>
+              </CardHeader>
+              <CardContent className="px-0 pt-0">
+                {productData.length === 0 ? (
+                  <p className="text-sm text-muted-foreground px-6 pb-4">Nenhum produto informado pela API.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-muted/30">
+                        <TableRow>
+                          <TableHead className="font-semibold px-4">Produto</TableHead>
+                          <TableHead className="font-semibold text-center">Qtd.</TableHead>
+                          <TableHead className="font-semibold text-right px-4">Valor</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {productData.map((item) => (
+                          <TableRow key={item.name} className="hover:bg-muted/50 border-border/40 transition-colors">
+                            <TableCell className="px-4 py-3 text-sm">{item.name}</TableCell>
+                            <TableCell className="py-3 text-center text-sm">{item.count}</TableCell>
+                            <TableCell className="py-3 px-4 text-right font-mono text-sm text-foreground/80">
+                              {formatCurrency(item.value)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
