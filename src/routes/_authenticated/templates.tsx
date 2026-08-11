@@ -621,7 +621,20 @@ Diretrizes de Especialista:
                     sessoes: gaSessions,
                     usuarios: gaUsers,
                     pageviews: gaPageViews,
-                    tempo_medio_sessao_segundos: gaAvgSessionDuration
+                    tempo_medio_sessao_segundos: gaAvgSessionDuration,
+                    // Cidades reais do GA4 com maior volume de sessões
+                    principais_cidades: (() => {
+                      const cityMap = new Map<string, number>();
+                      gaMetrics.forEach((d: any) => {
+                        if (d.city && d.city.trim() && d.city !== '(not set)') {
+                          cityMap.set(d.city, (cityMap.get(d.city) || 0) + (d.sessions || 0));
+                        }
+                      });
+                      return Array.from(cityMap.entries())
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 10)
+                        .map(([cidade, sessoes]) => ({ cidade, sessoes }));
+                    })()
                   },
                   seo_search_console: {
                     cliques_organicos: gscClicks,
