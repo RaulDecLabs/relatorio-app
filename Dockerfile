@@ -18,6 +18,9 @@ WORKDIR /app
 # Copiar a build do Nitro
 COPY --from=builder /app/.output ./.output
 
+# Copiar os scripts de importação usados pelos webhooks do n8n
+COPY --from=builder /app/scripts ./scripts
+
 # Copiar package.json e instalar SOMENTE as dependências de produção
 # Isso garante que openai, ws e qualquer outro pacote externo esteja disponível
 COPY package.json package-lock.json* ./
