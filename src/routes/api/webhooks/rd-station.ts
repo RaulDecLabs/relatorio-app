@@ -1,11 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
+import { verifyImportSecret } from '@/lib/verify-import-secret'
 
 export const Route = createFileRoute('/api/webhooks/rd-station')({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
+          if (!verifyImportSecret(request)) {
+            return new Response('Unauthorized', { status: 401 })
+          }
+
           const url = new URL(request.url)
           const reportId = url.searchParams.get('report_id')
 

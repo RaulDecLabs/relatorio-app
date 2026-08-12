@@ -50,9 +50,9 @@ export function ExecutiveSummaryTab({
     enabled: !!activeReport?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("executive_summaries" as any)
+        .from("executive_summaries")
         .select("*")
-        .eq("report_id" as any, activeReport.id)
+        .eq("report_id", activeReport.id)
         .gte("period_start", startDateStr)
         .lte("period_end", endDateStr)
         .order("created_at", { ascending: false })
@@ -69,9 +69,14 @@ export function ExecutiveSummaryTab({
 
   const generateMutation = useMutation({
     mutationFn: async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
       const response = await fetch('/api/generate-executive-summary', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           reportId: activeReport.id,
           activeReport,

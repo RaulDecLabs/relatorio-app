@@ -33,7 +33,7 @@ function ClientDetail() {
       <PageHeader
         title={client?.company_name ?? "Carregando..."}
         description={client?.segment ?? ""}
-        actions={<Button size="sm" variant="outline">Exportar PDF</Button>}
+        actions={<Button size="sm" variant="outline" disabled title="Exportação de PDF ainda não implementada">Exportar PDF</Button>}
       />
 
       <Tabs defaultValue="overview">
@@ -61,8 +61,8 @@ function ClientDetail() {
           <Card className="border-border/70 shadow-none">
             <CardHeader><CardTitle className="text-base">Feedback do cliente</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              <Textarea rows={3} placeholder="Compartilhe um comentário sobre os resultados..." />
-              <div className="flex justify-end"><Button size="sm">Enviar comentário</Button></div>
+              <Textarea rows={3} placeholder="Compartilhe um comentário sobre os resultados..." disabled />
+              <div className="flex justify-end"><Button size="sm" disabled title="Envio de comentários ainda não implementado">Enviar comentário</Button></div>
             </CardContent>
           </Card>
         </TabsContent>

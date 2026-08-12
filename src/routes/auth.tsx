@@ -35,7 +35,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) navigate({ to: "/reports", replace: true });
     });
   }, [navigate]);
 
@@ -52,7 +52,7 @@ function AuthPage() {
         password: values.password,
       });
       if (error) throw error;
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to: "/reports", replace: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao autenticar");
     } finally {
@@ -64,10 +64,10 @@ function AuthPage() {
     setLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/dashboard",
+        redirect_uri: window.location.origin + "/reports",
       });
       if (result.error) throw result.error;
-      if (!result.redirected) navigate({ to: "/dashboard", replace: true });
+      if (!result.redirected) navigate({ to: "/reports", replace: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha no login Google");
       setLoading(false);

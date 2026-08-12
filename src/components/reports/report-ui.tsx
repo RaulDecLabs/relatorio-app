@@ -16,6 +16,11 @@ export interface ReportConfig {
   gsc_url?: string | null;
   rd_public_token?: string | null;
   rd_private_token?: string | null;
+  rd_client_id?: string | null;
+  rd_client_secret?: string | null;
+  rd_access_token?: string | null;
+  rd_refresh_token?: string | null;
+  nectar_api_token?: string | null;
   created_at: string;
 }
 

@@ -1,13 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
+import { verifyImportSecret } from '@/lib/verify-import-secret'
+import { signState } from '@/lib/rd-marketing-state'
 
 export const Route = createFileRoute('/api/auth/login/rd-marketing')({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        if (!verifyImportSecret(request)) {
+          return new Response('Unauthorized', { status: 401 })
+        }
+
         const url = new URL(request.url)
         const reportId = url.searchParams.get('report_id')
-        
+
         if (!reportId) {
           return new Response('report_id is required', { status: 400 })
         }
@@ -29,8 +35,8 @@ export const Route = createFileRoute('/api/auth/login/rd-marketing')({
           }
           
           const redirectUri = `${url.origin}/api/auth/callback/rd-marketing`
-          const state = reportId
-          const rdAuthUrl = `https://api.rd.services/auth/dialog?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`
+          const state = signState(reportId)
+          const rdAuthUrl = `https://api.rd.services/auth/dialog?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}`
           
           return new Response(null, {
             status: 302,

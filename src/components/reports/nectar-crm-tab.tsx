@@ -266,7 +266,7 @@ export function NectarCrmTab({ activeReport, startDateStr, endDateStr, deals = [
               <CardContent>
                 <div className="text-2xl font-bold text-rose-500">{metrics.lostDeals}</div>
                 <p className="text-xs text-muted-foreground font-medium mt-1">
-                  {((metrics.lostDeals / metrics.totalDeals) * 100).toFixed(1)}% de perda
+                  {metrics.totalDeals > 0 ? `${((metrics.lostDeals / metrics.totalDeals) * 100).toFixed(1)}% de perda` : "Sem negócios no período"}
                 </p>
               </CardContent>
             </Card>

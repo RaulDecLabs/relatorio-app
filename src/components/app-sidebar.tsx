@@ -1,17 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard,
-  Users,
   FileText,
-  Plug,
   LayoutTemplate,
-  Workflow,
-  Wallet,
   Settings,
   UserCog,
   TrendingUp,
   ListChecks,
-  BarChart3,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,22 +21,17 @@ import {
 } from "@/components/ui/sidebar";
 import { useRoles } from "@/hooks/use-role";
 
+// Dashboard, Clientes, Integrações, Automações e Custos saíram do menu:
+// dependem de tabelas/dados que não existem em produção ou são só placeholder.
+// O código continua no repo pra quando forem retomados.
 const mainItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, staffOnly: true },
-  { title: "Clientes", url: "/clients", icon: Users, staffOnly: true },
   { title: "Relatórios de Canais", url: "/reports", icon: FileText, staffOnly: false },
   { title: "Parecer Executivo", url: "/templates", icon: LayoutTemplate, staffOnly: false },
-];
-
-const opsItems = [
-  { title: "Integrações", url: "/integrations", icon: Plug },
-  { title: "Automações", url: "/automations", icon: Workflow },
 ];
 
 const adminItems = [
   { title: "Gestão de Usuários", url: "/users", icon: UserCog },
   { title: "Roadmap", url: "/roadmap", icon: ListChecks },
-  { title: "Custos", url: "/costs", icon: Wallet },
   { title: "Configurações", url: "/settings", icon: Settings },
 ];
 
@@ -66,9 +55,6 @@ export function AppSidebar() {
     </SidebarMenuItem>
   );
 
-  // Se o usuário não for equipe da agência ou admin (ex: é Cliente), ele vê APENAS relatórios de canais e parecer executivo.
-  const visibleMainItems = mainItems.filter((item) => !item.staffOnly || (isStaff || isAdmin));
-
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
@@ -88,18 +74,9 @@ export function AppSidebar() {
         <SidebarGroup>
           {!collapsed && <SidebarGroupLabel>{isStaff || isAdmin ? "Principal" : "Menu do Cliente"}</SidebarGroupLabel>}
           <SidebarGroupContent>
-            <SidebarMenu>{visibleMainItems.map(renderItem)}</SidebarMenu>
+            <SidebarMenu>{mainItems.map(renderItem)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {(isStaff || isAdmin) && (
-          <SidebarGroup>
-            {!collapsed && <SidebarGroupLabel>Operação</SidebarGroupLabel>}
-            <SidebarGroupContent>
-              <SidebarMenu>{opsItems.map(renderItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
 
         {isAdmin && (
           <SidebarGroup>

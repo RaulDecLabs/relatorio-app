@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { exec } from 'child_process'
 import { promisify } from 'util'
+import { verifyImportSecret } from '@/lib/verify-import-secret'
 
 const execPromise = promisify(exec)
 
@@ -8,17 +9,12 @@ export const Route = createFileRoute('/api/public/trigger-import-nectar-crm')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // 1. Verificar segredo de autenticação
-        const url = new URL(request.url)
-        const requestSecret = (url.searchParams.get('secret') || request.headers.get('x-import-secret') || '').trim().replace(/^['"]|['"]$/g, '');
-        const configuredSecret = (process.env.INGEST_HMAC_SECRET || '').trim().replace(/^['"]|['"]$/g, '');
-        const validSecrets = [configuredSecret, 'insightOS-secret-2024', 'insightos-secret-2024'].filter(Boolean);
-
-        if (!requestSecret || !validSecrets.includes(requestSecret)) {
+        if (!verifyImportSecret(request)) {
           return new Response('Unauthorized', { status: 401 });
         }
 
         // 2. Parse dias para importar
+        const url = new URL(request.url)
         const daysParam = url.searchParams.get('days')
         const days = daysParam ? parseInt(daysParam, 10) : 7
 

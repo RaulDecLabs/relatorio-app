@@ -36,3 +36,6 @@ tmp
 .env.*
 *.env
 
+# Credenciais de conta de servico do Google (nunca versionar)
+google-credentials.json
+

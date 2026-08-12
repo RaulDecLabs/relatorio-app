@@ -74,6 +74,11 @@ export const Route = createFileRoute('/api/public/ingest')({
 
         const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
 
+        const { isTableOwnedByClient } = await import('@/lib/validate-table-name')
+        if (!(await isTableOwnedByClient(supabaseAdmin, client_id, table_name, 'table_name'))) {
+          return Response.json({ error: 'table_name does not belong to client_id' }, { status: 403 })
+        }
+
         // upsert rows directly to dynamic table_name
         const upsertRows = rows.map((r) => ({
           client_id,

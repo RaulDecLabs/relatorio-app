@@ -63,7 +63,7 @@ function UsersPage() {
   const deleteFn = useServerFn(deleteUser);
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate({ to: "/dashboard", replace: true });
+    if (!loading && !isAdmin) navigate({ to: "/reports", replace: true });
   }, [loading, isAdmin, navigate]);
 
   const { data: users = [], isLoading } = useQuery({

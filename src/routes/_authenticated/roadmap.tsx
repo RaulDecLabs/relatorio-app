@@ -36,7 +36,7 @@ function RoadmapPage() {
   const { isAdmin, loading } = useRoles();
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate({ to: "/dashboard", replace: true });
+    if (!loading && !isAdmin) navigate({ to: "/reports", replace: true });
   }, [loading, isAdmin, navigate]);
 
   const { data: items = [] } = useQuery({

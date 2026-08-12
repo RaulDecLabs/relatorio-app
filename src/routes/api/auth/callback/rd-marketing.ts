@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createClient } from '@supabase/supabase-js'
+import { verifyState } from '@/lib/rd-marketing-state'
 
 export const Route = createFileRoute('/api/auth/callback/rd-marketing')({
   server: {
@@ -7,12 +8,17 @@ export const Route = createFileRoute('/api/auth/callback/rd-marketing')({
       GET: async ({ request }) => {
         const url = new URL(request.url)
         const code = url.searchParams.get('code')
-        const state = url.searchParams.get('state')
-        
-        if (!code || !state) {
+        const rawState = url.searchParams.get('state')
+
+        if (!code || !rawState) {
           return new Response('Code ou State (report_id) ausente', { status: 400 })
         }
-        
+
+        const state = verifyState(rawState)
+        if (!state) {
+          return new Response('State inválido ou expirado: reinicie a conexão pelo painel.', { status: 401 })
+        }
+
         try {
           const cleanStr = (val: any) => typeof val === 'string' ? val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '') : undefined;
           const SUPABASE_URL = cleanStr(process.env.SUPABASE_URL) || cleanStr(process.env.VITE_SUPABASE_URL) || 'https://btdgetidtawjtqrvzybh.supabase.co';

@@ -32,6 +32,11 @@ export const Route = createFileRoute('/api/public/sheets-audit')({
           return Response.json({ error: 'Missing parameters' }, { status: 400 });
         }
 
+        const { requireReportAccess } = await import('@/lib/require-report-access');
+        if (!(await requireReportAccess(request, reportId))) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
 
         // Fetch sheet config

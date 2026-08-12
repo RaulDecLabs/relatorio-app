@@ -30,14 +30,20 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 });
 
 const WEBHOOK_URL = 'https://relatorios.decsigner.com.br/api/webhooks/rd-station';
+const INGEST_SECRET = process.env.INGEST_HMAC_SECRET;
 
 async function registerWebhook(token, reportId, eventType) {
+  if (!INGEST_SECRET) {
+    console.error('INGEST_HMAC_SECRET nao configurado no .env — necessario pra assinar a URL do webhook.');
+    process.exit(1);
+  }
+
   const url = 'https://api.rd.services/platform/webhooks';
-  
+
   // The event types can be WEBHOOK.CONVERTED, WEBHOOK.OPPORTUNITY, WEBHOOK.SALE
   const payload = {
     event_type: eventType,
-    url: `${WEBHOOK_URL}?report_id=${reportId}`
+    url: `${WEBHOOK_URL}?report_id=${reportId}&secret=${encodeURIComponent(INGEST_SECRET)}`
   };
 
   console.log(`Registering ${eventType}...`);

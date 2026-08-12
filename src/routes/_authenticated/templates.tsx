@@ -71,45 +71,6 @@ function SectionTitle({ title, description, icon: Icon, color = "blue" }: any) {
   );
 }
 
-function KpiCard({ label, value, icon: Icon, hint, color = "blue" }: any) {
-  const colorMap: Record<string, any> = {
-    blue: { bg: "bg-blue-500/10 text-blue-500", accent: "border-blue-500/30", hover: "hover:border-blue-500/50 hover:shadow-blue-500/20", gradient: "from-blue-500/10 to-transparent", dot: "bg-blue-500" },
-    green: { bg: "bg-emerald-500/10 text-emerald-500", accent: "border-emerald-500/30", hover: "hover:border-emerald-500/50 hover:shadow-emerald-500/20", gradient: "from-emerald-500/10 to-transparent", dot: "bg-emerald-500" },
-    amber: { bg: "bg-amber-500/10 text-amber-500", accent: "border-amber-500/30", hover: "hover:border-amber-500/50 hover:shadow-amber-500/20", gradient: "from-amber-500/10 to-transparent", dot: "bg-amber-500" },
-    indigo: { bg: "bg-indigo-500/10 text-indigo-500", accent: "border-indigo-500/30", hover: "hover:border-indigo-500/50 hover:shadow-indigo-500/20", gradient: "from-indigo-500/10 to-transparent", dot: "bg-indigo-500" },
-    purple: { bg: "bg-purple-500/10 text-purple-500", accent: "border-purple-500/30", hover: "hover:border-purple-500/50 hover:shadow-purple-500/20", gradient: "from-purple-500/10 to-transparent", dot: "bg-purple-500" },
-    rose: { bg: "bg-rose-500/10 text-rose-500", accent: "border-rose-500/30", hover: "hover:border-rose-500/50 hover:shadow-rose-500/20", gradient: "from-rose-500/10 to-transparent", dot: "bg-rose-500" },
-  };
-  const design = colorMap[color] || colorMap.blue;
-
-  return (
-    <Card className={cn(
-      "relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border-border/50 bg-card/60 backdrop-blur-xl", 
-      design.accent,
-      design.hover
-    )}>
-      <div className={cn("absolute inset-0 bg-gradient-to-br opacity-50", design.gradient)} />
-      <CardContent className="p-6 relative z-10">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl shadow-inner", design.bg)}>
-            <Icon className="h-5 w-5" />
-          </div>
-        </div>
-        <div className="mt-4 flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">{value}</span>
-        </div>
-        {hint && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground/80 font-medium">
-            <div className={cn("h-1.5 w-1.5 rounded-full animate-pulse", design.dot)} />
-            <span>{hint}</span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
 const CustomChartTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -271,16 +232,16 @@ function TemplatesPage() {
     enabled: !!activeReport?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("nectar_deals" as any)
+        .from("nectar_deals")
         .select("*")
-        .eq("report_id" as any, activeReport!.id)
+        .eq("report_id", activeReport!.id)
         .gte("created_at", startDateStr)
         .lte("created_at", endDateStr);
       if (error) throw error;
       return (data || []) as any[];
     }
   });
-  
+
   const aiInsight = (aiInsightsList.length > 0 ? aiInsightsList[0] : null) as any;
 
   const isLoading = loadGa || loadAds || loadFbAds || loadGsc || loadAi || loadNectar;

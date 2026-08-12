@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { exec } from 'child_process'
 import { promisify } from 'util'
+import { verifyImportSecret } from '@/lib/verify-import-secret'
 
 const execPromise = promisify(exec)
 
@@ -8,13 +9,7 @@ export const Route = createFileRoute('/api/public/trigger-mock-test')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Verificar segredo de autenticação
-        const url = new URL(request.url)
-        const requestSecret = (url.searchParams.get('secret') || request.headers.get('x-import-secret') || '').trim().replace(/^['"]|['"]$/g, '');
-        const configuredSecret = (process.env.INGEST_HMAC_SECRET || '').trim().replace(/^['"]|['"]$/g, '');
-        const validSecrets = [configuredSecret, 'insightOS-secret-2024', 'insightos-secret-2024'].filter(Boolean);
-
-        if (!requestSecret || !validSecrets.includes(requestSecret)) {
+        if (!verifyImportSecret(request)) {
           return new Response('Unauthorized', { status: 401 });
         }
 

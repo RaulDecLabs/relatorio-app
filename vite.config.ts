@@ -6,14 +6,19 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig({
-  nitro: {
-    preset: 'node-server',
-    rollupConfig: {
-      // Não externalizar nada — openai e ws devem ser embutidos no bundle do servidor
-      external: [],
-    },
+// O tipo `nitro` do wrapper da Lovable só expõe preset/output/cloudflare (de propósito,
+// Nitro v3 ainda é pre-RC). rollupConfig é aceito em runtime mas não está no tipo —
+// sem o `as any` aqui o TS recusa o objeto literal por causa da checagem de excess property.
+const nitroConfig = {
+  preset: 'node-server',
+  rollupConfig: {
+    // Não externalizar nada — openai e ws devem ser embutidos no bundle do servidor
+    external: [],
   },
+} as any;
+
+export default defineConfig({
+  nitro: nitroConfig,
   tanstackStart: {
     server: { entry: "server" },
   },

@@ -34,6 +34,11 @@ export const Route = createFileRoute('/api/generate-executive-summary')({
             return new Response('Missing reportId, activeReport, or fullDataContext data', { status: 400 })
           }
 
+          const { requireReportAccess } = await import('@/lib/require-report-access')
+          if (!(await requireReportAccess(request, reportId))) {
+            return new Response('Unauthorized', { status: 401 })
+          }
+
           const defaultUrl = "https://btdgetidtawjtqrvzybh.supabase.co";
           const defaultKey = "sb_publishable_ajCs5VZ3suNt9i1DJBtW5w_UNqtw4xm";
 

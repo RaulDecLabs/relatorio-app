@@ -327,7 +327,11 @@ function ReportsPage() {
     queryKey: ["sheets-audit", activeReport?.id, startDateStr, endDateStr],
     enabled: !!activeReport?.id,
     queryFn: async () => {
-      const res = await fetch(`/api/public/sheets-audit?report_id=${activeReport.id}&startDate=${startDateStr}&endDate=${endDateStr}`);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      const res = await fetch(`/api/public/sheets-audit?report_id=${activeReport.id}&startDate=${startDateStr}&endDate=${endDateStr}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (!res.ok) {
         throw new Error('Falha ao auditar planilha');
       }

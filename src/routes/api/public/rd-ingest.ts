@@ -41,14 +41,18 @@ export const Route = createFileRoute('/api/public/rd-ingest')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const secret = process.env.INGEST_HMAC_SECRET
+        if (!secret) {
+          return new Response('Server not configured', { status: 500 })
+        }
+
         const url = new URL(request.url)
         const requestSecret = (url.searchParams.get('secret') || request.headers.get('x-import-secret') || '').trim()
-        const secret = process.env.INGEST_HMAC_SECRET || 'insightOS-secret-2024'
         const body = await request.text()
         const signature = request.headers.get('x-ingest-signature')
 
         // Permitir autenticação via assinatura HMAC OU via segredo simples no header/query para máxima compatibilidade com n8n
-        const isSecretValid = requestSecret === secret || requestSecret === 'insightOS-secret-2024' || requestSecret === 'rd-marketing-secret'
+        const isSecretValid = requestSecret.length === secret.length && timingSafeEqual(Buffer.from(requestSecret), Buffer.from(secret))
         const isSignatureValid = verifySignature(secret, signature, body)
 
         if (!isSecretValid && !isSignatureValid) {
@@ -69,6 +73,16 @@ export const Route = createFileRoute('/api/public/rd-ingest')({
         const { client_id, table_name, rows } = parsed.data
 
         const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+
+        // client_id e opcional aqui por compatibilidade (so existe 1 cliente RD hoje).
+        // Se vier, valida dono real; se nao vier, so aceita a tabela default hardcoded.
+        const { isTableOwnedByClient } = await import('@/lib/validate-table-name')
+        const tableAllowed = client_id
+          ? await isTableOwnedByClient(supabaseAdmin, client_id, table_name, 'rd_table_name')
+          : table_name === 'multiperfil_rd_marketing_metrics'
+        if (!tableAllowed) {
+          return Response.json({ error: 'table_name does not belong to client_id' }, { status: 403 })
+        }
 
         const upsertRows = rows.map((r) => ({
           client_id: client_id || null,

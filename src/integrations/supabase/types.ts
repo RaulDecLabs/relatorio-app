@@ -369,6 +369,11 @@ export type Database = {
           rd_table_name: string | null
           rd_public_token: string | null
           rd_private_token: string | null
+          rd_client_id: string | null
+          rd_client_secret: string | null
+          rd_access_token: string | null
+          rd_refresh_token: string | null
+          nectar_api_token: string | null
           id: string
           name: string
           table_name: string
@@ -385,6 +390,11 @@ export type Database = {
           rd_table_name?: string | null
           rd_public_token?: string | null
           rd_private_token?: string | null
+          rd_client_id?: string | null
+          rd_client_secret?: string | null
+          rd_access_token?: string | null
+          rd_refresh_token?: string | null
+          nectar_api_token?: string | null
           id?: string
           name: string
           table_name: string
@@ -401,11 +411,116 @@ export type Database = {
           rd_table_name?: string | null
           rd_public_token?: string | null
           rd_private_token?: string | null
+          rd_client_id?: string | null
+          rd_client_secret?: string | null
+          rd_access_token?: string | null
+          rd_refresh_token?: string | null
+          nectar_api_token?: string | null
           id?: string
           name?: string
           table_name?: string
         }
         Relationships: []
+      }
+      executive_summaries: {
+        Row: {
+          id: string
+          report_id: string | null
+          created_at: string
+          period_start: string | null
+          period_end: string | null
+          summary_data: Json | null
+        }
+        Insert: {
+          id?: string
+          report_id?: string | null
+          created_at?: string
+          period_start?: string | null
+          period_end?: string | null
+          summary_data?: Json | null
+        }
+        Update: {
+          id?: string
+          report_id?: string | null
+          created_at?: string
+          period_start?: string | null
+          period_end?: string | null
+          summary_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "executive_summaries_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nectar_deals: {
+        Row: {
+          id: string
+          report_id: string
+          deal_id: string
+          deal_name: string | null
+          funnel_name: string | null
+          stage_name: string | null
+          value: number | null
+          status: string | null
+          created_at: string | null
+          updated_at: string | null
+          closed_at: string | null
+          origin_name: string | null
+          owner_name: string | null
+          loss_reason: string | null
+          product_names: string | null
+          payload: Json | null
+        }
+        Insert: {
+          id?: string
+          report_id: string
+          deal_id: string
+          deal_name?: string | null
+          funnel_name?: string | null
+          stage_name?: string | null
+          value?: number | null
+          status?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          closed_at?: string | null
+          origin_name?: string | null
+          owner_name?: string | null
+          loss_reason?: string | null
+          product_names?: string | null
+          payload?: Json | null
+        }
+        Update: {
+          id?: string
+          report_id?: string
+          deal_id?: string
+          deal_name?: string | null
+          funnel_name?: string | null
+          stage_name?: string | null
+          value?: number | null
+          status?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          closed_at?: string | null
+          origin_name?: string | null
+          owner_name?: string | null
+          loss_reason?: string | null
+          product_names?: string | null
+          payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nectar_deals_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports_config"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports_sheets_config: {
         Row: {

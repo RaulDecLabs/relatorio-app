@@ -62,6 +62,11 @@ export const Route = createFileRoute('/api/public/gsc-ingest')({
 
         const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
 
+        const { isTableOwnedByClient } = await import('@/lib/validate-table-name')
+        if (!(await isTableOwnedByClient(supabaseAdmin, client_id, table_name, 'gsc_table_name'))) {
+          return Response.json({ error: 'table_name does not belong to client_id' }, { status: 403 })
+        }
+
         const upsertRows = rows.map((r) => ({
           client_id,
           metric_date: r.metric_date,
