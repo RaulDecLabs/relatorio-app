@@ -325,11 +325,46 @@ export function ExecutiveSummaryTab({
           SEÇÃO 3 & 4: INSIGHTS ADICIONAIS
       ═══════════════════════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {data.channel_investment_insight && (
+        {channelData.length > 0 && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Investimento por Canal</h2>
-            <div className="bg-[#f4f6fb] text-[#1a2a5e] border border-slate-200 p-6 rounded-lg h-full flex items-center">
-              <p className="text-lg leading-relaxed font-light">{data.channel_investment_insight}</p>
+            <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-6">
+              <div className="h-[160px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={channelData}
+                    layout="vertical"
+                    margin={{ top: 5, right: 40, left: 10, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                    <XAxis type="number" hide />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      stroke="#475569"
+                      fontSize={12}
+                      fontWeight={600}
+                      tickMargin={10}
+                      width={90}
+                      tickLine={false}
+                      axisLine={{ stroke: '#cbd5e1' }}
+                    />
+                    <RechartsTooltip
+                      cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      formatter={(value: number) => [fmt(value), 'Investido']}
+                    />
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={28}>
+                      {channelData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              {data.channel_investment_insight && (
+                <p className="text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">{data.channel_investment_insight}</p>
+              )}
             </div>
           </div>
         )}
@@ -349,11 +384,40 @@ export function ExecutiveSummaryTab({
       {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 5: EVOLUÇÃO
       ═══════════════════════════════════════════════════════════════ */}
-      {data.evolution_insight && (
+      {mergedChartData.length > 0 && (
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Evolução do Investimento</h2>
-          <div className="bg-slate-50 border border-slate-200 p-6 rounded-lg text-slate-700 font-light text-lg">
-            {data.evolution_insight}
+          <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-4">
+            <div className="h-[280px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={mergedChartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis
+                    dataKey="date"
+                    stroke="#475569"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={{ stroke: '#cbd5e1' }}
+                  />
+                  <YAxis
+                    stroke="#475569"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value: number) => fmt(value).replace(',00', '')}
+                    width={80}
+                  />
+                  <RechartsTooltip
+                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    formatter={(value: number) => [fmt(value), 'Investido']}
+                  />
+                  <Line type="monotone" dataKey="totalCost" stroke="#d32f2f" strokeWidth={2.5} dot={{ r: 3, fill: '#d32f2f' }} activeDot={{ r: 5 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            {data.evolution_insight && (
+              <p className="text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">{data.evolution_insight}</p>
+            )}
           </div>
         </div>
       )}
