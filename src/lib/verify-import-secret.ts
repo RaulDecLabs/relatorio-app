@@ -5,6 +5,16 @@ function clean(value: string): string {
 }
 
 /**
+ * Le o INGEST_HMAC_SECRET do ambiente ja sem aspas/espacos nas bordas.
+ * Alguns lugares (Portainer, .env local) guardam o valor com aspas literais
+ * na string; usar isso em vez de process.env.INGEST_HMAC_SECRET direto evita
+ * quebrar a comparacao/assinatura por causa disso.
+ */
+export function getIngestSecret(): string {
+  return clean(process.env.INGEST_HMAC_SECRET || "");
+}
+
+/**
  * Compara o segredo enviado na requisição com o INGEST_HMAC_SECRET configurado.
  * Sem fallback hardcoded: se a env var não estiver setada, nenhuma requisição passa.
  */

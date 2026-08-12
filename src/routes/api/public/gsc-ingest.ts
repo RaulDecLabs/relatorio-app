@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createHmac, timingSafeEqual } from 'crypto'
 import { z } from 'zod'
+import { getIngestSecret } from '@/lib/verify-import-secret'
 
 const GscRowSchema = z.object({
   metric_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -36,7 +37,7 @@ export const Route = createFileRoute('/api/public/gsc-ingest')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env.INGEST_HMAC_SECRET
+        const secret = getIngestSecret()
         if (!secret) {
           return new Response('Server not configured', { status: 500 })
         }

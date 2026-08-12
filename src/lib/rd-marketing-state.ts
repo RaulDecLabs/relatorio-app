@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
+import { getIngestSecret } from "./verify-import-secret";
 
 /**
  * Assina o report_id usado como "state" no fluxo OAuth do RD Station Marketing.
@@ -6,13 +7,13 @@ import { createHmac, timingSafeEqual } from "crypto";
  * o callback direto com esse state e sequestrar a conexao RD daquele cliente.
  */
 export function signState(reportId: string): string {
-  const secret = process.env.INGEST_HMAC_SECRET || "";
+  const secret = getIngestSecret();
   const sig = createHmac("sha256", secret).update(reportId).digest("hex").slice(0, 16);
   return `${reportId}.${sig}`;
 }
 
 export function verifyState(state: string): string | null {
-  const secret = process.env.INGEST_HMAC_SECRET || "";
+  const secret = getIngestSecret();
   if (!secret) return null;
 
   const idx = state.lastIndexOf(".");
