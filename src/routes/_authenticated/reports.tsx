@@ -60,8 +60,8 @@ function ReportsPage() {
   const getYesterdayAnd30DaysAgo = () => {
     const end = new Date();
     end.setDate(end.getDate() - 1);
-    const start = new Date();
-    start.setDate(end.getDate() - 29);
+    const start = new Date(end);
+    start.setDate(start.getDate() - 29);
     const formatDate = (d: Date) => {
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -77,29 +77,31 @@ function ReportsPage() {
   const getDatesForRange = (range: string, customStart: string, customEnd: string) => {
     const end = new Date();
     end.setDate(end.getDate() - 1);
-    const start = new Date();
+    // start parte de uma copia de "end" (nao de "hoje") para o rollover de mes/ano
+    // ser calculado corretamente pelo proprio Date - subtrair direto de "hoje" quebra
+    // perto de virada de mes (ex: ia gerar intervalo invertido todo dia 1o do mes).
+    const start = new Date(end);
 
     switch (range) {
       case "yesterday":
-        start.setDate(end.getDate());
         break;
       case "7":
-        start.setDate(end.getDate() - 6);
+        start.setDate(start.getDate() - 6);
         break;
       case "30":
-        start.setDate(end.getDate() - 29);
+        start.setDate(start.getDate() - 29);
         break;
       case "90":
-        start.setDate(end.getDate() - 89);
+        start.setDate(start.getDate() - 89);
         break;
       case "custom":
         if (customStart && customEnd) {
           return { startDateStr: customStart, endDateStr: customEnd };
         }
-        start.setDate(end.getDate() - 6);
+        start.setDate(start.getDate() - 6);
         break;
       default:
-        start.setDate(end.getDate() - 6);
+        start.setDate(start.getDate() - 6);
     }
 
     const formatDate = (d: Date) => {

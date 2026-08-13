@@ -264,7 +264,13 @@ export function ExecutiveSummaryTab({
             <span className="text-white/30">·</span>
             <span>Período: {startDateStr} a {endDateStr}</span>
             <span className="text-white/30">·</span>
-            <span className="text-[#ff6b6b] font-bold">{days === "yesterday" ? "ONTEM" : `Últimos ${days} dias`}</span>
+            <span className="text-[#ff6b6b] font-bold">
+              {days === "yesterday" ? "ONTEM"
+                : days === "custom" ? "PERÍODO PERSONALIZADO"
+                : days === "this_month" ? "MÊS ATUAL"
+                : days === "last_month" ? "MÊS ANTERIOR"
+                : `Últimos ${days} dias`}
+            </span>
           </div>
         </div>
       </div>

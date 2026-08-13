@@ -97,6 +97,8 @@ function TemplatesPage() {
   const queryClient = useQueryClient();
   const [selectedReportId, setSelectedReportId] = useState<string>("");
   const [dateRange, setDateRange] = useState<string>("7");
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
   const [isGeneratingAi, setIsGeneratingAi] = useState<boolean>(false);
   const [autoAiEnabled, setAutoAiEnabled] = useState<boolean>(() => {
     const saved = localStorage.getItem("ai_auto_generation_enabled");
@@ -114,25 +116,37 @@ function TemplatesPage() {
     }
   };
 
-  const getDatesForRange = (range: string) => {
+  const getDatesForRange = (range: string, customStart?: string, customEnd?: string) => {
     const end = new Date();
     end.setDate(end.getDate() - 1);
-    const start = new Date();
-    
+    // start parte de uma copia de "end" (nao de "hoje") para o rollover de mes/ano
+    // ser calculado corretamente pelo proprio Date - subtrair direto de "hoje" quebra
+    // perto de virada de mes (ex: ia gerar intervalo invertido todo dia 1o do mes).
+    const start = new Date(end);
+
     switch (range) {
-      case "yesterday": start.setDate(end.getDate()); break;
-      case "7": start.setDate(end.getDate() - 6); break;
-      case "30": start.setDate(end.getDate() - 29); break;
-      case "90": start.setDate(end.getDate() - 89); break;
+      case "yesterday": break;
+      case "7": start.setDate(start.getDate() - 6); break;
+      case "30": start.setDate(start.getDate() - 29); break;
+      case "90": start.setDate(start.getDate() - 89); break;
+      case "custom":
+        if (customStart && customEnd) {
+          return { startDateStr: customStart, endDateStr: customEnd };
+        }
+        start.setDate(start.getDate() - 6);
+        break;
       case "this_month":
+        start.setTime(Date.now());
         start.setDate(1);
         break;
       case "last_month":
+        start.setTime(Date.now());
         start.setMonth(start.getMonth() - 1);
         start.setDate(1);
-        end.setDate(0); 
+        end.setTime(Date.now());
+        end.setDate(0);
         break;
-      default: start.setDate(end.getDate() - 6);
+      default: start.setDate(start.getDate() - 6);
     }
     
     const formatDate = (d: Date) => {
@@ -145,7 +159,17 @@ function TemplatesPage() {
     return { startDateStr: formatDate(start), endDateStr: formatDate(end) };
   };
 
-  const { startDateStr, endDateStr } = getDatesForRange(dateRange);
+  const getDateRangeLabel = (range: string, sStr: string, eStr: string) => {
+    switch (range) {
+      case "yesterday": return "Ontem";
+      case "custom": return `Período personalizado (${sStr} a ${eStr})`;
+      case "this_month": return "Mês atual";
+      case "last_month": return "Mês anterior";
+      default: return `Últimos ${range} dias (${sStr} a ${eStr})`;
+    }
+  };
+
+  const { startDateStr, endDateStr } = getDatesForRange(dateRange, customStartDate, customEndDate);
 
   // Queries
   const { data: reports = [] } = useQuery<ReportConfig[]>({
@@ -366,7 +390,7 @@ function TemplatesPage() {
     try {
       const promptData = {
         cliente: activeReport.name || "Cliente",
-        periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
+        periodo_analisado: getDateRangeLabel(dateRange, startDateStr, endDateStr),
         google_ads: {
           investimento: adsCost,
           cliques: adsClicks,
@@ -460,7 +484,7 @@ Diretrizes de Especialista:
       const { error: dbErr } = await supabase.from("ai_insights").insert({
         report_id: activeReport.id,
         insight_text: content,
-        analysis_period: `Período: ${startDateStr} a ${endDateStr} (${dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias`})`
+        analysis_period: `Período: ${getDateRangeLabel(dateRange, startDateStr, endDateStr)}`
       });
 
       if (dbErr) throw dbErr;
@@ -523,8 +547,27 @@ Diretrizes de Especialista:
                 <SelectItem value="90">Últimos 90 dias</SelectItem>
                 <SelectItem value="this_month">Mês Atual</SelectItem>
                 <SelectItem value="last_month">Mês Anterior</SelectItem>
+                <SelectItem value="custom">Personalizado</SelectItem>
               </SelectContent>
             </Select>
+
+            {dateRange === "custom" && (
+              <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-left-2 duration-200">
+                <Input
+                  type="date"
+                  className="h-10 w-[140px] text-xs bg-card/50 border-border/50"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                />
+                <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">até</span>
+                <Input
+                  type="date"
+                  className="h-10 w-[140px] text-xs bg-card/50 border-border/50"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                />
+              </div>
+            )}
           </div>
         }
       />
@@ -558,7 +601,7 @@ Diretrizes de Especialista:
                 topFbCampaigns={topFbCampaigns}
                 fullDataContext={{
                   cliente: activeReport.name || "Cliente",
-                  periodo_analisado: dateRange === "yesterday" ? "Ontem" : `Últimos ${dateRange} dias (${startDateStr} a ${endDateStr})`,
+                  periodo_analisado: getDateRangeLabel(dateRange, startDateStr, endDateStr),
                   google_ads: {
                     investimento: adsCost,
                     cliques: adsClicks,
