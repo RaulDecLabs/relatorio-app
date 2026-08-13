@@ -5,11 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { 
-  Brain, RefreshCcw, CheckCircle2, AlertTriangle, 
-  Lightbulb, Target, DollarSign, Users, 
+import {
+  Brain, RefreshCcw, CheckCircle2, AlertTriangle,
+  Lightbulb, Target, DollarSign, Users,
   Globe, BarChart3, ChevronRight, Award,
-  Info
+  Info, Download
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -53,8 +53,8 @@ export function ExecutiveSummaryTab({
         .from("executive_summaries")
         .select("*")
         .eq("report_id", activeReport.id)
-        .gte("period_start", startDateStr)
-        .lte("period_end", endDateStr)
+        .eq("period_start", startDateStr)
+        .eq("period_end", endDateStr)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -111,6 +111,10 @@ export function ExecutiveSummaryTab({
   const handleGenerate = () => {
     setIsGenerating(true);
     generateMutation.mutate();
+  };
+
+  const handleDownloadPdf = () => {
+    window.print();
   };
 
   if (isLoading) {
@@ -228,8 +232,17 @@ export function ExecutiveSummaryTab({
     : data.campaign_attention_point;
 
   return (
-    <div className="space-y-16 pb-16 animate-in fade-in duration-700 font-sans">
-      
+    <div id="parecer-executivo-print-area" className="space-y-16 pb-16 animate-in fade-in duration-700 font-sans">
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          #parecer-executivo-print-area, #parecer-executivo-print-area * { visibility: visible; }
+          #parecer-executivo-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+          #parecer-executivo-print-area .no-print { display: none !important; }
+          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+      `}</style>
+
       {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 1: CAPA HERO
       ═══════════════════════════════════════════════════════════════ */}
@@ -237,18 +250,24 @@ export function ExecutiveSummaryTab({
         {/* Efeito de brilho decorativo */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#d32f2f]/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
-        
-        {/* Badge + botão na mesma linha */}
-        <div className="relative z-10 flex items-center justify-between mb-8">
+
+        {/* Badge + botões na mesma linha */}
+        <div className="relative z-10 flex items-center justify-between mb-8 no-print">
           <div className="inline-block border border-white/30 text-white/80 text-[10px] font-bold px-4 py-1.5 tracking-[0.2em] uppercase rounded-sm">
             PARECER EXECUTIVO INSTITUCIONAL
           </div>
-          {!isClient && (
-            <Button onClick={handleGenerate} disabled={isGenerating} size="sm" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
-              {isGenerating ? <RefreshCcw className="w-3 h-3 animate-spin mr-1.5" /> : <RefreshCcw className="w-3 h-3 mr-1.5" />}
-              Regerar Parecer
+          <div className="flex items-center gap-2">
+            <Button onClick={handleDownloadPdf} size="sm" variant="outline" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
+              <Download className="w-3 h-3 mr-1.5" />
+              Baixar PDF
             </Button>
-          )}
+            {!isClient && (
+              <Button onClick={handleGenerate} disabled={isGenerating} size="sm" className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
+                {isGenerating ? <RefreshCcw className="w-3 h-3 animate-spin mr-1.5" /> : <RefreshCcw className="w-3 h-3 mr-1.5" />}
+                Regerar Parecer
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Título dinâmico da IA ou fallback */}
