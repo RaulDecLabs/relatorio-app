@@ -76,14 +76,14 @@ function AuthPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="hidden flex-col justify-between bg-gradient-to-br from-primary to-[oklch(0.45_0.18_265)] p-10 text-primary-foreground lg:flex">
-        <div className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/15">
+      <div className="hidden flex-col justify-between bg-primary p-10 text-primary-foreground lg:flex">
+        <div className="flex items-center gap-2.5">
+          <div className="grid h-9 w-9 place-items-center rounded-sm bg-highlight text-highlight-foreground">
             <TrendingUp className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold">InsightOS</span>
+          <span className="text-lg font-bold">InsightOS</span>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 border-t border-white/20 pt-6">
           <h2 className="text-3xl font-semibold leading-tight">
             O centro de gestão e performance da sua agência.
           </h2>
@@ -92,14 +92,14 @@ function AuthPage() {
             Tenha em mãos leituras executivas precisas e planos de ação estratégicos para acelerar seus resultados.
           </p>
         </div>
-        <div className="text-xs text-white/60">© {new Date().getFullYear()} InsightOS</div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-white/50">© {new Date().getFullYear()} InsightOS</div>
       </div>
 
       <div className="flex items-center justify-center bg-background p-6">
-        <Card className="w-full max-w-md border-border/70 shadow-sm">
+        <Card className="w-full max-w-md">
           <CardContent className="p-8">
-            <div className="mb-6">
-              <h1 className="text-2xl font-semibold">Bem-vindo</h1>
+            <div className="mb-6 border-b border-foreground pb-4">
+              <h1 className="text-[28px] font-semibold">Bem-vindo</h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 Entre com sua conta para acessar o painel.
               </p>

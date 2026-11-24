@@ -35,26 +35,17 @@ export function SectionTitle({
   icon: any; 
   color?: "blue" | "green" | "amber" | "indigo" | "purple" | "orange" | "teal" | "cyan" | "rose"
 }) {
-  const colorMap = {
-    blue: "text-blue-500 bg-blue-500/10 border-blue-500/20",
-    green: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
-    amber: "text-amber-500 bg-amber-500/10 border-amber-500/20",
-    indigo: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
-    purple: "text-purple-500 bg-purple-500/10 border-purple-500/20",
-    orange: "text-orange-500 bg-orange-500/10 border-orange-500/20",
-    teal: "text-teal-500 bg-teal-500/10 border-teal-500/20",
-    cyan: "text-cyan-500 bg-cyan-500/10 border-cyan-500/20",
-    rose: "text-rose-500 bg-rose-500/10 border-rose-500/20",
-  };
-  const design = colorMap[color] || colorMap.blue;
+  // A cor por seção foi substituída pelo bloco preto único do sistema; a prop
+  // continua aceita para não exigir mudança nas telas que a passam.
+  void color;
   return (
-    <div className="flex items-center gap-4 mb-6 mt-10">
-      <div className={cn("flex h-12 w-12 items-center justify-center rounded-2xl border shadow-sm", design)}>
-        <Icon className="h-6 w-6" />
+    <div className="flex items-center gap-3 mb-5 mt-12 border-b border-foreground pb-3">
+      <div className="flex h-9 w-9 items-center justify-center rounded-sm bg-primary text-primary-foreground">
+        <Icon className="h-4 w-4" />
       </div>
       <div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+        <p className="text-[13px] text-muted-foreground">{description}</p>
       </div>
     </div>
   );
@@ -73,38 +64,33 @@ export function CustomKpiCard({
   hint?: string; 
   color?: "blue" | "green" | "amber" | "red" | "indigo" | "purple" | "cyan" | "pink"
 }) {
-  const colorMap = {
-    blue: { bg: "bg-blue-500/10 text-blue-500", accent: "border-blue-500/20", hover: "hover:border-blue-500/40 hover:shadow-blue-500/10", gradient: "from-blue-500/5 to-transparent", dot: "bg-blue-500" },
-    green: { bg: "bg-emerald-500/10 text-emerald-500", accent: "border-emerald-500/20", hover: "hover:border-emerald-500/40 hover:shadow-emerald-500/10", gradient: "from-emerald-500/5 to-transparent", dot: "bg-emerald-500" },
-    amber: { bg: "bg-amber-500/10 text-amber-500", accent: "border-amber-500/20", hover: "hover:border-amber-500/40 hover:shadow-amber-500/10", gradient: "from-amber-500/5 to-transparent", dot: "bg-amber-500" },
-    red: { bg: "bg-rose-500/10 text-rose-500", accent: "border-rose-500/20", hover: "hover:border-rose-500/40 hover:shadow-rose-500/10", gradient: "from-rose-500/5 to-transparent", dot: "bg-rose-500" },
-    indigo: { bg: "bg-indigo-500/10 text-indigo-500", accent: "border-indigo-500/20", hover: "hover:border-indigo-500/40 hover:shadow-indigo-500/10", gradient: "from-indigo-500/5 to-transparent", dot: "bg-indigo-500" },
-    purple: { bg: "bg-purple-500/10 text-purple-500", accent: "border-purple-500/20", hover: "hover:border-purple-500/40 hover:shadow-purple-500/10", gradient: "from-purple-500/5 to-transparent", dot: "bg-purple-500" },
-    cyan: { bg: "bg-cyan-500/10 text-cyan-500", accent: "border-cyan-500/20", hover: "hover:border-cyan-500/40 hover:shadow-cyan-500/10", gradient: "from-cyan-500/5 to-transparent", dot: "bg-cyan-500" },
-    pink: { bg: "bg-pink-500/10 text-pink-500", accent: "border-pink-500/20", hover: "hover:border-pink-500/40 hover:shadow-pink-500/10", gradient: "from-pink-500/5 to-transparent", dot: "bg-pink-500" }
+  // Tiles neutros como no restante do sistema: só o marcador do hint carrega
+  // a cor (lima/amarelo/vermelho) para manter a leitura de status.
+  const dotMap = {
+    blue: "bg-foreground",
+    green: "bg-highlight",
+    amber: "bg-amber-300",
+    red: "bg-destructive",
+    indigo: "bg-foreground",
+    purple: "bg-foreground/60",
+    cyan: "bg-foreground/40",
+    pink: "bg-foreground/60",
   };
-  const design = colorMap[color] || colorMap.blue;
+  const dot = dotMap[color] || dotMap.blue;
 
   return (
-    <Card className={cn(
-      "relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border-border/40 bg-card/40 backdrop-blur-xl", 
-      design.accent,
-      design.hover
-    )}>
-      <div className={cn("absolute inset-0 bg-gradient-to-br opacity-50", design.gradient)} />
-      <CardContent className="p-6 relative z-10">
+    <Card className="transition-colors hover:border-foreground/20">
+      <CardContent className="p-5">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/90">{label}</span>
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl shadow-inner transition-all duration-300", design.bg)}>
-            <Icon className="h-5 w-5" />
-          </div>
+          <span className="label-caps">{label}</span>
+          <Icon className="h-5 w-5 text-foreground" strokeWidth={1.75} />
         </div>
-        <div className="mt-5 flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold tracking-tight bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">{value}</span>
+        <div className="mt-4 flex items-baseline gap-2">
+          <span className="text-2xl font-bold text-foreground">{value}</span>
         </div>
         {hint && (
-          <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground/80 font-medium">
-            <div className={cn("h-1.5 w-1.5 rounded-full animate-pulse", design.dot)} />
+          <div className="mt-3 flex items-center gap-2 label-caps">
+            <div className={cn("h-1.5 w-1.5 rounded-full", dot)} />
             <span>{hint}</span>
           </div>
         )}
@@ -127,11 +113,11 @@ export function ProgressBreakdownRow({
   const pct = total > 0 ? (sessions / total) * 100 : 0;
   
   const colorMap = {
-    blue: "bg-blue-500",
-    green: "bg-emerald-500",
-    amber: "bg-amber-500",
-    indigo: "bg-indigo-500",
-    purple: "bg-purple-500"
+    blue: "bg-foreground",
+    green: "bg-emerald-400",
+    amber: "bg-amber-400",
+    indigo: "bg-foreground/70",
+    purple: "bg-foreground/50"
   };
 
   return (
@@ -142,7 +128,7 @@ export function ProgressBreakdownRow({
           {sessions.toLocaleString("pt-BR")} <span className="text-muted-foreground/60 font-normal ml-0.5">({pct.toFixed(1)}%)</span>
         </span>
       </div>
-      <div className="h-2 w-full bg-secondary/50 rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
         <div 
           className={cn("h-full rounded-full transition-all duration-500", colorMap[color])} 
           style={{ width: `${pct}%` }} 
@@ -155,8 +141,8 @@ export function ProgressBreakdownRow({
 export const CustomChartTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card/90 border border-border/80 backdrop-blur-md p-4 rounded-xl shadow-lg text-xs space-y-1.5 min-w-36">
-        <p className="font-bold text-foreground mb-1 border-b pb-1 border-border/40">{label}</p>
+      <div className="bg-popover border border-foreground/80 p-3 rounded-sm text-xs space-y-1.5 min-w-36">
+        <p className="label-caps text-foreground mb-1 border-b pb-1 border-foreground/15">{label}</p>
         {payload.map((entry: any, i: number) => (
           <div key={i} className="flex items-center justify-between gap-4">
             <span className="flex items-center gap-1.5 text-muted-foreground font-medium flex-row">

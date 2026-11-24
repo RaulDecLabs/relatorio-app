@@ -60,13 +60,13 @@ export function AppTopbar({ title }: { title?: string }) {
   };
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-foreground/10 bg-background/90 px-6 backdrop-blur">
       <SidebarTrigger />
-      {title && <h1 className="text-sm font-semibold text-foreground">{title}</h1>}
+      {title && <h1 className="label-caps text-foreground">{title}</h1>}
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
         <div className="hidden text-right text-xs sm:block">
-          <div className="font-medium">{user?.email}</div>
-          <div className="text-muted-foreground">{roleLabel}</div>
+          <div className="font-semibold">{user?.email}</div>
+          <div className="label-caps">{roleLabel}</div>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>

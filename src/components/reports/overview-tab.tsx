@@ -106,9 +106,9 @@ export function OverviewTab({
                 <Line 
                   type="monotone" 
                   dataKey="totalCost" 
-                  stroke="#dc2626" 
+                  stroke="#b42318" 
                   strokeWidth={3}
-                  dot={{ r: 4, fill: "#dc2626", strokeWidth: 2, stroke: "#fff" }}
+                  dot={{ r: 4, fill: "#b42318", strokeWidth: 2, stroke: "#fff" }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
               </LineChart>
@@ -133,7 +133,7 @@ export function OverviewTab({
                   contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderRadius: '8px', border: 'none', color: '#fff' }}
                   formatter={(value: number) => [formatCurrency(value), 'Investimento']}
                 />
-                <Bar dataKey="investimento" fill="#1e3a8a" radius={[0, 4, 4, 0]} barSize={40} />
+                <Bar dataKey="investimento" fill="#262624" radius={[0, 4, 4, 0]} barSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>

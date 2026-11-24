@@ -155,21 +155,21 @@ export function GoogleAdsTab({ adsMetrics, activeReport }: GoogleAdsTabProps) {
               <AreaChart data={data.adsChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#141414" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#141414" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#a8c935" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#a8c935" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.5} />
-                <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} dy={8} tickFormatter={(val) => { const [, m, d] = val.split('-'); return `${d}/${m}`; }} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} dx={-8} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dcdcd7" strokeOpacity={0.5} />
+                <XAxis dataKey="date" stroke="#a3a39d" fontSize={11} tickLine={false} axisLine={false} dy={8} tickFormatter={(val) => { const [, m, d] = val.split('-'); return `${d}/${m}`; }} />
+                <YAxis stroke="#a3a39d" fontSize={11} tickLine={false} axisLine={false} dx={-8} />
                 <Tooltip content={<CustomChartTooltip />} />
                 <Legend verticalAlign="top" height={36} iconType="circle" />
-                <Area type="monotone" dataKey="cost" stroke="#3b82f6" strokeWidth={2.5} name="Investimento (R$)" fillOpacity={1} fill="url(#colorCost)" />
-                <Area type="monotone" dataKey="clicks" stroke="#10b981" strokeWidth={2.5} name="Cliques" fillOpacity={1} fill="url(#colorClicks)" />
+                <Area type="monotone" dataKey="cost" stroke="#141414" strokeWidth={2.5} name="Investimento (R$)" fillOpacity={1} fill="url(#colorCost)" />
+                <Area type="monotone" dataKey="clicks" stroke="#a8c935" strokeWidth={2.5} name="Cliques" fillOpacity={1} fill="url(#colorClicks)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>

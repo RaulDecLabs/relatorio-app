@@ -5,14 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif;
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /* Cantos quase retos em todo o sistema (estilo editorial) */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -28,6 +30,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
@@ -52,91 +56,218 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/*
+ * Sombras praticamente removidas: a hierarquia vem de superfície (cinza x off-white)
+ * e de linhas finas, não de elevação.
+ */
+@theme {
+  --shadow-2xs: 0 0 #0000;
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 1px 1px rgb(20 20 18 / 0.03);
+  --shadow: 0 1px 2px rgb(20 20 18 / 0.04);
+  --shadow-md: 0 1px 2px rgb(20 20 18 / 0.05);
+  --shadow-lg: 0 2px 8px rgb(20 20 18 / 0.06);
+  --shadow-xl: 0 4px 16px rgb(20 20 18 / 0.07);
+  --shadow-2xl: 0 8px 24px rgb(20 20 18 / 0.08);
+  --inset-shadow-sm: 0 0 #0000;
+
+  /*
+   * Paleta do Tailwind remapeada para o sistema monocromático + lima.
+   * As telas usam classes fixas (blue-500, emerald-500...); em vez de reescrever
+   * cada uma, as famílias passam a apontar para tons do novo estilo.
+   */
+  --color-slate-50: #f6f6f3;
+  --color-slate-100: #efefec;
+  --color-slate-200: #e2e2de;
+  --color-slate-300: #cfcfc9;
+  --color-slate-400: #a3a39d;
+  --color-slate-500: #73736d;
+  --color-slate-600: #575752;
+  --color-slate-700: #3d3d39;
+  --color-slate-800: #262624;
+  --color-slate-900: #171716;
+  --color-slate-950: #0e0e0d;
+
+  --color-gray-50: #f6f6f3;
+  --color-gray-100: #efefec;
+  --color-gray-200: #e2e2de;
+  --color-gray-300: #cfcfc9;
+  --color-gray-400: #a3a39d;
+  --color-gray-500: #73736d;
+  --color-gray-600: #575752;
+  --color-gray-700: #3d3d39;
+  --color-gray-800: #262624;
+  --color-gray-900: #171716;
+
+  /* Azul/índigo/sky -> grafite (cor "primária" do sistema) */
+  --color-blue-50: #f3f3f0;
+  --color-blue-100: #e6e6e2;
+  --color-blue-200: #cfcfc9;
+  --color-blue-300: #a3a39d;
+  --color-blue-400: #4a4a45;
+  --color-blue-500: #1f1f1c;
+  --color-blue-600: #141414;
+  --color-blue-700: #0e0e0d;
+  --color-blue-800: #0a0a09;
+  --color-blue-900: #050505;
+
+  --color-indigo-50: #f3f3f0;
+  --color-indigo-100: #e6e6e2;
+  --color-indigo-200: #cfcfc9;
+  --color-indigo-400: #5c5c57;
+  --color-indigo-500: #3d3d39;
+  --color-indigo-600: #262624;
+  --color-indigo-700: #171716;
+
+  --color-sky-500: #3d3d39;
+  --color-sky-600: #262624;
+
+  /* Verde/esmeralda/teal -> lima (positivo / destaque) */
+  --color-emerald-50: #f6fbe4;
+  --color-emerald-100: #ecf7c6;
+  --color-emerald-200: #dcf08f;
+  --color-emerald-300: #cdea5c;
+  --color-emerald-400: #a8c935;
+  --color-emerald-500: #6f8f12;
+  --color-emerald-600: #56700c;
+  --color-emerald-700: #405408;
+  --color-emerald-800: #2c3a05;
+
+  --color-green-50: #f6fbe4;
+  --color-green-100: #ecf7c6;
+  --color-green-500: #6f8f12;
+  --color-green-600: #56700c;
+  --color-green-700: #405408;
+
+  --color-teal-500: #56700c;
+  --color-teal-600: #405408;
+
+  /* Âmbar/amarelo/laranja -> amarelo do sistema (ocre para texto legível) */
+  --color-amber-50: #fdf9e1;
+  --color-amber-100: #fbf2b8;
+  --color-amber-200: #f6e67a;
+  --color-amber-300: #f3e04f;
+  --color-amber-400: #d8c234;
+  --color-amber-500: #a88f0a;
+  --color-amber-600: #866f05;
+  --color-amber-700: #655303;
+  --color-amber-800: #463902;
+
+  --color-yellow-300: #f3e04f;
+  --color-yellow-400: #e8d43c;
+  --color-yellow-500: #a88f0a;
+
+  --color-orange-500: #9a6a12;
+  --color-orange-600: #7a530c;
+
+  /* Roxo/violeta/ciano/rosa -> tons de cinza para diferenciar séries */
+  --color-purple-500: #5c5c57;
+  --color-purple-600: #474743;
+  --color-violet-500: #5c5c57;
+  --color-cyan-500: #868680;
+  --color-cyan-600: #6b6b66;
+  --color-pink-500: #73736d;
+  --color-pink-600: #575752;
+
+  /* Vermelho/rosa -> vermelho sóbrio (erros, quedas) */
+  --color-rose-500: #b42318;
+  --color-rose-600: #912018;
+  --color-red-500: #b42318;
+  --color-red-600: #912018;
+  --color-red-700: #7a1a14;
+}
+
 :root {
-  --radius: 0.625rem;
+  --radius: 0.25rem;
 
-  --background: oklch(0.99 0.003 250);
-  --foreground: oklch(0.21 0.03 256);
+  --background: #ececea;
+  --foreground: #141414;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.03 256);
+  --card: #f8f8f6;
+  --card-foreground: #141414;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.03 256);
+  --popover: #fbfbf9;
+  --popover-foreground: #141414;
 
-  --primary: oklch(0.58 0.19 258);
-  --primary-foreground: oklch(0.99 0.003 250);
+  --primary: #141414;
+  --primary-foreground: #fafaf8;
 
-  --secondary: oklch(0.96 0.008 250);
-  --secondary-foreground: oklch(0.21 0.03 256);
+  --secondary: #e4e4e1;
+  --secondary-foreground: #141414;
 
-  --muted: oklch(0.965 0.005 250);
-  --muted-foreground: oklch(0.5 0.02 256);
+  --muted: #e9e9e6;
+  --muted-foreground: #6b6b66;
 
-  --accent: oklch(0.95 0.03 258);
-  --accent-foreground: oklch(0.32 0.12 258);
+  --accent: #e6e6e2;
+  --accent-foreground: #141414;
 
-  --destructive: oklch(0.6 0.21 27);
-  --destructive-foreground: oklch(0.99 0.003 250);
+  /* Lima do status "AVAILABLE" e amarelo do selo do workspace */
+  --highlight: #d4f25a;
+  --highlight-foreground: #141414;
 
-  --success: oklch(0.68 0.15 155);
-  --success-foreground: oklch(0.99 0.003 250);
+  --destructive: #b42318;
+  --destructive-foreground: #fafaf8;
 
-  --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.21 0.03 256);
+  --success: #56700c;
+  --success-foreground: #fafaf8;
 
-  --border: oklch(0.92 0.008 255);
-  --input: oklch(0.92 0.008 255);
-  --ring: oklch(0.58 0.19 258);
+  --warning: #a88f0a;
+  --warning-foreground: #141414;
 
-  --chart-1: oklch(0.58 0.19 258);
-  --chart-2: oklch(0.68 0.15 155);
-  --chart-3: oklch(0.78 0.15 75);
-  --chart-4: oklch(0.6 0.21 27);
-  --chart-5: oklch(0.55 0.18 295);
+  --border: #dcdcd7;
+  --input: #d2d2cc;
+  --ring: #141414;
 
-  --sidebar: oklch(0.985 0.003 250);
-  --sidebar-foreground: oklch(0.32 0.03 256);
-  --sidebar-primary: oklch(0.58 0.19 258);
-  --sidebar-primary-foreground: oklch(0.99 0.003 250);
-  --sidebar-accent: oklch(0.95 0.015 255);
-  --sidebar-accent-foreground: oklch(0.32 0.12 258);
-  --sidebar-border: oklch(0.92 0.008 255);
-  --sidebar-ring: oklch(0.58 0.19 258);
+  --chart-1: #141414;
+  --chart-2: #a8c935;
+  --chart-3: #8a8a84;
+  --chart-4: #d8c234;
+  --chart-5: #c8c8c2;
+
+  --sidebar: #e3e3e0;
+  --sidebar-foreground: #3d3d39;
+  --sidebar-primary: #141414;
+  --sidebar-primary-foreground: #fafaf8;
+  --sidebar-accent: #f8f8f6;
+  --sidebar-accent-foreground: #141414;
+  --sidebar-border: #d2d2cc;
+  --sidebar-ring: #141414;
 }
 
 .dark {
-  --background: oklch(0.16 0.02 256);
-  --foreground: oklch(0.97 0.005 250);
-  --card: oklch(0.21 0.025 256);
-  --card-foreground: oklch(0.97 0.005 250);
-  --popover: oklch(0.21 0.025 256);
-  --popover-foreground: oklch(0.97 0.005 250);
-  --primary: oklch(0.68 0.18 258);
-  --primary-foreground: oklch(0.16 0.02 256);
-  --secondary: oklch(0.26 0.025 256);
-  --secondary-foreground: oklch(0.97 0.005 250);
-  --muted: oklch(0.26 0.025 256);
-  --muted-foreground: oklch(0.68 0.02 256);
-  --accent: oklch(0.3 0.06 258);
-  --accent-foreground: oklch(0.9 0.05 258);
-  --destructive: oklch(0.65 0.2 27);
-  --destructive-foreground: oklch(0.97 0.005 250);
-  --success: oklch(0.7 0.15 155);
-  --success-foreground: oklch(0.16 0.02 256);
-  --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.16 0.02 256);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.68 0.18 258);
-  --sidebar: oklch(0.18 0.022 256);
-  --sidebar-foreground: oklch(0.9 0.01 250);
-  --sidebar-primary: oklch(0.68 0.18 258);
-  --sidebar-primary-foreground: oklch(0.16 0.02 256);
-  --sidebar-accent: oklch(0.28 0.04 258);
-  --sidebar-accent-foreground: oklch(0.9 0.05 258);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.68 0.18 258);
+  --background: #121211;
+  --foreground: #f2f2ef;
+  --card: #1b1b19;
+  --card-foreground: #f2f2ef;
+  --popover: #1b1b19;
+  --popover-foreground: #f2f2ef;
+  --primary: #f2f2ef;
+  --primary-foreground: #141414;
+  --secondary: #262624;
+  --secondary-foreground: #f2f2ef;
+  --muted: #262624;
+  --muted-foreground: #a3a39d;
+  --accent: #2a2a27;
+  --accent-foreground: #f2f2ef;
+  --highlight: #d4f25a;
+  --highlight-foreground: #141414;
+  --destructive: #e5534b;
+  --destructive-foreground: #141414;
+  --success: #b8dc45;
+  --success-foreground: #141414;
+  --warning: #e8d43c;
+  --warning-foreground: #141414;
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #f2f2ef;
+  --sidebar: #171716;
+  --sidebar-foreground: #cfcfc9;
+  --sidebar-primary: #f2f2ef;
+  --sidebar-primary-foreground: #141414;
+  --sidebar-accent: #262624;
+  --sidebar-accent-foreground: #f2f2ef;
+  --sidebar-border: rgb(255 255 255 / 0.08);
+  --sidebar-ring: #f2f2ef;
 }
 
 @layer base {
@@ -146,5 +277,19 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: "tnum" 1;
+  }
+  h1, h2, h3 { letter-spacing: -0.01em; }
+  ::selection { background: var(--color-highlight); color: var(--color-highlight-foreground); }
+}
+
+@layer utilities {
+  /* Rótulo pequeno em caixa alta (TOTAL AVAILABLE, BUYER, STATUS...) */
+  .label-caps {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted-foreground);
   }
 }

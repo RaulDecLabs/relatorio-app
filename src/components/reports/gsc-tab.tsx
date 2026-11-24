@@ -148,20 +148,20 @@ export function GscTab({ gscMetrics, activeReport }: GscTabProps) {
               <AreaChart data={data.gscChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorGscClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#141414" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#141414" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorGscImp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#8a8a84" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#8a8a84" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dcdcd7" />
                 <XAxis 
                   dataKey="date" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tick={{ fontSize: 12, fill: '#73736d' }}
                   tickFormatter={(val) => {
                     const [, m, d] = val.split('-');
                     return `${d}/${m}`;
@@ -170,13 +170,13 @@ export function GscTab({ gscMetrics, activeReport }: GscTabProps) {
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tick={{ fontSize: 12, fill: '#73736d' }}
                   tickFormatter={(val) => val.toLocaleString("pt-BR")}
                 />
                 <Tooltip content={<CustomChartTooltip />} />
                 <Legend verticalAlign="top" height={36} iconType="circle" />
-                <Area type="monotone" dataKey="impressions" stroke="#8b5cf6" strokeWidth={2} name="Impressões" fillOpacity={1} fill="url(#colorGscImp)" />
-                <Area type="monotone" dataKey="clicks" stroke="#3b82f6" strokeWidth={2.5} name="Cliques" fillOpacity={1} fill="url(#colorGscClicks)" />
+                <Area type="monotone" dataKey="impressions" stroke="#8a8a84" strokeWidth={2} name="Impressões" fillOpacity={1} fill="url(#colorGscImp)" />
+                <Area type="monotone" dataKey="clicks" stroke="#141414" strokeWidth={2.5} name="Cliques" fillOpacity={1} fill="url(#colorGscClicks)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -269,7 +269,7 @@ export function GscTab({ gscMetrics, activeReport }: GscTabProps) {
                 <PieChart>
                   <Pie data={data.gscDeviceData} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value" strokeWidth={2} stroke="hsl(var(--background))">
                     {data.gscDeviceData.map((_, idx) => {
-                      const pieColors = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#94a3b8"];
+                      const pieColors = ["#141414", "#a8c935", "#d8c234", "#8a8a84", "#a3a39d"];
                       return <Cell key={idx} fill={pieColors[idx % pieColors.length]} />;
                     })}
                   </Pie>
@@ -282,7 +282,7 @@ export function GscTab({ gscMetrics, activeReport }: GscTabProps) {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-xs mt-3">
               {data.gscDeviceData.map((item, idx) => {
-                const pieColors = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#94a3b8"];
+                const pieColors = ["#141414", "#a8c935", "#d8c234", "#8a8a84", "#a3a39d"];
                 return (
                   <div key={idx} className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full" style={{ backgroundColor: pieColors[idx % pieColors.length] }} />

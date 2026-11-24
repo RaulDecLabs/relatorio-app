@@ -46,7 +46,11 @@ export function AppSidebar() {
 
   const renderItem = (item: { title: string; url: string; icon: any }) => (
     <SidebarMenuItem key={item.url}>
-      <SidebarMenuButton asChild isActive={isActive(item.url)}>
+      <SidebarMenuButton
+        asChild
+        isActive={isActive(item.url)}
+        className="h-8 text-[13px] text-sidebar-foreground data-[active=true]:font-semibold"
+      >
         <Link to={item.url} className="flex items-center gap-3">
           <item.icon className="h-4 w-4 shrink-0" />
           {!collapsed && <span>{item.title}</span>}
@@ -57,30 +61,30 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b">
-        <div className="flex items-center gap-2 px-2 py-3">
-          <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground">
+      <SidebarHeader>
+        <div className="flex items-center gap-2.5 px-2 pt-4 pb-3">
+          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-sm bg-primary text-primary-foreground">
             <TrendingUp className="h-4 w-4" />
           </div>
           {!collapsed && (
             <div className="leading-tight">
-              <div className="text-sm font-semibold">InsightOS</div>
-              <div className="text-[11px] text-muted-foreground">Marketing Intelligence</div>
+              <div className="text-[15px] font-bold text-foreground">InsightOS</div>
+              <div className="label-caps mt-0.5">Marketing Intelligence</div>
             </div>
           )}
         </div>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>{isStaff || isAdmin ? "Principal" : "Menu do Cliente"}</SidebarGroupLabel>}
+      <SidebarContent className="px-1">
+        <SidebarGroup className="border-t border-foreground/15 pt-3">
+          {!collapsed && <SidebarGroupLabel className="label-caps">{isStaff || isAdmin ? "Principal" : "Menu do Cliente"}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>{mainItems.map(renderItem)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         {isAdmin && (
-          <SidebarGroup>
-            {!collapsed && <SidebarGroupLabel>Administração</SidebarGroupLabel>}
+          <SidebarGroup className="border-t border-foreground/15 pt-3">
+            {!collapsed && <SidebarGroupLabel className="label-caps">Administração</SidebarGroupLabel>}
             <SidebarGroupContent>
               <SidebarMenu>{adminItems.map(renderItem)}</SidebarMenu>
             </SidebarGroupContent>

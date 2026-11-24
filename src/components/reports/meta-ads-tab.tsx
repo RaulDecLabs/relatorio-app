@@ -136,21 +136,21 @@ export function MetaAdsTab({ fbAdsMetrics, activeReport }: MetaAdsTabProps) {
               <AreaChart data={data.fbAdsChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorFbSpend" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.5} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#141414" stopOpacity={0.5} />
+                    <stop offset="95%" stopColor="#141414" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="colorFbClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#8a8a84" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#8a8a84" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" strokeOpacity={0.5} />
-                <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} dy={8} tickFormatter={(val) => { const [, m, d] = val.split('-'); return `${d}/${m}`; }} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} dx={-8} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#dcdcd7" strokeOpacity={0.5} />
+                <XAxis dataKey="date" stroke="#a3a39d" fontSize={11} tickLine={false} axisLine={false} dy={8} tickFormatter={(val) => { const [, m, d] = val.split('-'); return `${d}/${m}`; }} />
+                <YAxis stroke="#a3a39d" fontSize={11} tickLine={false} axisLine={false} dx={-8} />
                 <Tooltip content={<CustomChartTooltip />} />
                 <Legend verticalAlign="top" height={36} iconType="circle" />
-                <Area type="monotone" dataKey="spend" stroke="#3b82f6" strokeWidth={2.5} name="Investimento (R$)" fillOpacity={1} fill="url(#colorFbSpend)" />
-                <Area type="monotone" dataKey="clicks" stroke="#8b5cf6" strokeWidth={2.5} name="Cliques" fillOpacity={1} fill="url(#colorFbClicks)" />
+                <Area type="monotone" dataKey="spend" stroke="#141414" strokeWidth={2.5} name="Investimento (R$)" fillOpacity={1} fill="url(#colorFbSpend)" />
+                <Area type="monotone" dataKey="clicks" stroke="#8a8a84" strokeWidth={2.5} name="Cliques" fillOpacity={1} fill="url(#colorFbClicks)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>

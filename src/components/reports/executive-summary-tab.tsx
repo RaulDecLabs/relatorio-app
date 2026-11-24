@@ -130,14 +130,14 @@ export function ExecutiveSummaryTab({
 
   if (!summaryAny || !summaryAny.summary_data) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center bg-[#f4f6fb] rounded-2xl border border-slate-200">
+      <div className="flex flex-col items-center justify-center py-24 text-center bg-[#f3f3f0] rounded-2xl border border-slate-200">
         <Brain className="w-16 h-16 text-slate-300 mb-4" />
         <h3 className="text-xl font-bold text-slate-700 mb-2">Nenhum Parecer Disponível</h3>
         <p className="text-slate-500 max-w-md mb-8">
           Ainda não há um parecer executivo gerado para este período. O motor de inteligência artificial precisa analisar os dados brutos primeiro.
         </p>
         {!isClient && (
-          <Button onClick={handleGenerate} disabled={isGenerating} size="lg" className="bg-[#1a2a5e] hover:bg-[#1a2a5e]/90 text-white shadow-lg">
+          <Button onClick={handleGenerate} disabled={isGenerating} size="lg" className="bg-[#141414] hover:bg-[#141414]/90 text-white shadow-lg">
             {isGenerating ? <RefreshCcw className="w-5 h-5 animate-spin mr-2" /> : <Brain className="w-5 h-5 mr-2" />}
             {isGenerating ? "Analisando Dados..." : "Gerar Novo Parecer com IA"}
           </Button>
@@ -246,10 +246,10 @@ export function ExecutiveSummaryTab({
       {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 1: CAPA HERO
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="relative bg-gradient-to-br from-[#0f1c42] via-[#1a2a5e] to-[#243572] rounded-2xl overflow-hidden p-10 md:p-14 shadow-2xl">
+      <div className="relative bg-gradient-to-br from-[#0e0e0d] via-[#141414] to-[#2a2a27] rounded-2xl overflow-hidden p-10 md:p-14 shadow-2xl">
         {/* Efeito de brilho decorativo */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#d32f2f]/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#b42318]/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
 
         {/* Badge + botões na mesma linha */}
         <div className="relative z-10 flex items-center justify-between mb-8 no-print">
@@ -283,7 +283,7 @@ export function ExecutiveSummaryTab({
             <span className="text-white/30">·</span>
             <span>Período: {startDateStr} a {endDateStr}</span>
             <span className="text-white/30">·</span>
-            <span className="text-[#ff6b6b] font-bold">
+            <span className="text-[#d4574d] font-bold">
               {days === "yesterday" ? "ONTEM"
                 : days === "custom" ? "PERÍODO PERSONALIZADO"
                 : days === "this_month" ? "MÊS ATUAL"
@@ -298,35 +298,35 @@ export function ExecutiveSummaryTab({
           SEÇÃO 2: SUMÁRIO EXECUTIVO E INSIGHTS
       ═══════════════════════════════════════════════════════════════ */}
       <div className="space-y-8">
-        <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Sumário Executivo</h2>
+        <h2 className="text-2xl font-bold text-[#141414] font-serif border-b pb-2 border-slate-200">Sumário Executivo</h2>
         
         {exec.headline && (
-          <p className="text-xl md:text-2xl font-light text-slate-700 italic border-l-4 border-[#d32f2f] pl-6 py-2">
+          <p className="text-xl md:text-2xl font-light text-slate-700 italic border-l-4 border-[#b42318] pl-6 py-2">
             "{exec.headline}"
           </p>
         )}
 
         <div className={`grid grid-cols-2 gap-4 ${exec.total_regions > 1 ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
-          <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(rawMetrics?.consolidated?.totalCost || 0)}</span>
+          <div className="bg-[#f3f3f0] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
+            <span className="text-3xl font-bold text-[#141414] font-serif">{fmt(rawMetrics?.consolidated?.totalCost || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Investimento Total</span>
           </div>
           {exec.total_regions > 1 && (
-            <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-              <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(exec.total_regions)}</span>
+            <div className="bg-[#f3f3f0] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
+              <span className="text-3xl font-bold text-[#141414] font-serif">{fmtNum(exec.total_regions)}</span>
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Praças Impactadas</span>
             </div>
           )}
-          <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(rawMetrics?.consolidated?.totalLeads || 0)}</span>
+          <div className="bg-[#f3f3f0] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
+            <span className="text-3xl font-bold text-[#141414] font-serif">{fmtNum(rawMetrics?.consolidated?.totalLeads || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Leads</span>
           </div>
-          <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmtNum(rawMetrics?.wonDealsLength || 0)}</span>
+          <div className="bg-[#f3f3f0] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
+            <span className="text-3xl font-bold text-[#141414] font-serif">{fmtNum(rawMetrics?.wonDealsLength || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Contratações (Nectar)</span>
           </div>
-          <div className="bg-[#f4f6fb] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
-            <span className="text-3xl font-bold text-[#1a2a5e] font-serif">{fmt(rawMetrics?.consolidated?.blendedCpa || 0)}</span>
+          <div className="bg-[#f3f3f0] p-5 rounded-lg border border-slate-200 flex flex-col items-center text-center">
+            <span className="text-3xl font-bold text-[#141414] font-serif">{fmt(rawMetrics?.consolidated?.blendedCpa || 0)}</span>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-2">Custo por Lead</span>
           </div>
         </div>
@@ -337,7 +337,7 @@ export function ExecutiveSummaryTab({
             <ul className="space-y-4">
               {insights.map((insight: string, i: number) => (
                 <li key={i} className="flex gap-4 items-start">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#d32f2f] mt-2 flex-shrink-0" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#b42318] mt-2 flex-shrink-0" />
                   <p className="text-slate-700 leading-relaxed">{insight}</p>
                 </li>
               ))}
@@ -352,7 +352,7 @@ export function ExecutiveSummaryTab({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {channelData.length > 0 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Investimento por Canal</h2>
+            <h2 className="text-2xl font-bold text-[#141414] font-serif border-b pb-2 border-slate-200">Investimento por Canal</h2>
             <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-6">
               <div className="h-[160px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -361,22 +361,22 @@ export function ExecutiveSummaryTab({
                     layout="vertical"
                     margin={{ top: 5, right: 40, left: 10, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#efefec" />
                     <XAxis type="number" hide />
                     <YAxis
                       dataKey="name"
                       type="category"
-                      stroke="#475569"
+                      stroke="#575752"
                       fontSize={12}
                       fontWeight={600}
                       tickMargin={10}
                       width={90}
                       tickLine={false}
-                      axisLine={{ stroke: '#cbd5e1' }}
+                      axisLine={{ stroke: '#cfcfc9' }}
                     />
                     <RechartsTooltip
                       cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #dcdcd7', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       formatter={(value: number) => [fmt(value), 'Investido']}
                     />
                     <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={28}>
@@ -396,8 +396,8 @@ export function ExecutiveSummaryTab({
 
         {data.regional_insight && !data.regional_insight.toLowerCase().includes("não consolidado") && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Leitura Estratégica Regional</h2>
-            <div className="bg-[#1a2a5e] text-white p-6 rounded-lg shadow-md h-full flex items-center">
+            <h2 className="text-2xl font-bold text-[#141414] font-serif border-b pb-2 border-slate-200">Leitura Estratégica Regional</h2>
+            <div className="bg-[#141414] text-white p-6 rounded-lg shadow-md h-full flex items-center">
               <p className="text-lg leading-relaxed font-light">
                 {data.regional_insight}
               </p>
@@ -411,21 +411,21 @@ export function ExecutiveSummaryTab({
       ═══════════════════════════════════════════════════════════════ */}
       {mergedChartData.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Evolução do Investimento</h2>
+          <h2 className="text-2xl font-bold text-[#141414] font-serif border-b pb-2 border-slate-200">Evolução do Investimento</h2>
           <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm space-y-4">
             <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={mergedChartData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#efefec" />
                   <XAxis
                     dataKey="date"
-                    stroke="#475569"
+                    stroke="#575752"
                     fontSize={11}
                     tickLine={false}
-                    axisLine={{ stroke: '#cbd5e1' }}
+                    axisLine={{ stroke: '#cfcfc9' }}
                   />
                   <YAxis
-                    stroke="#475569"
+                    stroke="#575752"
                     fontSize={11}
                     tickLine={false}
                     axisLine={false}
@@ -433,10 +433,10 @@ export function ExecutiveSummaryTab({
                     width={80}
                   />
                   <RechartsTooltip
-                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #dcdcd7', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     formatter={(value: number) => [fmt(value), 'Investido']}
                   />
-                  <Line type="monotone" dataKey="totalCost" stroke="#d32f2f" strokeWidth={2.5} dot={{ r: 3, fill: '#d32f2f' }} activeDot={{ r: 5 }} />
+                  <Line type="monotone" dataKey="totalCost" stroke="#b42318" strokeWidth={2.5} dot={{ r: 3, fill: '#b42318' }} activeDot={{ r: 5 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -461,7 +461,7 @@ export function ExecutiveSummaryTab({
         return (
           <div className="space-y-6 pt-10">
             <div className="border-b pb-2 border-slate-200">
-              <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Alcance por Região</h2>
+              <h2 className="text-3xl font-bold text-[#141414] font-serif mb-1">Alcance por Região</h2>
               <p className="text-slate-500 font-light">Sessões de usuários por cidade — fonte: Google Analytics 4 · {ga4Cities.length} cidades identificadas</p>
             </div>
 
@@ -475,26 +475,26 @@ export function ExecutiveSummaryTab({
                       layout="vertical"
                       margin={{ top: 5, right: 40, left: 10, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#efefec" />
                       <XAxis type="number" hide />
                       <YAxis
                         dataKey="region"
                         type="category"
-                        stroke="#475569"
+                        stroke="#575752"
                         fontSize={11}
                         tickMargin={10}
                         width={140}
                         tickLine={false}
-                        axisLine={{ stroke: '#cbd5e1' }}
+                        axisLine={{ stroke: '#cfcfc9' }}
                       />
                       <RechartsTooltip
                         cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #dcdcd7', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         formatter={(value: number) => [fmtNum(value), 'Sessões']}
                       />
-                      <Bar dataKey="sessions" fill="#1a2a5e" radius={[0, 4, 4, 0]} barSize={22}>
+                      <Bar dataKey="sessions" fill="#141414" radius={[0, 4, 4, 0]} barSize={22}>
                         {ga4Cities.map((_: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={index === 0 ? '#d32f2f' : '#1a2a5e'} />
+                          <Cell key={`cell-${index}`} fill={index === 0 ? '#b42318' : '#141414'} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -505,8 +505,8 @@ export function ExecutiveSummaryTab({
               {/* Cards laterais com insight regional da IA */}
               <div className="lg:col-span-4 flex flex-col gap-4 justify-center">
                 {topCity && (
-                  <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
-                    <div className="text-3xl font-bold text-[#d32f2f] font-serif mb-1">
+                  <div className="bg-[#f6f6f3] p-6 rounded-xl border border-slate-100">
+                    <div className="text-3xl font-bold text-[#b42318] font-serif mb-1">
                       {fmtNum(topCity.sessions)}
                     </div>
                     <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Sessões em {topCity.city}</div>
@@ -515,8 +515,8 @@ export function ExecutiveSummaryTab({
                     </p>
                   </div>
                 )}
-                <div className="bg-[#f8f9fc] p-6 rounded-xl border border-slate-100">
-                  <div className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">
+                <div className="bg-[#f6f6f3] p-6 rounded-xl border border-slate-100">
+                  <div className="text-3xl font-bold text-[#141414] font-serif mb-1">
                     {fmtNum(totalSessions)}
                   </div>
                   <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Total de Sessões</div>
@@ -525,7 +525,7 @@ export function ExecutiveSummaryTab({
                   </p>
                 </div>
                 {data.regional_insight && (
-                  <div className="bg-[#1a2a5e] p-6 rounded-xl text-white shadow-md">
+                  <div className="bg-[#141414] p-6 rounded-xl text-white shadow-md">
                     <h4 className="font-bold mb-2 text-sm">Leitura estratégica</h4>
                     <p className="text-slate-300 text-sm font-light leading-relaxed">{data.regional_insight}</p>
                   </div>
@@ -543,16 +543,16 @@ export function ExecutiveSummaryTab({
       ═══════════════════════════════════════════════════════════════ */}
       <div className="space-y-8 pt-10">
         <div className="border-b pb-2 border-slate-200">
-          <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Estratégia de Mídia Digital</h2>
+          <h2 className="text-3xl font-bold text-[#141414] font-serif mb-1">Estratégia de Mídia Digital</h2>
           <p className="text-slate-500 font-light">Como o investimento em campanhas foi operacionalizado</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {mediaStrategy.map((strategy: any, i: number) => (
-            <div key={i} className="bg-[#f8f9fc] border border-slate-100 p-8 rounded-xl relative shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-full bg-[#1a2a5e] text-white flex items-center justify-center font-bold text-xl mb-6 shadow-sm">
+            <div key={i} className="bg-[#f6f6f3] border border-slate-100 p-8 rounded-xl relative shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 rounded-full bg-[#141414] text-white flex items-center justify-center font-bold text-xl mb-6 shadow-sm">
                 {strategy.number || (i + 1)}
               </div>
-              <h4 className="font-bold text-[#1a2a5e] text-lg mb-3">{strategy.title}</h4>
+              <h4 className="font-bold text-[#141414] text-lg mb-3">{strategy.title}</h4>
               <p className="text-slate-600 text-sm leading-relaxed mb-4">{strategy.data_highlight}</p>
               <p className="text-slate-500 text-sm font-light leading-relaxed">{strategy.description}</p>
             </div>
@@ -565,7 +565,7 @@ export function ExecutiveSummaryTab({
       ═══════════════════════════════════════════════════════════════ */}
       <div className="space-y-6 pt-10">
         <div className="border-b pb-2 border-slate-200">
-          <h2 className="text-3xl font-bold text-[#1a2a5e] font-serif mb-1">Resultados do Impulsionamento</h2>
+          <h2 className="text-3xl font-bold text-[#141414] font-serif mb-1">Resultados do Impulsionamento</h2>
           <p className="text-slate-500 font-light">Cliques, impressões e leads — amostra das principais campanhas</p>
         </div>
         
@@ -578,18 +578,18 @@ export function ExecutiveSummaryTab({
           
           return (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
-                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(totalClicks)}</div>
+              <div className="bg-[#f3f3f0] p-6 rounded-xl border border-slate-100">
+                <div className="text-4xl font-bold text-[#141414] font-serif mb-2">{fmtNum(totalClicks)}</div>
                 <div className="font-bold text-slate-700 mb-1">Cliques no link</div>
                 <div className="text-xs text-slate-500">{fmt(totalCost)} investidos • CPC médio {fmt(totalClicks > 0 ? totalCost / totalClicks : 0)}</div>
               </div>
-              <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
-                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(totalImps)}</div>
+              <div className="bg-[#f3f3f0] p-6 rounded-xl border border-slate-100">
+                <div className="text-4xl font-bold text-[#141414] font-serif mb-2">{fmtNum(totalImps)}</div>
                 <div className="font-bold text-slate-700 mb-1">Visualizações / Impressões</div>
                 <div className="text-xs text-slate-500">{fmt(totalCost)} investidos • CPM médio {fmt(totalImps > 0 ? (totalCost / totalImps) * 1000 : 0)}</div>
               </div>
-              <div className="bg-[#f4f6fb] p-6 rounded-xl border border-slate-100">
-                <div className="text-4xl font-bold text-[#1a2a5e] font-serif mb-2">{fmtNum(totalLeads)}</div>
+              <div className="bg-[#f3f3f0] p-6 rounded-xl border border-slate-100">
+                <div className="text-4xl font-bold text-[#141414] font-serif mb-2">{fmtNum(totalLeads)}</div>
                 <div className="font-bold text-slate-700 mb-1">Leads gerados</div>
                 <div className="text-xs text-slate-500">{fmt(totalCost)} investidos • CPL médio {fmt(totalLeads > 0 ? totalCost / totalLeads : 0)}</div>
               </div>
@@ -599,7 +599,7 @@ export function ExecutiveSummaryTab({
 
         <div className="overflow-hidden rounded-lg border border-slate-200 shadow-sm">
           <table className="w-full text-sm text-left">
-            <thead className="bg-[#1a2a5e] text-white font-bold text-xs tracking-wider">
+            <thead className="bg-[#141414] text-white font-bold text-xs tracking-wider">
               <tr>
                 <th className="px-4 py-4">Conjunto de anúncios / Região</th>
                 <th className="px-4 py-4">Canal</th>
@@ -625,7 +625,7 @@ export function ExecutiveSummaryTab({
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-600">{metricName}</td>
-                    <td className="px-4 py-3 text-right font-bold text-[#1a2a5e]">{fmtNum(resultVal)}</td>
+                    <td className="px-4 py-3 text-right font-bold text-[#141414]">{fmtNum(resultVal)}</td>
                     <td className="px-4 py-3 text-right text-slate-500">{fmt(costPer)}</td>
                     <td className="px-4 py-3 text-right text-slate-500">{fmt(c.cost)}</td>
                   </tr>
@@ -642,7 +642,7 @@ export function ExecutiveSummaryTab({
         </div>
         
         {attentionPoint && (
-          <div className="bg-[#fcf8f8] border-l-4 border-red-600 p-4 rounded-r-lg mt-4 text-sm text-slate-700">
+          <div className="bg-[#f8f8f6] border-l-4 border-red-600 p-4 rounded-r-lg mt-4 text-sm text-slate-700">
             <span className="font-bold text-red-700">Ponto de atenção:</span> {attentionPoint}
           </div>
         )}
@@ -651,25 +651,25 @@ export function ExecutiveSummaryTab({
       {/* ══════════════════════════════════════════════════════════════
           SEÇÃO 9: IMPACTO PARA O NEGÓCIO
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="bg-[#1e2a53] -mx-8 px-8 py-12 rounded-xl text-white space-y-8 my-10 shadow-inner">
+      <div className="bg-[#1f1f1c] -mx-8 px-8 py-12 rounded-xl text-white space-y-8 my-10 shadow-inner">
         <div>
           <h2 className="text-3xl font-bold font-serif mb-2">Impacto para o Negócio</h2>
-          <p className="text-[#a0aeca] font-light">
+          <p className="text-[#a3a39d] font-light">
             Ganhos qualitativos da estratégia de divulgação para a marca empregadora {activeReport?.name}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {businessImpact.map((impact: any, i: number) => (
-            <div key={i} className="bg-[#151d3b] p-8 rounded-lg relative overflow-hidden group border border-[#2a3867]">
+            <div key={i} className="bg-[#171716] p-8 rounded-lg relative overflow-hidden group border border-[#3d3d39]">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-bl-full transition-transform group-hover:scale-110" />
               
               <div className="flex items-start gap-5 relative z-10">
-                <div className="w-12 h-12 rounded-full bg-[#d32f2f] text-white flex items-center justify-center font-black flex-shrink-0 text-xl shadow-lg">
+                <div className="w-12 h-12 rounded-full bg-[#b42318] text-white flex items-center justify-center font-black flex-shrink-0 text-xl shadow-lg">
                   {i + 1}
                 </div>
                 <div>
                   <h4 className="font-bold text-lg mb-3 text-white">{impact.title}</h4>
-                  <p className="text-[#a0aeca] text-sm leading-relaxed">{impact.description}</p>
+                  <p className="text-[#a3a39d] text-sm leading-relaxed">{impact.description}</p>
                 </div>
               </div>
             </div>
@@ -681,7 +681,7 @@ export function ExecutiveSummaryTab({
           SEÇÃO 10: PRÓXIMOS PASSOS
       ═══════════════════════════════════════════════════════════════ */}
       <div className="space-y-6 pt-6">
-        <h2 className="text-2xl font-bold text-[#1a2a5e] font-serif border-b pb-2 border-slate-200">Próximos Passos Recomendados</h2>
+        <h2 className="text-2xl font-bold text-[#141414] font-serif border-b pb-2 border-slate-200">Próximos Passos Recomendados</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {nextSteps.map((step: any, i: number) => (
             <div key={i} className="flex gap-4 items-start">
@@ -689,7 +689,7 @@ export function ExecutiveSummaryTab({
                 {String(i + 1).padStart(2, '0')}
               </div>
               <div>
-                <h4 className="font-bold text-[#1a2a5e] mb-1">{step.title}</h4>
+                <h4 className="font-bold text-[#141414] mb-1">{step.title}</h4>
                 <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
               </div>
             </div>

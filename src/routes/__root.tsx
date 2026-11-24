@@ -73,7 +73,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "InsightOS — Growth & Performance Intelligence" },
       { name: "description", content: "Centro de gestão e análise avançada para campanhas de Growth Marketing." },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" },
+      { rel: "stylesheet", href: appCss },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

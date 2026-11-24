@@ -816,7 +816,7 @@ function ReportsPage() {
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "traffic" 
-                  ? "border-primary text-primary bg-primary/5" 
+                  ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
               onClick={() => setActiveTab("traffic")}
@@ -828,7 +828,7 @@ function ReportsPage() {
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "ads" 
-                  ? "border-primary text-primary bg-primary/5" 
+                  ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
               onClick={() => setActiveTab("ads")}
@@ -840,7 +840,7 @@ function ReportsPage() {
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "fb_ads" 
-                  ? "border-primary text-primary bg-primary/5" 
+                  ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
               onClick={() => setActiveTab("fb_ads")}
@@ -852,7 +852,7 @@ function ReportsPage() {
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "gsc" 
-                  ? "border-primary text-primary bg-primary/5" 
+                  ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
               onClick={() => setActiveTab("gsc")}
@@ -864,7 +864,7 @@ function ReportsPage() {
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "nectar" 
-                  ? "border-primary text-primary bg-primary/5" 
+                  ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
               onClick={() => setActiveTab("nectar")}
@@ -876,7 +876,7 @@ function ReportsPage() {
               className={cn(
                 "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
                 activeTab === "sheets" 
-                  ? "border-primary text-primary bg-primary/5" 
+                  ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
               onClick={() => setActiveTab("sheets")}

@@ -146,7 +146,7 @@ export function NectarCrmTab({ activeReport, startDateStr, endDateStr, deals = [
     }
   };
 
-  const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981'];
+  const COLORS = ['#141414', '#8a8a84', '#5c5c57', '#b42318', '#d8c234', '#a8c935'];
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

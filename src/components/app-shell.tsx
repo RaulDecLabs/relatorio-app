@@ -10,7 +10,7 @@ export function AppShell({ title, children }: { title?: string; children: ReactN
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           <AppTopbar title={title} />
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 px-6 py-8 lg:px-10">{children}</main>
         </div>
       </div>
     </SidebarProvider>
