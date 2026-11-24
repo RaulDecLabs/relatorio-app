@@ -810,11 +810,11 @@ function ReportsPage() {
       {activeReport ? (
         <div className="space-y-6">
           {/* Tabs Selector */}
-          <div className="flex border-b border-border/60 mb-6 gap-2 overflow-x-auto">
+          <div className="flex border-b border-foreground/15 mb-6 gap-2 overflow-x-auto overflow-y-hidden">
             <Button
               variant="ghost"
               className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 transition-all whitespace-nowrap hover:bg-transparent",
                 activeTab === "traffic" 
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -826,7 +826,7 @@ function ReportsPage() {
             <Button
               variant="ghost"
               className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 transition-all whitespace-nowrap hover:bg-transparent",
                 activeTab === "ads" 
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -838,7 +838,7 @@ function ReportsPage() {
             <Button
               variant="ghost"
               className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 transition-all whitespace-nowrap hover:bg-transparent",
                 activeTab === "fb_ads" 
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -850,7 +850,7 @@ function ReportsPage() {
             <Button
               variant="ghost"
               className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 transition-all whitespace-nowrap hover:bg-transparent",
                 activeTab === "gsc" 
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -862,7 +862,7 @@ function ReportsPage() {
             <Button
               variant="ghost"
               className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 transition-all whitespace-nowrap hover:bg-transparent",
                 activeTab === "nectar" 
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -874,7 +874,7 @@ function ReportsPage() {
             <Button
               variant="ghost"
               className={cn(
-                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 -mb-[2px] transition-all whitespace-nowrap",
+                "px-4 py-2 text-sm font-semibold rounded-none border-b-2 transition-all whitespace-nowrap hover:bg-transparent",
                 activeTab === "sheets" 
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"

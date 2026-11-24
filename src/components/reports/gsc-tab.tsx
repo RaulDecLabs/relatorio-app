@@ -148,7 +148,7 @@ export function GscTab({ gscMetrics, activeReport }: GscTabProps) {
               <AreaChart data={data.gscChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorGscClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#141414" stopOpacity={0.3}/>
+                    <stop offset="5%" stopColor="#141414" stopOpacity={0.08}/>
                     <stop offset="95%" stopColor="#141414" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorGscImp" x1="0" y1="0" x2="0" y2="1">

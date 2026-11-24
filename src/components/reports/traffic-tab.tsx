@@ -196,8 +196,8 @@ export function TrafficTab({ metrics, activeReport }: TrafficTabProps) {
               <AreaChart data={data.chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorSessions" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#141414" stopOpacity={0.5} />
-                    <stop offset="95%" stopColor="#141414" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#141414" stopOpacity={0.08} />
+                    <stop offset="95%" stopColor="#141414" stopOpacity={0.08} />
                   </linearGradient>
                   <linearGradient id="colorPageViews" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#a8c935" stopOpacity={0.35} />

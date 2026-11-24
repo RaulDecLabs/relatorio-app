@@ -155,8 +155,8 @@ export function GoogleAdsTab({ adsMetrics, activeReport }: GoogleAdsTabProps) {
               <AreaChart data={data.adsChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#141414" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#141414" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#141414" stopOpacity={0.08} />
+                    <stop offset="95%" stopColor="#141414" stopOpacity={0.08} />
                   </linearGradient>
                   <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#a8c935" stopOpacity={0.35} />
