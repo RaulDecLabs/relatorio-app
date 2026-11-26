@@ -374,6 +374,7 @@ export type Database = {
           rd_access_token: string | null
           rd_refresh_token: string | null
           nectar_api_token: string | null
+          crm_workspace_suffix: string | null
           id: string
           name: string
           table_name: string
@@ -395,6 +396,7 @@ export type Database = {
           rd_access_token?: string | null
           rd_refresh_token?: string | null
           nectar_api_token?: string | null
+          crm_workspace_suffix?: string | null
           id?: string
           name: string
           table_name: string
@@ -416,6 +418,7 @@ export type Database = {
           rd_access_token?: string | null
           rd_refresh_token?: string | null
           nectar_api_token?: string | null
+          crm_workspace_suffix?: string | null
           id?: string
           name?: string
           table_name?: string
@@ -450,6 +453,88 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "executive_summaries_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_declabs_leads: {
+        Row: {
+          report_id: string
+          lead_id: string
+          data_criacao: string | null
+          origem: string | null
+          estagio_funil: string | null
+          status: string | null
+          valor_estimado: number
+          atualizado_em: string
+        }
+        Insert: {
+          report_id: string
+          lead_id: string
+          data_criacao?: string | null
+          origem?: string | null
+          estagio_funil?: string | null
+          status?: string | null
+          valor_estimado?: number
+          atualizado_em?: string
+        }
+        Update: {
+          report_id?: string
+          lead_id?: string
+          data_criacao?: string | null
+          origem?: string | null
+          estagio_funil?: string | null
+          status?: string | null
+          valor_estimado?: number
+          atualizado_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_declabs_leads_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_declabs_ml_pedidos: {
+        Row: {
+          report_id: string
+          pedido_id: string
+          data_venda: string
+          produto: string | null
+          valor_venda: number
+          valor_liquido: number
+          situacao: string
+          atualizado_em: string
+        }
+        Insert: {
+          report_id: string
+          pedido_id: string
+          data_venda: string
+          produto?: string | null
+          valor_venda?: number
+          valor_liquido?: number
+          situacao: string
+          atualizado_em?: string
+        }
+        Update: {
+          report_id?: string
+          pedido_id?: string
+          data_venda?: string
+          produto?: string | null
+          valor_venda?: number
+          valor_liquido?: number
+          situacao?: string
+          atualizado_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_declabs_ml_pedidos_report_id_fkey"
             columns: ["report_id"]
             isOneToOne: false
             referencedRelation: "reports_config"

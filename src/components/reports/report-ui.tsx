@@ -21,6 +21,8 @@ export interface ReportConfig {
   rd_access_token?: string | null;
   rd_refresh_token?: string | null;
   nectar_api_token?: string | null;
+  /** Workspace do CRM DecLabs que alimenta a aba de CRM (ex. 'alphaz'). Vazio = usa o Nectar. */
+  crm_workspace_suffix?: string | null;
   created_at: string;
 }
 

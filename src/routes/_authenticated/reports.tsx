@@ -30,6 +30,7 @@ import { MetaAdsTab } from "@/components/reports/meta-ads-tab";
 import { GscTab } from "@/components/reports/gsc-tab";
 import { SheetsTab } from "@/components/reports/sheets-tab";
 import { NectarCrmTab } from "@/components/reports/nectar-crm-tab";
+import { CrmDeclabsTab, type CrmLead, type CrmPedido } from "@/components/reports/crm-declabs-tab";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
@@ -360,6 +361,27 @@ function ReportsPage() {
     },
   });
 
+  // 3.10 CRM DecLabs (CRM próprio): leads e pedidos do Mercado Livre copiados pelo importador Python.
+  // O filtro de período é feito na aba, porque o funil mostra o estado atual de todos os leads.
+  const usaCrmDeclabs = !!activeReport?.crm_workspace_suffix;
+  const { data: crmData = { leads: [] as CrmLead[], pedidos: [] as CrmPedido[] }, isLoading: isLoadingCrm } = useQuery({
+    queryKey: ["crm-declabs", activeReport?.id],
+    enabled: !!activeReport?.id && usaCrmDeclabs,
+    queryFn: async () => {
+      const [leadsRes, pedidosRes] = await Promise.all([
+        supabase.from("crm_declabs_leads").select("*").eq("report_id", activeReport.id).limit(10000),
+        supabase.from("crm_declabs_ml_pedidos").select("*").eq("report_id", activeReport.id)
+          .order("data_venda", { ascending: false }).limit(10000),
+      ]);
+      if (leadsRes.error) console.warn("Erro ao carregar leads do CRM DecLabs:", leadsRes.error.message);
+      if (pedidosRes.error) console.warn("Erro ao carregar pedidos do CRM DecLabs:", pedidosRes.error.message);
+      return {
+        leads: (leadsRes.data || []) as CrmLead[],
+        pedidos: (pedidosRes.data || []) as CrmPedido[],
+      };
+    },
+  });
+
   // 4. Mutation to create report config mapping & dynamic tables (GA4, Ads, FB Ads, and GSC)
   const createReportMutation = useMutation({
     mutationFn: async ({ 
@@ -482,7 +504,7 @@ function ReportsPage() {
     });
   };
 
-  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics || isLoadingNectarDeals;
+  const isLoading = isLoadingConfigs || isLoadingMetrics || isLoadingAdsMetrics || isLoadingFbAdsMetrics || isLoadingGscMetrics || isLoadingNectarDeals || isLoadingCrm;
 
   return (
     <AppShell title="Relatórios">
@@ -869,7 +891,7 @@ function ReportsPage() {
               )}
               onClick={() => setActiveTab("nectar")}
             >
-              Nectar CRM
+              {usaCrmDeclabs ? "CRM DecLabs" : "Nectar CRM"}
             </Button>
             <Button
               variant="ghost"
@@ -904,12 +926,22 @@ function ReportsPage() {
 
           {activeTab === "nectar" && (
             <div className="mt-6 animate-in fade-in duration-500">
-              <NectarCrmTab 
-                activeReport={activeReport} 
-                startDateStr={startDateStr} 
-                endDateStr={endDateStr} 
-                deals={nectarDeals}
-              />
+              {usaCrmDeclabs ? (
+                <CrmDeclabsTab
+                  activeReport={activeReport}
+                  startDateStr={startDateStr}
+                  endDateStr={endDateStr}
+                  leads={crmData.leads}
+                  pedidos={crmData.pedidos}
+                />
+              ) : (
+                <NectarCrmTab
+                  activeReport={activeReport}
+                  startDateStr={startDateStr}
+                  endDateStr={endDateStr}
+                  deals={nectarDeals}
+                />
+              )}
             </div>
           )}
 

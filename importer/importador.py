@@ -14,12 +14,14 @@ Uso:
   python importador.py --days 7          # roda uma vez (ultimos 7 dias)
   python importador.py --loop            # fica rodando, 1x por dia em RUN_AT_HOUR
   python importador.py --days 30 --only ga4,gsc
+  python importador.py --only crm         # so o CRM DecLabs (leads + Mercado Livre)
 
 Variaveis de ambiente:
   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
   GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_LOGIN_CUSTOMER_ID
   META_ACCESS_TOKEN (opcional; sem ele o Meta e ignorado)
+  CRM_SUPABASE_URL, CRM_SUPABASE_SERVICE_KEY (CRM DecLabs; sem eles o CRM e ignorado)
   PYTHON_IMPORT_CLIENTS (padrao "Alphaz"), IMPORT_DAYS (padrao 3),
   RUN_AT_HOUR (padrao 6, horario de Brasilia)
 """
@@ -397,9 +399,90 @@ def import_meta(sb: Supabase, cfg: dict, start: str, end: str) -> int:
     return len(rows)
 
 
+# ------------------------------------------------------------- crm declabs
+
+# So colunas sem dado pessoal: nome, telefone, e-mail e CPF ficam no CRM.
+CRM_LEAD_COLS = "id,data_criacao,origem,estagio_funil,status,valor_estimado"
+CRM_PEDIDO_COLS = "pedido_id,data_venda,produto,valor_venda,valor_liquido,situacao"
+
+
+def _crm_select_all(base: str, key: str, path: str) -> list[dict]:
+    """Le todas as linhas de uma tabela do CRM (PostgREST), paginando pelo header Range."""
+    out, start, page = [], 0, 1000
+    headers = {"apikey": key, "Authorization": f"Bearer {key}"}
+    while True:
+        r = requests.get(f"{base}/rest/v1/{path}", headers={**headers, "Range": f"{start}-{start + page - 1}"},
+                         timeout=HTTP_TIMEOUT)
+        if r.status_code not in (200, 206):
+            raise RuntimeError(f"CRM {path.split('?')[0]}: {r.status_code} {r.text[:500]}")
+        rows = r.json()
+        out.extend(rows)
+        if len(rows) < page:
+            return out
+        start += page
+
+
+def import_crm(sb: Supabase, cfg: dict) -> int:
+    suffix = str(cfg.get("crm_workspace_suffix") or "").strip()
+    if not suffix:
+        log("   CRM DecLabs: sem crm_workspace_suffix, pulando.")
+        return 0
+    base = (env("CRM_SUPABASE_URL") or "").rstrip("/")
+    key = env("CRM_SUPABASE_SERVICE_KEY")
+    if not base or not key:
+        log("   CRM DecLabs: CRM_SUPABASE_URL / CRM_SUPABASE_SERVICE_KEY nao definidos, pulando.")
+        return 0
+
+    # Leads: foto atual do funil inteiro (etapas mudam, entao reescreve tudo a cada rodada).
+    leads = _crm_select_all(base, key, f"{quote(suffix)}_leads_clients?select={CRM_LEAD_COLS}&order=id")
+    lead_rows = [{
+        "report_id": cfg["id"],
+        "lead_id": str(l["id"]),
+        "data_criacao": l.get("data_criacao"),
+        "origem": (l.get("origem") or "").strip() or None,
+        "estagio_funil": l.get("estagio_funil") or "prospeccao",
+        "status": l.get("status"),
+        "valor_estimado": round(float(l.get("valor_estimado") or 0), 2),
+        "atualizado_em": datetime.now(timezone.utc).isoformat(),
+    } for l in leads]
+    if lead_rows:
+        sb.upsert("crm_declabs_leads", lead_rows, "report_id,lead_id")
+    # Lead apagado no CRM sai do relatorio tambem.
+    ids_crm = {r["lead_id"] for r in lead_rows}
+    no_relatorio = sb.select("crm_declabs_leads", f"select=lead_id&report_id=eq.{cfg['id']}")
+    sobrando = [r["lead_id"] for r in no_relatorio if r["lead_id"] not in ids_crm]
+    for lead_id in sobrando:
+        r = sb.session.delete(f"{sb.base}/crm_declabs_leads",
+                              params={"report_id": f"eq.{cfg['id']}", "lead_id": f"eq.{lead_id}"},
+                              timeout=HTTP_TIMEOUT)
+        if r.status_code >= 300:
+            raise RuntimeError(f"Supabase delete crm_declabs_leads: {r.status_code} {r.text[:300]}")
+
+    # Pedidos do Mercado Livre deste workspace.
+    pedidos = _crm_select_all(
+        base, key,
+        f"mercadolivre_pedidos?select={CRM_PEDIDO_COLS}&workspace_suffix=eq.{quote(suffix)}&order=pedido_id")
+    ped_rows = [{
+        "report_id": cfg["id"],
+        "pedido_id": str(p["pedido_id"]),
+        "data_venda": p["data_venda"],
+        "produto": p.get("produto"),
+        "valor_venda": round(float(p.get("valor_venda") or 0), 2),
+        "valor_liquido": round(float(p.get("valor_liquido") or 0), 2),
+        "situacao": p.get("situacao") or "pendente",
+        "atualizado_em": datetime.now(timezone.utc).isoformat(),
+    } for p in pedidos]
+    if ped_rows:
+        sb.upsert("crm_declabs_ml_pedidos", ped_rows, "report_id,pedido_id")
+
+    log(f"   CRM DecLabs ({suffix}): {len(lead_rows)} leads ({len(sobrando)} removidos), "
+        f"{len(ped_rows)} pedidos do Mercado Livre")
+    return len(lead_rows) + len(ped_rows)
+
+
 # -------------------------------------------------------------------- main
 
-SOURCES = ("ads", "ga4", "gsc", "meta")
+SOURCES = ("ads", "ga4", "gsc", "meta", "crm")
 
 
 def run_once(days: int, only: set[str]) -> bool:
@@ -425,6 +508,7 @@ def run_once(days: int, only: set[str]) -> bool:
             "ga4": lambda: import_ga4(sb, cfg, token, start, end),
             "gsc": lambda: import_gsc(sb, cfg, token, start, end),
             "meta": lambda: import_meta(sb, cfg, start, end),
+            "crm": lambda: import_crm(sb, cfg),
         }
         for name in SOURCES:
             if name not in only:
