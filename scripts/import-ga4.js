@@ -28,6 +28,9 @@ function loadEnv() {
 
 loadEnv();
 
+// Clientes importados pelo importador Python (importer/importador.py) e nao pelo n8n.
+const PYTHON_CLIENTS = (process.env.PYTHON_IMPORT_CLIENTS ?? 'Alphaz')
+  .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
 function cleanEnv(val, fallback = undefined) {
   if (!val || typeof val !== 'string') return fallback;
   const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
@@ -37,7 +40,6 @@ function cleanEnv(val, fallback = undefined) {
 const defaultUrl = 'https://btdgetidtawjtqrvzybh.supabase.co';
 const SUPABASE_URL = cleanEnv(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, defaultUrl);
 const SUPABASE_SERVICE_ROLE_KEY = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
-const GA_PROPERTY_ID = cleanEnv(process.env.GA_PROPERTY_ID);
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não definidos no arquivo .env.');
@@ -105,7 +107,11 @@ async function runImport() {
     }
 
     for (const config of configs) {
-      const clientPropertyId = config.ga4_property_id || GA_PROPERTY_ID;
+      if (PYTHON_CLIENTS.includes(String(config.name || '').toLowerCase())) {
+        console.log(`[Info] '${config.name}' e importado pelo importador Python. Pulando...`);
+        continue;
+      }
+      const clientPropertyId = config.ga4_property_id;
       if (!clientPropertyId || clientPropertyId === 'SEU_PROPERTY_ID_AQUI') {
         console.warn(`[Aviso] Cliente '${config.name}' não possui ga4_property_id configurado. Pulando...`);
         continue;

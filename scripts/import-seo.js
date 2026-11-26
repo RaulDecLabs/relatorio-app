@@ -25,6 +25,9 @@ function loadEnv() {
 
 loadEnv();
 
+// Clientes importados pelo importador Python (importer/importador.py) e nao pelo n8n.
+const PYTHON_CLIENTS = (process.env.PYTHON_IMPORT_CLIENTS ?? 'Alphaz')
+  .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
 function cleanEnv(val, fallback = undefined) {
   if (!val || typeof val !== 'string') return fallback;
   const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
@@ -37,7 +40,6 @@ const SUPABASE_SERVICE_ROLE_KEY = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY
 const CLIENT_ID = cleanEnv(process.env.GOOGLE_CLIENT_ID);
 const CLIENT_SECRET = cleanEnv(process.env.GOOGLE_CLIENT_SECRET);
 const REFRESH_TOKEN = cleanEnv(process.env.GOOGLE_REFRESH_TOKEN);
-const DEFAULT_SITE_URL = cleanEnv(process.env.GSC_SITE_URL, 'sc-domain:multiperfil.com.br');
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não definidos no .env.');
@@ -110,7 +112,15 @@ async function runImport() {
     }
 
     for (const config of configs) {
-      const siteUrl = config.gsc_site_url || DEFAULT_SITE_URL;
+      if (PYTHON_CLIENTS.includes(String(config.name || '').toLowerCase())) {
+        console.log(`[Info] '${config.name}' e importado pelo importador Python. Pulando...`);
+        continue;
+      }
+      const siteUrl = (config.gsc_url || config.gsc_site_url || '').trim();
+      if (!siteUrl) {
+        console.warn(`[Aviso] Cliente '${config.name}' não possui gsc_url configurado. Pulando...`);
+        continue;
+      }
       const tableName = config.gsc_table_name || config.seo_table_name || 'Dec_google_search_console_metrics';
 
       console.log(`\nProcessando cliente: ${config.name} (Site: ${siteUrl})`);

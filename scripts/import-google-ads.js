@@ -25,6 +25,9 @@ function loadEnv() {
 
 loadEnv();
 
+// Clientes importados pelo importador Python (importer/importador.py) e nao pelo n8n.
+const PYTHON_CLIENTS = (process.env.PYTHON_IMPORT_CLIENTS ?? 'Alphaz')
+  .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
 function cleanEnv(val, fallback = undefined) {
   if (!val || typeof val !== 'string') return fallback;
   const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
@@ -38,7 +41,6 @@ const CLIENT_ID = cleanEnv(process.env.GOOGLE_CLIENT_ID);
 const CLIENT_SECRET = cleanEnv(process.env.GOOGLE_CLIENT_SECRET);
 const REFRESH_TOKEN = cleanEnv(process.env.GOOGLE_REFRESH_TOKEN);
 const DEVELOPER_TOKEN = cleanEnv(process.env.GOOGLE_ADS_DEVELOPER_TOKEN, 'jDZOXu1IwUTlveZ6s4n_-w');
-const DEFAULT_CUSTOMER_ID = cleanEnv(process.env.GOOGLE_ADS_CUSTOMER_ID, '2906359264');
 const LOGIN_CUSTOMER_ID = cleanEnv(process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID, '3235757447');
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
@@ -112,7 +114,16 @@ async function runImport() {
     }
 
     for (const config of configs) {
-      const customerId = (config.google_ads_customer_id || DEFAULT_CUSTOMER_ID).replace(/-/g, '');
+      if (PYTHON_CLIENTS.includes(String(config.name || '').toLowerCase())) {
+        console.log(`[Info] '${config.name}' e importado pelo importador Python. Pulando...`);
+        continue;
+      }
+      const rawCustomerId = config.google_ads_id || config.google_ads_customer_id;
+      if (!rawCustomerId) {
+        console.warn(`[Aviso] Cliente '${config.name}' não possui google_ads_id configurado. Pulando...`);
+        continue;
+      }
+      const customerId = String(rawCustomerId).replace(/-/g, '').trim();
       const tableName = config.ads_table_name || 'Dec_google_ads_metrics';
 
       console.log(`\nProcessando cliente: ${config.name} (Customer ID: ${customerId})`);

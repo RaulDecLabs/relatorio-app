@@ -25,6 +25,9 @@ function loadEnv() {
 
 loadEnv();
 
+// Clientes importados pelo importador Python (importer/importador.py) e nao pelo n8n.
+const PYTHON_CLIENTS = (process.env.PYTHON_IMPORT_CLIENTS ?? 'Alphaz')
+  .split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
 function cleanEnv(val, fallback = undefined) {
   if (!val || typeof val !== 'string') return fallback;
   const cleaned = val.trim().replace(/^['"\s`]+|['"\s`]+$/g, '');
@@ -35,7 +38,6 @@ const defaultUrl = 'https://btdgetidtawjtqrvzybh.supabase.co';
 const SUPABASE_URL = cleanEnv(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, defaultUrl);
 const SUPABASE_SERVICE_ROLE_KEY = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
 const META_ACCESS_TOKEN = cleanEnv(process.env.META_ACCESS_TOKEN);
-const DEFAULT_ACCOUNT_ID = cleanEnv(process.env.META_ACCOUNT_ID, 'act_1306814463495766');
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('ERRO: SUPABASE_URL ou SUPABASE_SERVICE_ROLE_KEY não definidos no .env.');
@@ -84,7 +86,15 @@ async function runImport() {
     }
 
     for (const config of configs) {
-      const accountId = config.meta_account_id || config.fb_account_id || DEFAULT_ACCOUNT_ID;
+      if (PYTHON_CLIENTS.includes(String(config.name || '').toLowerCase())) {
+        console.log(`[Info] '${config.name}' e importado pelo importador Python. Pulando...`);
+        continue;
+      }
+      const accountId = (config.meta_ads_id || config.meta_account_id || config.fb_account_id || '').trim();
+      if (!accountId) {
+        console.warn(`[Aviso] Cliente '${config.name}' não possui meta_ads_id configurado. Pulando...`);
+        continue;
+      }
       const tableName = config.fb_ads_table_name || config.meta_table_name || (config.name === 'Alphaz' ? 'Alphaz_facebook_ads_metrics' : 'Dec_facebook_ads_metrics');
 
       console.log(`\nProcessando cliente: ${config.name} (Conta Meta: ${accountId})`);
